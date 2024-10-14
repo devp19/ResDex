@@ -34,7 +34,29 @@ const Home = () => {
                 </div>
            </div>
         </div>
-       
+
+        <div className='bottom-container'>
+          <div className='row mt-4 justify-content-center'>
+            <div className='col-md-3 mx-3'>
+              <div className='column-content'>
+                <h3>Credentials</h3>
+                <p>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
+              </div>
+            </div>
+            <div className='col-md-3 mx-3'>
+              <div className='column-content'>
+                <h3>Connect</h3>
+                <p>ResDex connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
+              </div>
+            </div>
+            <div className='col-md-3 mx-3'>
+              <div className='column-content'>
+                <h3>Peer Review</h3>
+                <p>ResDex enables constructive peer review, helping students refine their research and enhance their academic skills.</p>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   );
 };

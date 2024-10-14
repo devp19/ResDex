@@ -127,3 +127,30 @@ code {
 .nav-item:hover {
   background-color: black;
 }
+.bottom-container {
+  display: flex;
+  height: 50vh;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: none;
+  border-top: 4px solid white;
+}
+
+.column-content {
+  padding: 15px; 
+  background-color: transparent;
+  border: none;
+  border-top: 4px solid white;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.column-content h3 {
+  margin-top: 0px;
+}
+
+.column-content p {
+  margin-top: 10px;
+}
+
