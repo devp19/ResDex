@@ -27,7 +27,7 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 90vh;
   width: 100%;
   background: none;
 }
@@ -82,4 +82,48 @@ code {
 #headline-img:hover{
   transform: rotateY(360deg); /* Spins the image 360 degrees */
 
+}
+
+#navbar-logo{
+
+  height: 40px;
+}
+
+
+
+.nav-item {
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 15px;
+  transition: background-color 0.5s;
+}
+
+.navbar-nav .nav-link {
+  color: white; /* Base color for nav links */
+  position: relative;
+  transition: color 0.5s;
+}
+
+.navbar-nav .nav-link.active {
+  color: white; /* Keep active link color white */
+}
+
+.navbar-nav .nav-link::before {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background-color: white;
+  transition: width 0.5s;
+}
+
+.navbar-nav .nav-link:hover::before,
+.navbar-nav .nav-link.active::before {
+  width: 100%;
+}
+
+.nav-item:hover {
+  background-color: black;
 }

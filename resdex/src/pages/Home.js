@@ -2,6 +2,7 @@
 import React from 'react';
 import Headline from '../images/headline.png';
 
+
 const Home = () => {
   return (
     <div className='background'>
