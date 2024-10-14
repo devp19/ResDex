@@ -27,7 +27,7 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90vh;
+  height: 70vh;
   width: 100%;
   background: none;
 }
@@ -59,10 +59,14 @@ code {
 
 #headline-img{
   height: auto;
-  max-height: 500px;
+  max-height: 400px;
   border-radius: 50px;
   transition: 2s ease-out;
   transform-style: preserve-3d; /* Enables 3D transform effects */
+}
+
+.spacer {
+  height: 30vh;
 }
 
 .col-center {
@@ -76,12 +80,6 @@ code {
 }
 .smaller-text {
   font-size: 10px;
-}
-
-
-#headline-img:hover{
-  transform: rotateY(360deg); /* Spins the image 360 degrees */
-
 }
 
 #navbar-logo{
@@ -130,6 +128,7 @@ code {
 .bottom-container {
   display: flex;
   height: 50vh;
+  margin-top: 15vh;
   align-items: center;
   justify-content: center;
   width: 100%;
