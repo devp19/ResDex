@@ -6,6 +6,8 @@ import Navbar from './pages/Navbar'; // Updated import path to 'components'
 import News from './pages/News';
 import Login from './pages/Login';
 import Footer from './pages/Footer';
+import Team from './pages/Team';
+import Contact from './pages/Contact';
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -41,6 +43,8 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/news" element={<News />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/contact" element={<Contact />} />
             </Routes>
             <Footer />
           </>

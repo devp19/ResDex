@@ -201,3 +201,8 @@ code {
 .left {
   margin-left: 30px;
 }
+
+.link {
+  text-decoration: none;
+  color: white;
+}

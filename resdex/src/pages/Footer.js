@@ -11,16 +11,25 @@ const Footer = () => {
             <div className='center'>
             <div className='row'>
                 <div className='col-md-2 left'>
+                    
+                    <a className='link' href="/about">
                     About
+                    </a>
                 </div>
                 <div className='col-md-2 left'>
+                    <a className='link' href="/news">
                     News
+                    </a>
                 </div>
                 <div className='col-md-2 left'>
+                    <a className='link' href="/team">
                     Team
+                    </a>
                 </div>
                 <div className='col-md-2 left'>
+                    <a className='link' href="/contact">
                     Contact
+                    </a>
                 </div>
             </div>
             </div>
