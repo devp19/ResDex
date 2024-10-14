@@ -61,6 +61,8 @@ code {
   height: auto;
   max-height: 500px;
   border-radius: 50px;
+  transition: 2s ease-out;
+  transform-style: preserve-3d; /* Enables 3D transform effects */
 }
 
 .col-center {
@@ -69,3 +71,15 @@ code {
   align-items: center;
 }
 
+.regular-text {
+  font-size: 20px;
+}
+.smaller-text {
+  font-size: 10px;
+}
+
+
+#headline-img:hover{
+  transform: rotateY(360deg); /* Spins the image 360 degrees */
+
+}
