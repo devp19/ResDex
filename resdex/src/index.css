@@ -61,8 +61,6 @@ code {
   height: auto;
   max-height: 400px;
   border-radius: 50px;
-  transition: 2s ease-out;
-  transform-style: preserve-3d; /* Enables 3D transform effects */
 }
 
 .spacer {
@@ -79,7 +77,7 @@ code {
   font-size: 20px;
 }
 .smaller-text {
-  font-size: 10px;
+  font-size: 15px;
 }
 
 #navbar-logo{
@@ -127,20 +125,20 @@ code {
 }
 .bottom-container {
   display: flex;
-  height: 50vh;
+  height: 40vh;
   margin-top: 15vh;
   align-items: center;
   justify-content: center;
   width: 100%;
   background: none;
-  border-top: 4px solid white;
+  border-top: 2px solid white;
 }
 
 .column-content {
   padding: 15px; 
   background-color: transparent;
   border: none;
-  border-top: 4px solid white;
+  border-top: 2px solid white;
   text-align: center;
   margin-top: 10px;
 }
@@ -153,3 +151,53 @@ code {
   margin-top: 10px;
 }
 
+.title-2 {
+  font-size: 60px;
+  text-align: center;
+}
+
+.custom {
+  color:black;
+  background-color: white;
+  text-decoration: none;
+  margin-top: 30px;
+  font-size: 15px;
+  border: none;
+  border-radius: 5px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  transition: 0.5s;
+}
+
+.custom:hover{
+  color: white;
+  background-color: black;
+  border: 1px solid white;
+
+}
+
+.last-container{
+  margin-top: 50px;
+  border-top: 2px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20vh;
+  width: 100%;
+  background: none;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: none;
+  margin-top: -20px;
+}
+
+.left {
+  margin-left: 30px;
+}

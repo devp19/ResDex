@@ -5,6 +5,7 @@ import About from './pages/About';
 import Navbar from './pages/Navbar'; // Updated import path to 'components'
 import News from './pages/News';
 import Login from './pages/Login';
+import Footer from './pages/Footer';
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -27,13 +28,13 @@ function App() {
       <div className="App">
         {isMobile ? (
           <div className="center-container">
-            View on Larger Screen! 
+            ResDex → Mobile Soon!
             <br></br>
             <br></br>
-            - ResDex Team
           </div>
         ) : (
           <>
+          
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -41,6 +42,7 @@ function App() {
               <Route path="/news" element={<News />} />
               <Route path="/login" element={<Login />} />
             </Routes>
+            <Footer />
           </>
         )}
       </div>

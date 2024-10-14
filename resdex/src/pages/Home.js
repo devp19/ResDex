@@ -6,6 +6,11 @@ import Headline from '../images/headline.png';
 const Home = () => {
   return (
     <div className='background'>
+         
+         <div class="alert alert-light" role="alert">
+            ResDex is still under development! → Thanks for visiting!
+        </div>
+
         <div className="center-container title">
            <div className='row length'>
                 <div className='col-md-5 offset-md-1 col-center'>
@@ -14,10 +19,12 @@ const Home = () => {
                     Research Made Easy.
                     <br></br>
                     <span className='regular-text'>
+                        <br></br>
                        ↓
                        <br></br>
 
                        For students, by students.
+                       <br></br>
                        <br></br>
                        <span className='smaller-text'>
                         Share research, gain insightful feedback and connect with industry professionals in over 100+ topics.
@@ -57,6 +64,26 @@ const Home = () => {
             </div>
           </div>
         </div>
+
+        <div className='center-sample'>
+            
+           
+            <div className='row'>
+                
+                <div className='col-md-8 mx-auto title-2'>
+                ↓
+                <br></br>
+                    Kickstart your research career now!
+                    <br></br>
+
+                    <div className='smaller-text button-custom'> 
+                        <button className='custom'> Sign Up </button>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+      
     </div>
   );
 };
