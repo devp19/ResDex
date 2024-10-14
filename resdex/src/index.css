@@ -95,13 +95,13 @@ code {
 }
 
 .navbar-nav .nav-link {
-  color: white; /* Base color for nav links */
+  color: white;
   position: relative;
   transition: color 0.5s;
 }
 
 .navbar-nav .nav-link.active {
-  color: white; /* Keep active link color white */
+  color: white;
 }
 
 .navbar-nav .nav-link::before {

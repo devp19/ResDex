@@ -30,7 +30,7 @@ function App() {
       <div className="App">
         {isMobile ? (
           <div className="center-container">
-            ResDex → Mobile Soon!
+            ResDex → Coming to Mobile Soon!
             <br></br>
             <br></br>
           </div>

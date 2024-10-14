@@ -7,9 +7,11 @@ const Home = () => {
   return (
     <div className='background'>
          
-         <div class="alert alert-light" role="alert">
-            ResDex is still under development! → Thanks for visiting!
-        </div>
+         <div class="alert alert-light alert-dismissible fade show" role="alert">
+    ResDex is still under development! → Thanks for visiting!
+   
+    </div>
+
 
         <div className="center-container title">
            <div className='row length'>
