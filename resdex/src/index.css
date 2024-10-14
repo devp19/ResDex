@@ -9,7 +9,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: black;
+  background-color: rgb(12, 12, 12);
   margin-left: 40px;
   margin-right: 40px;
 }
@@ -196,6 +196,7 @@ code {
   width: 100%;
   background: none;
   margin-top: -20px;
+  margin-bottom: 50px;
 }
 
 .left {
@@ -205,4 +206,8 @@ code {
 .link {
   text-decoration: none;
   color: white;
+}
+
+.reduce {
+  margin-top: -45px;
 }

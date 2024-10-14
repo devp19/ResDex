@@ -32,6 +32,14 @@ const Footer = () => {
                     </a>
                 </div>
             </div>
+    
+            
+            </div>
+            <div className="center">
+            ©2024, ResDex. All Rights Reserved.
+            </div>
+            <div className="center reduce">
+            By using this website, you accept our Terms of Use and Privacy Policy.
             </div>
         </div>
     )
