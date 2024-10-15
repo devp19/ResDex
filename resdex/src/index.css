@@ -85,6 +85,9 @@ code {
   height: 40px;
 }
 
+#curve {
+  border-radius: 30vh;
+}
 
 
 .nav-item {
