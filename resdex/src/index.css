@@ -63,6 +63,12 @@ code {
   border-radius: 50px;
 }
 
+#headline-2{
+  height: auto;
+  max-height: 200px;
+  border-radius: 50px;
+}
+
 .spacer {
   height: 30vh;
 }
@@ -102,7 +108,9 @@ code {
   width: 500px;
 }
 
-
+#curve {
+  border-radius: 30vh;
+}
 
 .nav-item {
   padding-left: 5px;
