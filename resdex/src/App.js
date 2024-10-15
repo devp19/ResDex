@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
-import Navbar from './pages/Navbar'; // Updated import path to 'components'
+import Navbar from './pages/Navbar';
 import News from './pages/News';
 import Login from './pages/Login';
 import Footer from './pages/Footer';
@@ -13,7 +13,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
 
   const checkMobileDevice = () => {
-    const mobileWidth = 768; // Set threshold for mobile devices
+    const mobileWidth = 768;
     setIsMobile(window.innerWidth < mobileWidth);
   };
 
@@ -21,7 +21,6 @@ function App() {
     checkMobileDevice();
     window.addEventListener('resize', checkMobileDevice);
     
-    // Cleanup listener on component unmount
     return () => window.removeEventListener('resize', checkMobileDevice);
   }, []);
 
