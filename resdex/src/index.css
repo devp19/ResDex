@@ -63,6 +63,12 @@ code {
   border-radius: 50px;
 }
 
+#headline-2{
+  height: auto;
+  max-height: 200px;
+  border-radius: 50px;
+}
+
 .spacer {
   height: 30vh;
 }
