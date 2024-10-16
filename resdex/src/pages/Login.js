@@ -3,12 +3,13 @@ import { Form, Button } from 'react-bootstrap';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import Logo from '../images/index.png';
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +18,7 @@ const Login = () => {
       const token = await userCredential.user.getIdToken();
       localStorage.setItem('authToken', token);
       console.log('Login successful');
-      navigate('/home');
+      navigate('/');
     } catch (err) {
       setError('Failed to log in. Check your credentials.');
       console.error(err);
