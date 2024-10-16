@@ -61,7 +61,8 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
-
+            <Link className='regular' to="/recovery">Forgot your password?</Link>
+            <br></br>
             {error && <p className="error-text">{error}</p>}
             <Button className='custom' type="submit">
               Sign In

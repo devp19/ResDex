@@ -1,6 +1,7 @@
 // src/pages/Home.js
 import React from 'react';
 import Headline from '../images/headline.png';
+import { Link } from 'react-router-dom';
 
 
 const Home = () => {
@@ -89,8 +90,8 @@ const Home = () => {
                     Kickstart your research career now!
                     <br></br>
 
-                    <div className='smaller-text button-custom'> 
-                        <button className='custom'> Sign Up </button>
+                    <div className='smaller-text button-custom pt-4'> 
+                        <Link className='custom' to='/signup'>Sign Up</Link>
                      </div>
                 </div>
             </div>
