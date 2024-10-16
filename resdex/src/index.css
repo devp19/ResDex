@@ -82,6 +82,10 @@ code {
 .regular-text {
   font-size: 20px;
 }
+
+.regular{
+  color: white;
+}
 .smaller-text {
   font-size: 15px;
 }

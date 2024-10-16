@@ -8,6 +8,9 @@ import Login from './pages/Login';
 import Footer from './pages/Footer';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
+import PrivateRoute from './pages/privateroute';
+import Signup from './pages/signup';
+
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -35,15 +38,17 @@ function App() {
           </div>
         ) : (
           <>
-          
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/news" element={<News />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route path="/signup" element={<Signup />} />
+              
+              {/* Wrap protected routes with PrivateRoute */}
+              <Route path="/team" element={<PrivateRoute><Team /></PrivateRoute>} />
+              <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
             </Routes>
             <Footer />
           </>

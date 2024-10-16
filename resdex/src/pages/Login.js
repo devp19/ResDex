@@ -1,54 +1,71 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import Logo from '../images/index.png'
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import Logo from '../images/index.png';
+import { Link } from 'react-router-dom'
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      localStorage.setItem('authToken', token);
+      console.log('Login successful');
+      navigate('/home');
+    } catch (err) {
+      setError('Failed to log in. Check your credentials.');
+      console.error(err);
+    }
   };
 
   return (
     <div>
-    
       <div className='container'>
         <div className='row center top'>
           <h3 className='center'> ResDex | Sign In</h3>
-          <br></br>
           <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
         </div>
         <div className='row center'>
-        <Form className='login-form' onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
+          <Form className='login-form' onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-        
-          <Button className='custom' type="submit">
-            Sign In
-          </Button>
-        </Form>
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+
+            {error && <p className="error-text">{error}</p>}
+            <Button className='custom' type="submit">
+              Sign In
+            </Button>
+            <p>
+              <br>
+              </br>
+              <br></br>
+      Don't have an account? <Link className='regular' to="/signup">Sign Up</Link>
+    </p>
+          </Form>
+          
         </div>
-        
       </div>
     </div>
   );
