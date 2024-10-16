@@ -1,7 +1,7 @@
 import React from 'react';
 import { auth } from '../firebaseConfig';
 
-const Success = () => {
+const Profile = () => {
   return (
     <div>
       <h1>Welcome, {auth.currentUser.displayName}!</h1>
@@ -10,4 +10,4 @@ const Success = () => {
   );
 };
 
-export default Success;
+export default Profile;
