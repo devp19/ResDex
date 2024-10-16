@@ -20,7 +20,8 @@ const Login = () => {
       if(userCredential.user.emailVerified){
         localStorage.setItem('authToken', token);
         console.log('Login successful');
-        navigate('/success');
+        console.log(userCredential.user.displayName)
+        navigate('/profile');
       }
       else {
         setError('Email has not been verified. Please verify before continuing!')

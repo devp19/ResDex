@@ -10,7 +10,7 @@ import Team from './pages/Team';
 import Contact from './pages/Contact';
 import PrivateRoute from './pages/privateroute';
 import Signup from './pages/signup';
-import Success from './pages/Success';
+import Profile from './pages/Profile';
 
 
 function App() {
@@ -49,7 +49,7 @@ function App() {
               
               <Route path="/team" element={<PrivateRoute><Team /></PrivateRoute>} />
               <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
-              <Route path="/success" element={<PrivateRoute><Success /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             </Routes>
             <Footer />
           </>
