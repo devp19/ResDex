@@ -11,6 +11,7 @@ import Contact from './pages/Contact';
 import PrivateRoute from './pages/privateroute';
 import Signup from './pages/signup';
 import Profile from './pages/Profile';
+import Recovery from './pages/recovery';
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
               <Route path="/news" element={<News />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/recovery" element={<Recovery />} />
               
               <Route path="/team" element={<PrivateRoute><Team /></PrivateRoute>} />
               <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
