@@ -16,9 +16,16 @@ const Login = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
-      localStorage.setItem('authToken', token);
-      console.log('Login successful');
-      navigate('/');
+      
+      if(userCredential.user.emailVerified){
+        localStorage.setItem('authToken', token);
+        console.log('Login successful');
+        navigate('/success');
+      }
+      else {
+        setError('Email has not been verified. Please verify before continuing!')
+      }
+  
     } catch (err) {
       setError('Failed to log in. Check your credentials.');
       console.error(err);
