@@ -8,6 +8,10 @@ import Login from './pages/Login';
 import Footer from './pages/Footer';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
+import PrivateRoute from './pages/privateroute';
+import Signup from './pages/signup';
+import Success from './pages/Success';
+
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -35,15 +39,17 @@ function App() {
           </div>
         ) : (
           <>
-          
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/news" element={<News />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route path="/signup" element={<Signup />} />
+              
+              <Route path="/team" element={<PrivateRoute><Team /></PrivateRoute>} />
+              <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
+              <Route path="/success" element={<PrivateRoute><Success /></PrivateRoute>} />
             </Routes>
             <Footer />
           </>

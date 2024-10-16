@@ -1,34 +1,33 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate, Link } from 'react-router-dom';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import Logo from '../images/index.png';
-import { useNavigate, Link } from 'react-router-dom'
+import { Form, Button } from 'react-bootstrap';
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await sendEmailVerification(user);
       
-      if(userCredential.user.emailVerified){
-        localStorage.setItem('authToken', token);
-        console.log('Login successful');
-        navigate('/success');
-      }
-      else {
-        setError('Email has not been verified. Please verify before continuing!')
-      }
-  
+      setSuccess('Verification email sent! Please check your inbox to verify your email address.');
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 5000);
+
     } catch (err) {
-      setError('Failed to log in. Check your credentials.');
-      console.error(err);
+      setError(err.message);
     }
   };
 
@@ -36,11 +35,11 @@ const Login = () => {
     <div>
       <div className='container'>
         <div className='row center top'>
-          <h3 className='center'> ResDex | Sign In</h3>
+          <h3 className='center'>ResDex | Sign Up</h3>
           <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
         </div>
         <div className='row center'>
-          <Form className='login-form' onSubmit={handleSubmit}>
+          <Form className='login-form' onSubmit={handleSignup}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
@@ -62,21 +61,20 @@ const Login = () => {
             </Form.Group>
 
             {error && <p className="error-text">{error}</p>}
+            {success && <p className="success-text">{success}</p>}
+
             <Button className='custom' type="submit">
-              Sign In
+              Sign Up
             </Button>
             <p>
-              <br>
-              </br>
-              <br></br>
-      Don't have an account? <Link className='regular' to="/signup">Sign Up</Link>
-    </p>
+              <br />
+              Already have an account? <Link className='regular' to="/login">Sign In</Link>
+            </p>
           </Form>
-          
         </div>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Signup;
