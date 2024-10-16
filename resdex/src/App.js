@@ -47,7 +47,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               
-              {/* Wrap protected routes with PrivateRoute */}
               <Route path="/team" element={<PrivateRoute><Team /></PrivateRoute>} />
               <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
               <Route path="/success" element={<PrivateRoute><Success /></PrivateRoute>} />
