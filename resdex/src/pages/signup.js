@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { Link } from 'react-router-dom';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import Logo from '../images/index.png';
 import { Form, Button } from 'react-bootstrap';
@@ -8,24 +8,20 @@ import { Form, Button } from 'react-bootstrap';
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayname, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password );
       const user = userCredential.user;
-
       await sendEmailVerification(user);
-      
+      await updateProfile(auth.currentUser, { displayName: displayname})
       setSuccess('Verification email sent! Please check your inbox to verify your email address.');
-
-      setTimeout(() => {
-        navigate('/login');
-      }, 5000);
-
+      
     } catch (err) {
       setError(err.message);
     }
@@ -40,6 +36,15 @@ const Signup = () => {
         </div>
         <div className='row center'>
           <Form className='login-form' onSubmit={handleSignup}>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Full Name</Form.Label>
+              <Form.Control
+                type="name"
+                placeholder="Enter name"
+                value={displayname}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control

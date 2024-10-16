@@ -20,6 +20,7 @@ const Login = () => {
       if(userCredential.user.emailVerified){
         localStorage.setItem('authToken', token);
         console.log('Login successful');
+        console.log(userCredential.user.displayName)
         navigate('/success');
       }
       else {

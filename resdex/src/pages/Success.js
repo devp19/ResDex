@@ -1,10 +1,10 @@
-// src/pages/Home.js
 import React from 'react';
+import { auth } from '../firebaseConfig';
 
 const Success = () => {
   return (
     <div>
-      <h1>You're Logged In!</h1>
+      <h1>Welcome, {auth.currentUser.displayName}!</h1>
       <p>Login worked!</p>
     </div>
   );
