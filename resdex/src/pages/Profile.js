@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebaseConfig';
 import { collection, doc, getDoc } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
+import PDFUpload from './PDFUpload';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -13,6 +14,7 @@ const Profile = () => {
         setUser(user);
         const userId = user.uid;
         const userDocRef = doc(collection(db, 'users'), userId);
+
 
         getDoc(userDocRef).then((doc) => {
           if (doc.exists()) {
@@ -45,6 +47,10 @@ const Profile = () => {
             />
           )}
           <ProfilePictureUpload user={user} />
+          
+     
+          <PDFUpload user={user} />
+          
         </>
       ) : (
         <p>Loading...</p>
