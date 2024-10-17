@@ -1,8 +1,7 @@
-// In ProfilePictureUpload.js
 import { useState } from 'react';
-import { storage, db } from '../firebaseConfig'; // Import storage and db
+import { storage, db } from '../firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const ProfilePictureUpload = ({ user }) => {
   const [file, setFile] = useState(null);
@@ -13,7 +12,7 @@ const ProfilePictureUpload = ({ user }) => {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file || !user) return;
 
     const storageRef = ref(storage, `profilePictures/${user.uid}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -27,19 +26,23 @@ const ProfilePictureUpload = ({ user }) => {
       (error) => {
         console.error('Error uploading file: ', error);
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // Update the user's profile picture in Firestore
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           const userDocRef = doc(db, 'users', user.uid);
-          updateDoc(userDocRef, { profilePicture: downloadURL })
-            .then(() => {
-              console.log('Profile picture updated successfully!');
-              // You might want to update the profilePicture state in the parent component here
-            })
-            .catch((error) => {
-              console.error('Error updating profile picture in Firestore: ', error);
-            });
-        });
+
+          // Check if the document exists; if not, create it
+          const docSnapshot = await getDoc(userDocRef);
+          if (!docSnapshot.exists()) {
+            await setDoc(userDocRef, { profilePicture: downloadURL });
+            console.log('Profile document created successfully!');
+          } else {
+            await updateDoc(userDocRef, { profilePicture: downloadURL });
+            console.log('Profile picture updated successfully!');
+          }
+        } catch (error) {
+          console.error('Error updating or creating profile picture document: ', error);
+        }
       }
     );
   };
