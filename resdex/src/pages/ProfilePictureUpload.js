@@ -8,9 +8,11 @@ const ProfilePictureUpload = ({ user }) => {
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(false);
+  
 
-  const handleFileChange = (e) => {
+  const handleProfilePictureChange = (e) => {
     const selectedFile = e.target.files[0];
+    
     if (selectedFile) {
       setFile(selectedFile);
       handleUpload(selectedFile);
@@ -45,9 +47,10 @@ const ProfilePictureUpload = ({ user }) => {
           } else {
             await updateDoc(userDocRef, { profilePicture: downloadURL });
             console.log('Profile picture updated successfully!');
-            window.location.reload(); // Reload to display the new profile picture
+            window.location.reload();
           }
           setLoading(false);
+          setUploadProgress(0);
         }
       );
     } catch (error) {
@@ -68,21 +71,22 @@ const ProfilePictureUpload = ({ user }) => {
       justifyContent: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       zIndex: 1000,
-    },
+    }
   };
   
 
   return (
     <div>
       <input
-        id="fileInput"
+        id="profilePictureInput"
         type="file"
-        style={{ display: 'none' }} // Hide the file input
-        onChange={handleFileChange}
-      />
+        style={{ display: 'none' }} 
+        accept="image/*"
+        onChange={handleProfilePictureChange}
+        />
       <button
         className="custom right"
-        onClick={() => document.getElementById('fileInput').click()}
+        onClick={() => document.getElementById('profilePictureInput').click()}
       >
         Upload Picture
       </button>
@@ -91,6 +95,12 @@ const ProfilePictureUpload = ({ user }) => {
           <Spinner animation="border" variant="light" />
         </div>
       )}
+      {uploadProgress > 0 && !loading && (
+        <div>
+          <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>
+        </div>
+      )}
+  
     </div>
   );
 };
