@@ -44,7 +44,6 @@ const Profile = () => {
               style={{ width: '150px', height: '150px', borderRadius: '50%' }} 
             />
           )}
-          <p>Login worked!</p>
           <ProfilePictureUpload user={user} />
         </>
       ) : (

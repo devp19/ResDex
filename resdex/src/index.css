@@ -208,6 +208,10 @@ code {
 
 }
 
+.right {
+  margin-right: 15px;
+}
+
 .last-container{
   margin-top: 50px;
   border-top: 2px solid white;
