@@ -6,7 +6,6 @@ import { auth } from '../firebaseConfig';
 const Navbar = () => {
   const [user, setUser] = useState(null);
 
-  // Listen for changes in authentication state
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
