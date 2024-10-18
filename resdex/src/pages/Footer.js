@@ -17,8 +17,8 @@ const Footer = () => {
                     </a>
                 </div>
                 <div className='col-md-2 left'>
-                    <a className='link' href="/news">
-                    News
+                    <a className='link' href="/Profile">
+                    Profile
                     </a>
                 </div>
                 <div className='col-md-2 left'>

@@ -4,8 +4,8 @@ const Team = () => {
 
     return (
         <div>
-      <h1>Welcome to the Team Page</h1>
-      <p>This is the Team Page!</p>
+      <h1>ResDex Team</h1>
+      <p>Meet the creators of ResDex!</p>
     </div>
     );
 

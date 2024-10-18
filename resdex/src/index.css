@@ -208,6 +208,10 @@ code {
 
 }
 
+.up{
+  margin-top: -30px;
+} 
+
 .right {
   margin-right: 15px;
 }
