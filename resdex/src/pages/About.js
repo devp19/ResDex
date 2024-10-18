@@ -7,7 +7,7 @@ const About = () => {
   return (
     <div>
    
-      <div className='row center-container'>
+      <div className='row center-container up'>
         
         <div className='col-md-6'>
         <h3>About | ResDex</h3>

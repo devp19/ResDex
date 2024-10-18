@@ -6,7 +6,6 @@ import { auth } from '../firebaseConfig';
 const Navbar = () => {
   const [user, setUser] = useState(null);
 
-  // Listen for changes in authentication state
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
@@ -40,7 +39,7 @@ const Navbar = () => {
             <NavLink to="/about" className="nav-link" activeClassName="active">About</NavLink>
           </li>
           <li className="nav-item">
-            <NavLink to="/news" className="nav-link" activeClassName="active">News</NavLink>
+            <NavLink to="/profile" className="nav-link" activeClassName="active">Profile</NavLink>
           </li>
           
           <li className="nav-item">

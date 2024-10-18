@@ -4,17 +4,14 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import Spinner from 'react-bootstrap/Spinner';
 
-const ProfilePictureUpload = ({ user }) => {
-  const [file, setFile] = useState(null);
+const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(false);
-  
 
   const handleProfilePictureChange = (e) => {
     const selectedFile = e.target.files[0];
     
     if (selectedFile) {
-      setFile(selectedFile);
       handleUpload(selectedFile);
     }
   };
@@ -47,8 +44,10 @@ const ProfilePictureUpload = ({ user }) => {
           } else {
             await updateDoc(userDocRef, { profilePicture: downloadURL });
             console.log('Profile picture updated successfully!');
-            window.location.reload();
           }
+
+          updateProfilePicture(downloadURL);
+
           setLoading(false);
           setUploadProgress(0);
         }
@@ -73,7 +72,6 @@ const ProfilePictureUpload = ({ user }) => {
       zIndex: 1000,
     }
   };
-  
 
   return (
     <div>
@@ -83,24 +81,25 @@ const ProfilePictureUpload = ({ user }) => {
         style={{ display: 'none' }} 
         accept="image/*"
         onChange={handleProfilePictureChange}
-        />
+      />
       <button
         className="custom right"
         onClick={() => document.getElementById('profilePictureInput').click()}
       >
         Upload Picture
       </button>
+      
       {loading && (
         <div style={styles.loadingOverlay}>
           <Spinner animation="border" variant="light" />
         </div>
       )}
+      
       {uploadProgress > 0 && !loading && (
         <div>
           <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>
         </div>
       )}
-  
     </div>
   );
 };
