@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import NavbarLogo from '../images/logo.png';
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setUsername(userData.username);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        setUsername('');
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -38,10 +54,11 @@ const Navbar = () => {
           <li className="nav-item">
             <NavLink to="/about" className="nav-link" activeClassName="active">About</NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink to="/profile" className="nav-link" activeClassName="active">Profile</NavLink>
-          </li>
-          
+          {user && username && (
+            <li className="nav-item">
+              <NavLink to={`/profile/${username}`} className="nav-link" activeClassName="active">Profile</NavLink>
+            </li>
+          )}
           <li className="nav-item">
             {user ? (
               <NavLink to="/" className="nav-link" onClick={() => auth.signOut()}>Logout</NavLink>
