@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 import Logo from '../images/index.png';
 import { useNavigate, Link } from 'react-router-dom'
 
@@ -15,18 +16,34 @@ const Login = () => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      const user = userCredential.user;
+      const token = await user.getIdToken();
       
-      if(userCredential.user.emailVerified){
+      if(user.emailVerified){
         localStorage.setItem('authToken', token);
         console.log('Login successful');
-        console.log(userCredential.user.displayName)
-        navigate('/profile');
-      }
-      else {
+        
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const username = userData.username;
+          
+          if (username) {
+            navigate(`/profile/${username}`);
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
+          } else {
+            setError('Username not found. Please contact support.');
+          }
+        } else {
+          setError('User data not found. Please contact support.');
+        }
+      } else {
         setError('Email has not been verified. Please verify before continuing!')
       }
-  
     } catch (err) {
       setError('Failed to log in. Check your credentials.');
       console.error(err);
@@ -68,13 +85,11 @@ const Login = () => {
               Sign In
             </Button>
             <p>
-              <br>
-              </br>
               <br></br>
-      Don't have an account? <Link className='regular' to="/signup">Sign Up</Link>
-    </p>
+              <br></br>
+              Don't have an account? <Link className='regular' to="/signup">Sign Up</Link>
+            </p>
           </Form>
-          
         </div>
       </div>
     </div>

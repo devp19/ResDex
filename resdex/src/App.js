@@ -12,7 +12,6 @@ import Signup from './pages/signup';
 import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
 
-
 function App() {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -49,7 +48,7 @@ function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/contact" element={<Contact/>} />
               
-              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/profile/:username" element={<Profile />} />
             </Routes>
             <Footer />
           </>
