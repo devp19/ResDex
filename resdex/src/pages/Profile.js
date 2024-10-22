@@ -5,6 +5,7 @@ import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'fireb
 import ProfilePictureUpload from './ProfilePictureUpload';
 import PDFUpload from './PDFUpload';
 
+
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
 const saveProfileToLocalStorage = (username, profileData) => {
@@ -36,6 +37,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [newAbout, setNewAbout] = useState('');
   const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update
+
 
   const fetchProfileData = useCallback(async () => {
     try {
@@ -109,24 +111,22 @@ const Profile = () => {
   }, [username]);
 
   const updateAbout = useCallback(async (newAboutSection) => {
+    if (!profileUser) return; // Ensure profileUser exists
+
     setAbout(newAboutSection);
-    setProfileUser(prev => {
-      if (prev) {
-        const updatedUser = { ...prev, about: newAboutSection };
-        saveProfileToLocalStorage(username, updatedUser);
-        return updatedUser;
-      }
-      return null;
-    });
+    const updatedUser = { ...profileUser, about: newAboutSection };
+    saveProfileToLocalStorage(username, updatedUser);
+    setProfileUser(updatedUser);
 
     try {
-      const userDocRef = doc(db, 'users', profileUser.uid);
-      await updateDoc(userDocRef, { about: newAboutSection });
-      console.log("About section updated in Firestore.");
+        const userDocRef = doc(db, 'users', profileUser.uid);
+        await updateDoc(userDocRef, { about: newAboutSection });
+        console.log("About section updated in Firestore.");
     } catch (error) {
-      console.error("Error updating about section in Firestore: ", error);
+        console.error("Error updating about section in Firestore: ", error);
     }
-  }, [username, profileUser]);
+}, [username, profileUser]);
+
 
   const handleAboutSubmit = () => {
     updateAbout(newAbout);
@@ -268,12 +268,29 @@ const Profile = () => {
                     id="profilePictureInput"
                     style={{ display: 'none' }}
                   />
-                  {/* <PDFUpload /> */}
                 </>
               )}
             </div>
+            
           </div>
+          {/* <div className='container upload-cont'>
+            
+              <div className='row upload bg-white'>
+            
+                <div className='col-md-5 actual-upload'>
+                {isOwnProfile && (
+                <>
+              <PDFUpload user={currentUser}
+               />
+                </>
+              )}
+  
+                </div>
+              </div>
+            </div> */}
+
         </div>
+
       </div>
     </div>
   );

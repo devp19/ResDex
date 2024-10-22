@@ -274,8 +274,6 @@ code {
 }
 
 
-
-
 .profile-picture-container {
   position: relative;
   width: 150px;
@@ -321,32 +319,32 @@ code {
   opacity: 1;
 }
 
-
-
-
-.tooltip {
-  position: relative;
-  display: inline-block;
+.upload {
+  height: 300px;
+  border-radius: 5px;
 }
 
-.tooltip .tooltiptext {
-  visibility: hidden; /* Hidden by default */
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%; /* Position the tooltip above the text */
-  left: 50%;
-  margin-left: -60px; /* Center the tooltip */
-  opacity: 0; /* Hidden by default */
-  transition: opacity 0.3s; /* Transition for smooth appearance */
+.upload-cont{
+  margin-top: 50px;
+  padding-top: 50px;
+border-top: 1px solid white;
 }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible; /* Show tooltip on hover */
-  opacity: 1; /* Make it fully visible */
+.actual-upload{
+  margin: 30px;
+  border-radius: 5px;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s ease-out;
+  cursor: pointer;
+  outline: 1px dashed black;
+  outline-offset: 2px;
+}
+
+.actual-upload:hover {
+  margin: 15px;
+
 }
