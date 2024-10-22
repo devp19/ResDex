@@ -92,12 +92,7 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
         accept="image/*"
         onChange={handleProfilePictureChange}
       />
-      <button
-        className="custom right"
-        onClick={() => document.getElementById('profilePictureInput').click()}
-      >
-        Upload Picture
-      </button>
+      
       
       {loading && (
         <div style={styles.loadingOverlay}>
