@@ -19,7 +19,7 @@ const PDFUpload = ({ user }) => {
   const handleUpload = async (file) => {
     if (!file || !user) return;
   
-    console.log(file)
+    console.log(file);
     setLoading(true);
     const params = {
       Bucket: 'resdex-bucket',
@@ -35,7 +35,6 @@ const PDFUpload = ({ user }) => {
       const pdfUrl = data.Location;
       setPdfUrl(pdfUrl);
 
-  
       const userDocRef = doc(db, 'users', user.uid);
       const docSnapshot = await getDoc(userDocRef);
       if (!docSnapshot.exists()) {
@@ -51,7 +50,6 @@ const PDFUpload = ({ user }) => {
       setLoading(false);
     }
   };
-  
 
   const styles = {
     loadingOverlay: {
@@ -72,6 +70,11 @@ const PDFUpload = ({ user }) => {
       border: 'none',
       marginTop: '20px', 
     },
+    uploadArea: {
+      cursor: 'pointer',
+      borderRadius: '5px',
+      textAlign: 'center',
+    }
   };
 
   return (
@@ -79,30 +82,33 @@ const PDFUpload = ({ user }) => {
       <input
         id="pdfInput"
         type="file"
-        style={{ display: 'none' }}
+        style={{ display: 'none'}}
         accept=".pdf"
         onChange={handleFileChange}
       />
-      <button
-        className="custom right"
+      <div
+        style={styles.uploadArea}
         onClick={() => document.getElementById('pdfInput').click()}
       >
-        Upload PDF
-      </button>
+        <svg style={{marginBottom: '20px'}} xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-upload" viewBox="0 0 16 16">
+  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+</svg>
+                  <h5>Upload Document</h5>
+      </div>
       {loading && (
         <div style={styles.loadingOverlay}>
           <Spinner animation="border" variant="light" />
         </div>
       )}
 
-{pdfUrl && (
+      {pdfUrl && (
         <iframe
           src={pdfUrl}
           style={styles.pdfPreview}
           title="PDF Preview"
         />
       )}
-
     </div>
   );
 };
