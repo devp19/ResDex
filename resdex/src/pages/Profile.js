@@ -36,39 +36,56 @@ const Profile = () => {
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [loading, setLoading] = useState(true);
   const [newAbout, setNewAbout] = useState('');
-  const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update
+  const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update so user can changeeee
   const [pdfs, setPdfs] = useState([]);
+  const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
 
-  const fetchPDFs = useCallback(async (userId) => {
-    try {
-      const userDocRef = doc(db, 'users', userId);
-      const userDoc = await getDoc(userDocRef);
-      const userData = userDoc.data();
-      if (userData && userData.pdfs) {
-        // Filter out PDFs that return 403 errors
-        const validPdfs = [];
-        for (const pdf of userData.pdfs) {
-          try {
-            const response = await fetch(pdf, { method: 'HEAD' });
-            if (response.ok) {
-              validPdfs.push(pdf);
-            }
-          } catch (error) {
-            console.error("Error checking PDF:", error);
+const nextPdf = () => {
+  if (currentPdfIndex < pdfs.length - 1) {
+    setCurrentPdfIndex(currentPdfIndex + 1);
+  }
+};
+
+const previousPdf = () => {
+  if (currentPdfIndex > 0) {
+    setCurrentPdfIndex(currentPdfIndex - 1);
+  }
+};
+
+  
+const fetchPDFs = useCallback(async (userId) => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data();
+    
+    if (userData && userData.pdfs && userData.pdfs.length > 0) {
+      const validPdfs = [];
+      
+      for (const pdfData of userData.pdfs) {
+        try {
+          const response = await fetch(pdfData.url, { method: 'HEAD' });
+          if (response.ok) {
+            validPdfs.push(pdfData);
           }
+        } catch (error) {
+          console.error("PDF no longer exists:", error);
         }
-        
-        // Update Firestore if some PDFs were invalid
-        if (validPdfs.length !== userData.pdfs.length) {
-          await updateDoc(userDocRef, { pdfs: validPdfs });
-        }
-        
-        setPdfs(validPdfs);
       }
-    } catch (error) {
-      console.error("Error fetching PDFs:", error);
+
+      if (validPdfs.length !== userData.pdfs.length) {
+        await updateDoc(userDocRef, { pdfs: validPdfs });
+      }
+
+      setPdfs(validPdfs);
+    } else {
+      setPdfs([]);
     }
-  }, []); 
+  } catch (error) {
+    console.error("Error fetching PDFs:", error);
+    setPdfs([]);
+  }
+}, []);
 
   const fetchProfileData = useCallback(async () => {
 
@@ -141,7 +158,6 @@ const Profile = () => {
     return () => unsubscribe();
   }, []);
 
-  
 
   const updateProfilePicture = useCallback((newPictureUrl) => {
     setProfilePicture(newPictureUrl);
@@ -156,7 +172,7 @@ const Profile = () => {
   }, [username]);
 
   const updateAbout = useCallback(async (newAboutSection) => {
-    if (!profileUser) return; // Ensure profileUser exists
+    if (!profileUser) return; // make sure profile exists otherwise, its screwed up
 
     setAbout(newAboutSection);
     const updatedUser = { ...profileUser, about: newAboutSection };
@@ -275,7 +291,6 @@ const Profile = () => {
   </h1>
 </div>
 
-      
             <div className='row'>
               <div className='col-md-8'>
                 {isEditingAbout ? (
@@ -319,58 +334,111 @@ const Profile = () => {
             
           </div>
 
-
-        {/* THIS PART BELOW NEEDS TO SHOW THE PDFS! */}
+       
         <div className='container upload-cont'>
-          <h4 style={{marginTop: '-20px', marginBottom: '30px'}}> Completed Research</h4>
+  <h4 style={{marginTop: '-20px', marginBottom: '30px'}}> Completed Research</h4>
 
-          <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center bg-white'>
+  <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center bg-white'>
   <div style={{
-    margin: '10px', 
-    height: '200px', 
+    margin: '10px',
+    minHeight: '300px',
     borderRadius: '5px',
-    overflowX: 'auto',
-    overflowY: 'hidden',
-    whiteSpace: 'nowrap',
-    padding: '10px'
+    padding: '20px'
   }} className='col-md-7 bg-black'>
     {pdfs.length > 0 ? (
-      pdfs.map((pdf, index) => (
-        <iframe
-          key={index}
-          src={pdf}
-          style={{
-            height: '180px',
-            width: '140px',
-            border: 'none',
-            marginRight: '10px',
-            display: 'inline-block'
-          }}
-          title={`PDF ${index + 1}`}
-        />
-      ))
+      <div className="d-flex flex-column h-100">
+        <div className="d-flex align-items-center" style={{ height: '100%' }}>
+          {currentPdfIndex > 0 && (
+            <button 
+            onClick={previousPdf}
+            className="btn btn-link"
+            style={{ 
+              position: 'absolute', 
+              left: '50px',
+              color: 'white',
+              backgroundColor: 'black',
+              borderRadius: '50%',
+              width: '30px',
+              textDecoration: 'none',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0',
+              border: 'none'
+            }}
+          >
+            ←
+          </button>
+          )}
+          
+          <div className='row' style={{ width: '100%' }}>
+            <div className='col-md-5'>
+            <iframe 
+              src={pdfs[currentPdfIndex].url}
+              style={{
+                width: '100%',
+                height: '300px',
+                border: 'none',
+                borderRadius: '5px',
+                pointerEvents: 'none'
+              }}
+            />
+            </div>
+            <div className='col-md-7'>
+
+            <div className="text-white mt-3">
+              <h5>{pdfs[currentPdfIndex].title}</h5>
+              <p>{pdfs[currentPdfIndex].description}</p>
+              <button 
+                  className="custom"
+                  onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
+                > View Full Paper ⇗</button>
+            </div>
+            </div>
+          </div>
+
+          {currentPdfIndex < pdfs.length - 1 && (
+            <button 
+            onClick={nextPdf}
+            className="btn btn-link"
+            style={{ 
+              position: 'absolute', 
+              right: '50px',
+              color: 'white',
+              backgroundColor: 'black',
+              textDecoration: 'none',
+              borderRadius: '50%',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0',
+              border: 'none'
+            }}
+            >
+              →
+            </button>
+          )}
+        </div>
+      </div>
     ) : (
       <div className="d-flex align-items-center justify-content-center h-100 text-white">
         No Documents Uploaded
       </div>
     )}
   </div>
-  <div style={{margin: '10px', height: '200px', borderRadius: '5px'}} 
-       className='col-md-3 bg-black d-flex align-items-center justify-content-center'>
+  
     {isOwnProfile && (
-      <PDFUpload 
-      user={currentUser} 
-      onUploadComplete={() => {
-        if (currentUser) {
-          fetchPDFs(currentUser.uid);
-        }
-      }} 
-    />    )}
-  </div>
+      <div style={{margin: '10px', height: '300px', borderRadius: '5px'}} 
+      className='col-md-3 bg-black d-flex align-items-center justify-content-center'>
+      <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
+      </div>
+    )}
 </div>
-
-            </div>
-
+</div>
+       
         </div>
 
       </div>
