@@ -37,9 +37,41 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [newAbout, setNewAbout] = useState('');
   const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update
+  const [pdfs, setPdfs] = useState([]);
 
+  const fetchPDFs = useCallback(async (userId) => {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+      if (userData && userData.pdfs) {
+        // Filter out PDFs that return 403 errors
+        const validPdfs = [];
+        for (const pdf of userData.pdfs) {
+          try {
+            const response = await fetch(pdf, { method: 'HEAD' });
+            if (response.ok) {
+              validPdfs.push(pdf);
+            }
+          } catch (error) {
+            console.error("Error checking PDF:", error);
+          }
+        }
+        
+        // Update Firestore if some PDFs were invalid
+        if (validPdfs.length !== userData.pdfs.length) {
+          await updateDoc(userDocRef, { pdfs: validPdfs });
+        }
+        
+        setPdfs(validPdfs);
+      }
+    } catch (error) {
+      console.error("Error fetching PDFs:", error);
+    }
+  }, []); 
 
   const fetchProfileData = useCallback(async () => {
+
     try {
       const cachedProfile = getProfileFromLocalStorage(username);
       if (cachedProfile) {
@@ -49,6 +81,9 @@ const Profile = () => {
         setProfilePicture(cachedProfile.profilePicture || null);
         setLoading(false);
         return;
+      }
+      if (cachedProfile && cachedProfile.uid) {
+        await fetchPDFs(cachedProfile.uid);
       }
 
       const usernamesRef = collection(db, 'usernames');
@@ -77,6 +112,8 @@ const Profile = () => {
         setProfilePicture(userData.profilePicture || null);
         setAbout(userData.about || '');
         saveProfileToLocalStorage(username, userData);
+        await fetchPDFs(userData.uid);
+
       }
     } catch (error) {
       console.error("Error fetching profile data: ", error);
@@ -84,11 +121,17 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, fetchPDFs]);
 
   useEffect(() => {
     fetchProfileData();
   }, [fetchProfileData]);
+
+  useEffect(() => {
+    if (profileUser && profileUser.uid) {
+      fetchPDFs(profileUser.uid);
+    }
+  }, [profileUser, fetchPDFs]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -97,6 +140,8 @@ const Profile = () => {
 
     return () => unsubscribe();
   }, []);
+
+  
 
   const updateProfilePicture = useCallback((newPictureUrl) => {
     setProfilePicture(newPictureUrl);
@@ -154,8 +199,8 @@ const Profile = () => {
   return (
     <div>
       <div className='center top'>
-        <div className='row center'>
-          <div className='col-md-3 offset-md-1 d-flex justify-content-center' 
+        <div className='row'>
+          <div className='col-md-3 d-flex justify-content-center' 
                style={{borderRight: '1px solid white', marginRight: '50px'}}>
             <label>
               <div
@@ -273,21 +318,58 @@ const Profile = () => {
             </div>
             
           </div>
-          {/* <div className='container upload-cont'>
-            
-              <div className='row upload bg-white'>
-            
-                <div className='col-md-5 actual-upload'>
-                {isOwnProfile && (
-                <>
-              <PDFUpload user={currentUser}
-               />
-                </>
-              )}
-  
-                </div>
-              </div>
-            </div> */}
+
+
+        {/* THIS PART BELOW NEEDS TO SHOW THE PDFS! */}
+        <div className='container upload-cont'>
+          <h4 style={{marginTop: '-20px', marginBottom: '30px'}}> Completed Research</h4>
+
+          <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center bg-white'>
+  <div style={{
+    margin: '10px', 
+    height: '200px', 
+    borderRadius: '5px',
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    whiteSpace: 'nowrap',
+    padding: '10px'
+  }} className='col-md-7 bg-black'>
+    {pdfs.length > 0 ? (
+      pdfs.map((pdf, index) => (
+        <iframe
+          key={index}
+          src={pdf}
+          style={{
+            height: '180px',
+            width: '140px',
+            border: 'none',
+            marginRight: '10px',
+            display: 'inline-block'
+          }}
+          title={`PDF ${index + 1}`}
+        />
+      ))
+    ) : (
+      <div className="d-flex align-items-center justify-content-center h-100 text-white">
+        No Documents Uploaded
+      </div>
+    )}
+  </div>
+  <div style={{margin: '10px', height: '200px', borderRadius: '5px'}} 
+       className='col-md-3 bg-black d-flex align-items-center justify-content-center'>
+    {isOwnProfile && (
+      <PDFUpload 
+      user={currentUser} 
+      onUploadComplete={() => {
+        if (currentUser) {
+          fetchPDFs(currentUser.uid);
+        }
+      }} 
+    />    )}
+  </div>
+</div>
+
+            </div>
 
         </div>
 

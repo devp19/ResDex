@@ -4,11 +4,11 @@ import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Spinner from 'react-bootstrap/Spinner';
 
-const PDFUpload = ({ user }) => {
+const PDFUpload = ({ user, onUploadComplete }) => {
   const [loading, setLoading] = useState(false);
   const [pdfUrl, setPdfUrl] = useState(null);
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = async (e) => {  // Define handleFileChange here
     const selectedFile = e.target.files[0];
 
     if (selectedFile) {
@@ -19,7 +19,6 @@ const PDFUpload = ({ user }) => {
   const handleUpload = async (file) => {
     if (!file || !user) return;
   
-    console.log(file);
     setLoading(true);
     const params = {
       Bucket: 'resdex-bucket',
@@ -30,19 +29,24 @@ const PDFUpload = ({ user }) => {
   
     try {
       const options = { partSize: 5 * 1024 * 1024, queueSize: 1 };
-  
       const data = await s3.upload(params, options).promise();
       const pdfUrl = data.Location;
       setPdfUrl(pdfUrl);
 
       const userDocRef = doc(db, 'users', user.uid);
       const docSnapshot = await getDoc(userDocRef);
+      
       if (!docSnapshot.exists()) {
-        await setDoc(userDocRef, { pdfUrl: pdfUrl });
-        console.log('Profile document created successfully!');
+        await setDoc(userDocRef, { pdfs: [pdfUrl] });
       } else {
-        await updateDoc(userDocRef, { pdfUrl: pdfUrl });
-        console.log('PDF URL updated successfully!');
+        const currentPdfs = docSnapshot.data().pdfs || [];
+        await updateDoc(userDocRef, { 
+          pdfs: [...currentPdfs, pdfUrl] 
+        });
+      }
+      
+      if (onUploadComplete) {
+        onUploadComplete(user.uid);
       }
     } catch (error) {
       console.error('Error uploading PDF: ', error);
@@ -82,7 +86,7 @@ const PDFUpload = ({ user }) => {
       <input
         id="pdfInput"
         type="file"
-        style={{ display: 'none'}}
+        style={{ display: 'none' }}
         accept=".pdf"
         onChange={handleFileChange}
       />
@@ -91,23 +95,15 @@ const PDFUpload = ({ user }) => {
         onClick={() => document.getElementById('pdfInput').click()}
       >
         <svg style={{marginBottom: '20px'}} xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-upload" viewBox="0 0 16 16">
-  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
-  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
-</svg>
-                  <h5>Upload Document</h5>
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+          <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+        </svg>
+        <h5>Upload Document</h5>
       </div>
       {loading && (
         <div style={styles.loadingOverlay}>
           <Spinner animation="border" variant="light" />
         </div>
-      )}
-
-      {pdfUrl && (
-        <iframe
-          src={pdfUrl}
-          style={styles.pdfPreview}
-          title="PDF Preview"
-        />
       )}
     </div>
   );
