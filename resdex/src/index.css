@@ -19,8 +19,8 @@ code {
     monospace;
 }
 
-.border-view {
-  outline: 2px solid white;
+.border-black {
+  outline: 2px solid rgb(255, 0, 0);
 }
 
 .center-container {
@@ -320,7 +320,7 @@ code {
 }
 
 .upload {
-  height: 300px;
+  /* height: 300px; */
   border-radius: 5px;
 }
 
@@ -331,7 +331,7 @@ border-top: 1px solid white;
 }
 
 .actual-upload{
-  margin: 30px;
+  margin: 10px;
   border-radius: 5px;
   background-color: rgb(0, 0, 0);
   color: white;
@@ -342,9 +342,40 @@ border-top: 1px solid white;
   cursor: pointer;
   outline: 1px dashed black;
   outline-offset: 2px;
+  height: 300px;
 }
 
-.actual-upload:hover {
-  margin: 15px;
+.uploaded{
+  margin: 10px;
+  border-radius: 5px;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+/* .actual-upload:hover {
+  margin: 15px;
+} */
+
+
+
+/* Add to your CSS file */
+.pdf-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.pdf-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.pdf-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.pdf-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
