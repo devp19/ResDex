@@ -215,8 +215,8 @@ const fetchPDFs = useCallback(async (userId) => {
   return (
     <div>
       <div className='center top'>
-        <div className='row'>
-          <div className='col-md-3 d-flex justify-content-center' 
+        <div className='row d-flex justify-content-center'>
+          <div className='col-md-3 offset-md-2 d-flex justify-content-center' 
                style={{borderRight: '1px solid white', marginRight: '50px'}}>
             <label>
               <div
@@ -394,6 +394,11 @@ const fetchPDFs = useCallback(async (userId) => {
                   className="custom"
                   onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
                 > View Full Paper ⇗</button>
+                <br></br>
+              <button 
+                  className="custom"
+                  onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
+                > Remove Paper </button>
             </div>
             </div>
           </div>
@@ -431,7 +436,7 @@ const fetchPDFs = useCallback(async (userId) => {
   </div>
   
     {isOwnProfile && (
-      <div style={{margin: '10px', height: '300px', borderRadius: '5px'}} 
+      <div style={{alignSelf: 'center', height: '300px', borderRadius: '5px', marginLeft: '20px'}} 
       className='col-md-3 bg-black d-flex align-items-center justify-content-center'>
       <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
       </div>
