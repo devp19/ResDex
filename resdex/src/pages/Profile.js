@@ -4,7 +4,7 @@ import { auth, db } from '../firebaseConfig';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
 import PDFUpload from './PDFUpload';
-
+import { s3 } from '../awsConfig';
 
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
@@ -52,6 +52,36 @@ const previousPdf = () => {
   }
 };
 
+const handleRemove = async (pdfToRemove) => {
+  if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
+    return;
+  }
+
+  try {
+    const key = decodeURIComponent(pdfToRemove.url.split('resdex-bucket.s3.amazonaws.com/')[1]);
+    console.log(key);
+    console.log("Attempting to delete object with key:", key);
+    
+    const params = { Bucket: 'resdex-bucket', Key: key };
+    await s3.deleteObject(params).promise();
+
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const updatedPdfs = pdfs.filter(pdf => pdf.url !== pdfToRemove.url);
+    await updateDoc(userDocRef, { pdfs: updatedPdfs });
+
+    setPdfs(updatedPdfs);
+    if (currentPdfIndex >= updatedPdfs.length) {
+      setCurrentPdfIndex(Math.max(0, updatedPdfs.length - 1));
+    }
+
+    console.log("Successfully removed PDF from both S3 and Firestore");
+
+  } catch (error) {
+    console.error("Error removing PDF:", error);
+    console.error("Full error details:", error.message);
+    alert("Failed to remove PDF. Please try again.");
+  }
+};
   
 const fetchPDFs = useCallback(async (userId) => {
   try {
@@ -211,6 +241,7 @@ const fetchPDFs = useCallback(async (userId) => {
 
   const isOwnProfile = currentUser && currentUser.uid === profileUser.uid;
 
+ 
 
   return (
     <div>
@@ -397,7 +428,7 @@ const fetchPDFs = useCallback(async (userId) => {
                 <br></br>
               <button 
                   className="custom"
-                  onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
+                  onClick={() => handleRemove(pdfs[currentPdfIndex])}
                 > Remove Paper </button>
             </div>
             </div>
@@ -449,6 +480,7 @@ const fetchPDFs = useCallback(async (userId) => {
       </div>
     </div>
   );
+
 };
 
 
