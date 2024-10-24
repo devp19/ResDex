@@ -426,10 +426,12 @@ const fetchPDFs = useCallback(async (userId) => {
                   onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
                 > View Full Paper ⇗</button>
                 <br></br>
+                {isOwnProfile && (
               <button 
                   className="custom"
                   onClick={() => handleRemove(pdfs[currentPdfIndex])}
                 > Remove Paper </button>
+                )}
             </div>
             </div>
           </div>
