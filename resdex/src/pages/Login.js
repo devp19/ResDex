@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import Logo from '../images/index.png';
@@ -43,6 +43,7 @@ const Login = () => {
         }
       } else {
         setError('Email has not been verified. Please verify before continuing!')
+        await signOut(auth);
       }
     } catch (err) {
       setError('Failed to log in. Check your credentials.');

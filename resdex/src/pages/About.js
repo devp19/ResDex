@@ -1,4 +1,3 @@
-// src/pages/Home.js
 import React from 'react';
 import About1 from '../images/index.png'
 import About2 from '../images/indexinv.png'
