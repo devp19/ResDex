@@ -29,6 +29,13 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      auth.signOut();
+    }
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light pt-4">
       <NavLink className="navbar-brand" to="/">
@@ -61,7 +68,7 @@ const Navbar = () => {
           )}
           <li className="nav-item">
             {user ? (
-              <NavLink to="/" className="nav-link" onClick={() => auth.signOut()}>Logout</NavLink>
+              <NavLink to="/" className="nav-link" onClick={handleLogout}>Logout</NavLink>
             ) : (
               <NavLink to="/login" className="nav-link" activeClassName="active">Sign In</NavLink>
             )}

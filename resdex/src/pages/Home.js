@@ -1,4 +1,3 @@
-// src/pages/Home.js
 import React from 'react';
 import Headline from '../images/headline.png';
 import { Link } from 'react-router-dom';

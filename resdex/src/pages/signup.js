@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import Logo from '../images/index.png';
 import { collection, addDoc, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { Form, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState("");
+  const [passwordMatch, setPasswordMatch] = useState(true);
   const [fullName, setFullName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
@@ -17,10 +23,14 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // Basic username validation
     const username = displayName.toLowerCase().replace(/\s+/g, '');
     if (username.length < 3) {
       setError('Username must be at least 3 characters long');
+      return;
+    }
+
+    if (password !== password2) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -65,10 +75,20 @@ const Signup = () => {
       console.log("Firestore write operations completed successfully");
       
       setSuccess('Verification email sent! Please check your inbox to verify your email address.');
+      await signOut(auth);
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     } catch (authError) {
       console.error("Error during authentication:", authError);
       setError(authError.message);
     }
+  };
+
+  const handlePassword2Change = (e) => {
+    const value = e.target.value;
+    setPassword2(value);
+    setPasswordMatch(value === password);
   };
 
   return (
@@ -87,6 +107,7 @@ const Signup = () => {
                 placeholder="Enter full name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                required
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicDisplayName">
@@ -96,6 +117,7 @@ const Signup = () => {
                 placeholder="Enter display name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                required
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -105,6 +127,7 @@ const Signup = () => {
                 placeholder="Enter email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -114,7 +137,22 @@ const Signup = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicPassword2">
+              <Form.Label>Confirm Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Retype Password"
+                value={password2}
+                onChange={handlePassword2Change}
+                isInvalid={!passwordMatch && password2.length > 0}
+                required='true'
+              />
+              <Form.Control.Feedback type="invalid">
+                Passwords do not match
+              </Form.Control.Feedback>
             </Form.Group>
 
             {error && <p className="error-text">{error}</p>}

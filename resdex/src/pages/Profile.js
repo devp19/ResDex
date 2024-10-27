@@ -8,6 +8,7 @@ import { s3 } from '../awsConfig';
 
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
+
 const saveProfileToLocalStorage = (username, profileData) => {
   const dataToStore = {
     profile: profileData,
