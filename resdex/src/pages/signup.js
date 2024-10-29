@@ -23,11 +23,19 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const username = displayName.toLowerCase().replace(/\s+/g, '');
-    if (username.length < 3) {
-      setError('Username must be at least 3 characters long');
-      return;
-    }
+  const username = displayName.toLowerCase().replace(/\s+/g, '');
+  const usernameRegex = /^[a-zA-Z0-9]+$/;
+
+  if (username.length < 3) {
+    setError('Username must be at least 3 characters long');
+    return;
+  }
+
+  if (!usernameRegex.test(username)) {
+    setError('Username can only contain letters and numbers, with no spaces or special characters.');
+    return;
+  }
+
 
     if (password !== password2) {
       setError('Passwords do not match');

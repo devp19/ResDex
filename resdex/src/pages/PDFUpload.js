@@ -1,62 +1,83 @@
 import { useState } from 'react';
 import { s3 } from '../awsConfig';
-import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 
+const MAX_FILE_SIZE_MB = 5; // so that someone doesn't upload a file of like 1000gb 
+const MAX_UPLOADS_PER_DAY = 10; // just so someone doesn't try to fill up the S3 Bucket..
+
 const PDFUpload = ({ user, onUploadComplete }) => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showErrorModal, setErrorModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        setErrorMessage(`File size exceeds ${MAX_FILE_SIZE_MB} MB limit.`);
+        setErrorModal(true);
+        return;
+      }
       setSelectedFile(file);
+      setErrorMessage('');
       setShowModal(true);
     }
   };
 
   const handleUpload = async () => {
     if (!selectedFile || !user || !title.trim()) return;
-  
+
     setLoading(true);
     setShowModal(false);
+    setErrorModal(false);
 
-    const params = {
-      Bucket: 'resdex-bucket',
-      Key: `pdfs/${user.uid}/${selectedFile.name}`,
-      Body: selectedFile,
-      ContentType: 'application/pdf',
-    };
-  
     try {
+      const userDocRef = doc(db, 'users', user.uid);
+      const docSnapshot = await getDoc(userDocRef);
+      const currentPdfs = docSnapshot.exists() ? docSnapshot.data().pdfs || [] : [];
+
+      const today = new Date().toISOString().split('T')[0];
+      const todaysUploads = currentPdfs.filter(pdf => pdf.uploadDate.startsWith(today));
+      
+      if (todaysUploads.length >= MAX_UPLOADS_PER_DAY) {
+        setLoading(false);
+        setErrorMessage(`You have reached the daily limit of ${MAX_UPLOADS_PER_DAY} uploads.`);
+        setErrorModal(true);
+        return;
+      }
+      setErrorModal(false);
+      setErrorMessage('')
+      const params = {
+        Bucket: 'resdex-bucket',
+        Key: `pdfs/${user.uid}/${selectedFile.name}`,
+        Body: selectedFile,
+        ContentType: 'application/pdf',
+      };
+
       const options = { partSize: 5 * 1024 * 1024, queueSize: 1 };
       const data = await s3.upload(params, options).promise();
-      
+
       const pdfData = {
         url: data.Location,
         title: title,
         description: description,
-        uploadDate: new Date().toISOString()
+        uploadDate: new Date().toISOString(),
       };
 
-      const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDoc(userDocRef);
-      
       if (!docSnapshot.exists()) {
         await setDoc(userDocRef, { pdfs: [pdfData] });
       } else {
-        const currentPdfs = docSnapshot.data().pdfs || [];
-        await updateDoc(userDocRef, { 
-          pdfs: [...currentPdfs, pdfData] 
-        });
+        await updateDoc(userDocRef, { pdfs: arrayUnion(pdfData) });
       }
-      
+
       if (onUploadComplete) {
         onUploadComplete(user.uid);
       }
@@ -64,8 +85,11 @@ const PDFUpload = ({ user, onUploadComplete }) => {
       setTitle('');
       setDescription('');
       setSelectedFile(null);
+      setErrorMessage('');
+      window.location.reload();
     } catch (error) {
       console.error('Error uploading PDF: ', error);
+      setErrorMessage('Failed to upload. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -113,9 +137,10 @@ const PDFUpload = ({ user, onUploadComplete }) => {
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Document Details</Modal.Title>
+          <Modal.Title style={{color: 'black'}}>Document Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title*</Form.Label>
@@ -151,6 +176,21 @@ const PDFUpload = ({ user, onUploadComplete }) => {
           </button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={showErrorModal} onHide={() => setErrorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title className='title'> Error Uploading Document </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="custom border" onClick={() =>  {setErrorModal(false); window.location.reload();}}>
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+
 
       {loading && (
         <div style={styles.loadingOverlay}>
