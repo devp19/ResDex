@@ -7,7 +7,8 @@ import Login from './pages/Login';
 import Footer from './pages/Footer';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
-import PrivateRoute from './pages/privateroute';
+// import PrivateRoute from './pages/privateroute';
+import Search from './pages/Search';
 import Signup from './pages/signup';
 import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
@@ -47,6 +48,7 @@ function App() {
               <Route path="/recovery" element={<Recovery />} />
               <Route path="/team" element={<Team />} />
               <Route path="/contact" element={<Contact/>} />
+              <Route path="/search" element={<Search/>} />
               
               <Route path="/profile/:username" element={<Profile />} />
             </Routes>

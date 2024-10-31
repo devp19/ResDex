@@ -224,10 +224,49 @@ code {
   transition: 0.5s;
 }
 
+.custom-view {
+  color:rgb(255, 255, 255);
+  background-color: rgb(0, 0, 0);
+  text-decoration: none;
+  font-size: 15px;
+  border: none;
+  border-radius: 5px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  transition: 0.5s;
+}
+
+/* Remove blue outline on input focus */
+input:focus, select:focus, button:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: inherit; /* Keep the original border color without highlighting */
+}
+
+.search-input-group input:focus,
+.search-input-group select:focus,
+.search-input-group button:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: inherit;
+}
+
+
+
 .custom:hover{
   color: white;
   background-color: black;
   border: 1px solid white;
+
+}
+
+.custom-view:hover{
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(0, 0, 0);
+  
 
 }
 
