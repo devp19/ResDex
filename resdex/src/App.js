@@ -13,6 +13,8 @@ import Signup from './pages/signup';
 import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
 import Success from './pages/Success';
+import ReleaseDocs from './pages/ReleaseDocs'
+
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -51,6 +53,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/search" element={<Search />} />
               <Route path="/success" element={<Success />} />
+              <Route path="/releasedocs" element={<ReleaseDocs />} />
               <Route path="/profile/:username" element={<Profile />} />
             </Routes>
             <Footer />

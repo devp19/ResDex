@@ -36,20 +36,18 @@ const Footer = () => {
             </div>
             
             <div className='center'>
-                <div className='row'>
+                <div className='row d-flex justify-content-center' style={{lineHeight: '40px'}}>
                     <div className='col-md-2 left'>
                         <Link className='link' to="/about">About</Link>
                     </div>
-                    {user && username && (
-                        <div className='col-md-2 left'>
-                            <Link className='link' to={`/profile/${username}`}>Profile</Link>
-                        </div>
-                    )}
                     <div className='col-md-2 left'>
                         <Link className='link' to="/team">Team</Link>
                     </div>
                     <div className='col-md-2 left'>
                         <Link className='link' to="/contact">Contact</Link>
+                    </div>
+                    <div className='col-md-2 left'>
+                        <Link className='link' to="/releasedocs">ReleaseDocs</Link>
                     </div>
                 </div>
             </div>
