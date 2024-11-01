@@ -1,6 +1,14 @@
 *{
   color: white;
 }
+body::-webkit-scrollbar {
+  width: 5px; 
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgb(255, 255, 255); 
+  border-radius: 20px; 
+}
 
 body {
   margin: 0;
@@ -238,11 +246,10 @@ code {
   transition: 0.5s;
 }
 
-/* Remove blue outline on input focus */
 input:focus, select:focus, button:focus {
   outline: none;
   box-shadow: none;
-  border-color: inherit; /* Keep the original border color without highlighting */
+  border-color: inherit;
 }
 
 .search-input-group input:focus,
@@ -359,7 +366,6 @@ input:focus, select:focus, button:focus {
 }
 
 .upload {
-  /* height: 300px; */
   border-radius: 5px;
 }
 
@@ -394,25 +400,18 @@ border-top: 1px solid white;
   align-items: center;
 }
 
-/* .actual-upload:hover {
-  margin: 15px;
-
-}
-
-/* Wrapper for the image */
 .profile-pic {
   width: 150px;
   height: 150px;
-  border-radius: 50%; /* Circular shape */
-  overflow: hidden; /* Ensures the image doesn’t overflow */
-  margin-bottom: 10px; /* Space below the picture */
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 
-/* Styling for the image itself */
 .profile-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image fits nicely inside the circle */
+  object-fit: cover;
 }
 
 .profile-name {
@@ -485,13 +484,6 @@ border-top: 1px solid white;
 }
 
 
-
-
-
-
-
-
-/* Add to your CSS file */
 .pdf-container::-webkit-scrollbar {
   height: 8px;
 }
