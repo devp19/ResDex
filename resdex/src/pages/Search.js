@@ -30,7 +30,7 @@ const Search = () => {
     };
 
     const handleSearch = async (term) => {
-        if (searchType === "users" && term.trim() !== "") {
+        if (term.trim() !== "") {
             const processedTerm = term.toLowerCase();
 
             const usersCollection = collection(db, "users");
@@ -40,25 +40,20 @@ const Search = () => {
 
             const allUsers = querySnapshot.docs.map(doc => doc.data());
 
-            const filteredResults = allUsers.filter(user => 
-                user.username.toLowerCase().includes(processedTerm) || 
-                user.fullName.toLowerCase().includes(processedTerm)
-            );
+            let filteredResults;
 
-            const sortedResults = filteredResults.sort((a, b) => {
-                const aUsernameMatch = a.username.toLowerCase() === processedTerm;
-                const bUsernameMatch = b.username.toLowerCase() === processedTerm;
+            if (searchType === "users") {
+                filteredResults = allUsers.filter(user => 
+                    user.username.toLowerCase().includes(processedTerm) || 
+                    user.fullName.toLowerCase().includes(processedTerm)
+                );
+            } else if (searchType === "papers") {
+                filteredResults = allUsers.filter(user => 
+                    user.pdfs && user.pdfs.some(pdf => pdf.title.toLowerCase().includes(processedTerm))
+                );
+            }
 
-                if (aUsernameMatch && !bUsernameMatch) return -1;
-                if (!aUsernameMatch && bUsernameMatch) return 1;  
-
-                if (a.username.toLowerCase() < b.username.toLowerCase()) return -1;
-                if (a.username.toLowerCase() > b.username.toLowerCase()) return 1;
-
-                return a.fullName.toLowerCase().localeCompare(b.fullName.toLowerCase());
-            });
-
-            setResults(sortedResults); 
+            setResults(filteredResults); 
         } else {
             setResults([]);
         }
@@ -96,32 +91,71 @@ const Search = () => {
                 </div>
                 <div className="mt-3 center">
                     {results.length > 0 ? (
-                        <ul className="list-group">
+                        <div 
+                            className="row" 
+                            style={{ 
+                                display: 'flex', 
+                                flexWrap: 'wrap', 
+                                justifyContent: results.length === 1 ? 'center' : 'space-between' 
+                            }}
+                        >
                             {results.map((user, index) => (
-                                <li style={{minWidth: '600px'}} key={index} className="list-group-item d-flex align-items-center justify-content-between">
-                                    <div className="d-flex align-items-center">
-                                        <img 
-                                            src={user.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de' }  // Default image if no profile picture exists
-                                            alt={`${user.fullName}'s profile`}
-                                            style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }}
-                                        />
-                         
-                                        <div>
-                                            <strong style={{color: 'black'}}> {user.fullName} </strong> 
-                                            <span><i style={{color: 'gray', marginLeft: '10px'}}>'{user.username}'</i></span>
+                                <div 
+                                    key={index} 
+                                    className="col" 
+                                    style={{ 
+                                        backgroundColor:'white', 
+                                        padding:'20px', 
+                                        borderRadius:'10px', 
+                                        flex: results.length === 1 ? '0 0 100%' : '0 0 calc(50% - 10px)', 
+                                        marginBottom: '20px',
+                                        maxWidth: results.length === 1 ? '600px' : 'none'
+                                    }}
+                                >
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <div className="d-flex align-items-center" style={{marginRight: '30px'}}>
+                                            <img 
+                                                src={user.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de' }  
+                                                alt={`${user.fullName}'s profile`}
+                                                style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }}
+                                            />
+                                            <div>
+                                                <strong style={{color: 'black'}}> {user.fullName} </strong> 
+                                                <br></br>
+                                                <span><i style={{color: 'gray'}}>'{user.username}'</i></span>
+                                            </div>
                                         </div>
+
+                                        <button 
+                                            className="custom-view"
+                                            onClick={() => goToProfile(user.username)}
+                                        >
+                                            View Profile ↗︎
+                                        </button>
                                     </div>
 
-                     
-                                    <button 
-                                        className="custom-view"
-                                        onClick={() => goToProfile(user.username)}
-                                    >
-                                        View Profile ↗︎
-                                    </button>
-                                </li>
+                                    {searchType === "papers" && user.pdfs && (
+                                        <div style={{ marginTop: '20px', width: '100%' }}>
+                                            {user.pdfs.map((pdf, pdfIndex) => (
+                                                pdf.title.toLowerCase().includes(searchTerm.toLowerCase()) && (
+                                                    <div key={pdfIndex} style={{ marginBottom: '20px' }}>
+                                                        <h5 style={{color: 'black'}}>{pdf.title}</h5>
+                                                        <p style={{color: 'black'}}>{pdf.description}</p>
+                                                        <iframe 
+                                                            src={pdf.url} 
+                                                            title={pdf.title}
+                                                            width="100%" 
+                                                            height="400px" 
+                                                            style={{ border: '1px solid #ccc' }}
+                                                        ></iframe>
+                                                    </div>
+                                                )
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     ) : (
                         searchTerm.trim() !== "" && <p>No results found</p>
                     )}
