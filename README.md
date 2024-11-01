@@ -3,6 +3,7 @@
 
 `Platform Launching Soon!`
 ___
+<iframe src='https://resdex.vercel.app'> </iframe>
 
 ![ResDex Banner](https://github.com/user-attachments/assets/f15be4bb-a691-4376-be2a-953261f60c9f)
 
