@@ -35,6 +35,7 @@ const Contact = () => {
           console.log('SUCCESS!', response.status, response.text);
           setSuccess('Ticket submitted successfully!');
           setError('');
+          navigate('/success')
         },
         (err) => {
           console.error('FAILED...', err);

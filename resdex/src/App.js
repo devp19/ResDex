@@ -12,6 +12,7 @@ import Search from './pages/Search';
 import Signup from './pages/signup';
 import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
+import Success from './pages/Success';
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -47,9 +48,9 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/recovery" element={<Recovery />} />
               <Route path="/team" element={<Team />} />
-              <Route path="/contact" element={<Contact/>} />
-              <Route path="/search" element={<Search/>} />
-              
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/success" element={<Success />} />
               <Route path="/profile/:username" element={<Profile />} />
             </Routes>
             <Footer />
