@@ -1,6 +1,6 @@
 import React from 'react';
 import Fenil from '../images/FenilPFP.png'
-import Dev from '../images/DevPFP.jpg'
+import Dev from '../images/dev.png'
 const Team = () => {
     return (
         <div>
@@ -16,7 +16,8 @@ const Team = () => {
         />
     </div>
     <p className="profile-name">Dev Patel</p>
-    <p className="profile-position">Position</p>
+    <p className="profile-position">Co-Founder &</p>
+    <p className="profile-position minus">Full-Stack Developer</p>
                         
                        
               
@@ -33,15 +34,14 @@ const Team = () => {
         />
     </div>
     <p className="profile-name">Fenil Shah</p>
-    <p className="profile-position">Position</p>
-                        
-                       
+    <p className="profile-position">Co-Founder &</p>
+    <p className="profile-position minus">Project Manager</p>
               
                     </div>
                     <div className='col-md-4 d-flex flex-column align-items-center'>
                         <div className="profile-pic"></div>
                         <p className="profile-name">Deep Patel</p>
-                        <p className="profile-position">Position</p>
+                        <p className="profile-position">Head of Medical Outsourcing</p>
                     </div>
                 </div>  
 
