@@ -4,7 +4,7 @@
 `Platform Launching Soon!`
 ___
 
-![ResDex Banner](https://github.com/user-attachments/assets/bb981789-f2f6-47c6-8246-0e99a8e7f85d)
+![ResDex Banner](https://github.com/user-attachments/assets/f15be4bb-a691-4376-be2a-953261f60c9f)
 
 ___
 
