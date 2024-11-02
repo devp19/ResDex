@@ -32,7 +32,7 @@ const About = () => {
         </div>
         
       <div className='col-md-6 offset-md-1'>
-      <h3>Objective | ResDex</h3>
+      <h3>Mission Statement | ResDex</h3>
 
       As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in.
       <br></br>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 import { auth, db } from '../firebaseConfig';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
@@ -34,12 +35,14 @@ const Profile = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [about, setAbout] = useState('');
-  const [isEditingAbout, setIsEditingAbout] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [organization, setOrganization] = useState('');
+  const [newOrganization, setNewOrganization] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAbout, setNewAbout] = useState('');
-  const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update so user can changeeee
+  const [loading, setLoading] = useState(true);
   const [pdfs, setPdfs] = useState([]);
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update so user can changeeee
 
 const nextPdf = () => {
   if (currentPdfIndex < pdfs.length - 1) {
@@ -126,6 +129,7 @@ const fetchPDFs = useCallback(async (userId) => {
         console.log("Profile found in local storage");
         setProfileUser(cachedProfile);
         setAbout(cachedProfile.about || '');
+        setOrganization(cachedProfile.organization || '');
         setProfilePicture(cachedProfile.profilePicture || null);
         setLoading(false);
         return;
@@ -153,12 +157,14 @@ const fetchPDFs = useCallback(async (userId) => {
         console.log("User document does not exist");
         setProfileUser(null);
         setAbout('');
+        setOrganization('');
       } else {
         const userData = userDocSnapshot.data();
         console.log("Full user data:", userData);
         setProfileUser(userData);
         setProfilePicture(userData.profilePicture || null);
         setAbout(userData.about || '');
+        setOrganization(userData.about || '');
         saveProfileToLocalStorage(username, userData);
         await fetchPDFs(userData.uid);
 
@@ -219,11 +225,23 @@ const fetchPDFs = useCallback(async (userId) => {
     }
 }, [username, profileUser]);
 
+  const updateOrganization = useCallback(async (newOrganizationSection) => {
+    if (!profileUser) return; // make sure profile exists otherwise, its screwed up
 
-  const handleAboutSubmit = () => {
-    updateAbout(newAbout);
-    setIsEditingAbout(false);
-  };
+    setOrganization(newOrganizationSection);
+    const updatedUser = { ...profileUser, organization: newOrganizationSection };
+    saveProfileToLocalStorage(username, updatedUser);
+    setProfileUser(updatedUser);
+
+    try {
+        const userDocRef = doc(db, 'users', profileUser.uid);
+        await updateDoc(userDocRef, { organization: newOrganizationSection });
+        console.log("Organization section updated in Firestore.");
+    } catch (error) {
+        console.error("Error updating about section in Firestore: ", error);
+    }
+}, [username, profileUser]);
+
 
   const handleProfilePictureClick = () => {
     document.getElementById('profilePictureInput').click();
@@ -231,6 +249,22 @@ const fetchPDFs = useCallback(async (userId) => {
 
   const handleMouseEnter = () => setIsHovering(true);
   const handleMouseLeave = () => setIsHovering(false);
+
+  const handleModalOpen = () => {
+    setNewAbout(about);
+    setNewOrganization(organization)
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleAboutSubmit = () => {
+    updateAbout(newAbout);
+    updateOrganization(newOrganization)
+    setIsModalOpen(false);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -325,31 +359,17 @@ const fetchPDFs = useCallback(async (userId) => {
 
             <div className='row'>
               <div className='col-md-8'>
-                {isEditingAbout ? (
-                  <>
-                    <textarea
-                      maxLength="150"
-                      value={newAbout}
-                      onChange={(e) => setNewAbout(e.target.value)}
-                      rows="4"
-                      style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none" }}
-                    />
-                    <button className='custom' onClick={handleAboutSubmit}>Save About</button>
-                    <button className='custom border' style={{ marginLeft: '10px', background: 'black', color: 'white' }} onClick={() => setIsEditingAbout(false)}>Cancel</button>
-                  </>
-                ) : (
-                  <>
                     <p>{about}</p>
+                    <p> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-buildings" viewBox="0 0 16 16">
+  <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z"/>
+  <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z"/>
+</svg> {organization}</p>
                     {isOwnProfile && (
-                      <button className='custom' onClick={() => {
-                        setNewAbout(about);
-                        setIsEditingAbout(true);
-                      }}>
-                        Edit About
+                      <button className='custom' onClick={handleModalOpen}> 
+                      Edit Profile  
                       </button>
-                    )}
-                  </>
-                )}
+                    )
+                    }
               </div>
 
               {isOwnProfile && (
@@ -481,6 +501,43 @@ const fetchPDFs = useCallback(async (userId) => {
         </div>
 
       </div>
+
+      <Modal show={isModalOpen} onHide={handleModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title style={{color: 'black'}}>Edit Profile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p><strong style={{color: 'black'}}>Edit About</strong></p>
+          <textarea
+            maxLength="150"
+            value={newAbout}
+            onChange={(e) => setNewAbout(e.target.value)}
+            rows="4"
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none" }}
+          />
+          <br></br>
+          <br></br>
+          <br></br>
+
+          <p><strong style={{color: 'black'}}>Edit Organization</strong></p>
+          <textarea
+            maxLength="40"
+            value={newOrganization}
+            onChange={(e) => setNewOrganization(e.target.value)}
+            rows="1"
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none" }}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleModalClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" className='custom-view' onClick={handleAboutSubmit}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
     </div>
   );
 

@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
 import Success from './pages/Success';
 import ReleaseDocs from './pages/ReleaseDocs'
+import V101 from './Releases/V101'
 
 
 function App() {
@@ -54,7 +55,9 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/success" element={<Success />} />
               <Route path="/releasedocs" element={<ReleaseDocs />} />
+              <Route path="/releasedocs/v101" element={<V101 />} />
               <Route path="/profile/:username" element={<Profile />} />
+
             </Routes>
             <Footer />
           </>
