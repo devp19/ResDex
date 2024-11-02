@@ -41,7 +41,7 @@ const Team = () => {
                     <div className='col-md-4 d-flex flex-column align-items-center'>
                         <div className="profile-pic"></div>
                         <p className="profile-name">Deep Patel</p>
-                        <p className="profile-position">Head of Medical Outsourcing</p>
+                        <p className="profile-position">Medical Outsourcing</p>
                     </div>
                 </div>  
 
@@ -50,12 +50,12 @@ const Team = () => {
                     <div className='col-md-4 d-flex flex-column align-items-center'>
                         <div className="profile-pic"></div>
                         <p className="profile-name">Bhavi Singh</p>
-                        <p className="profile-position">Position</p>
+                        <p className="profile-position">Medical Outsourcing</p>
                     </div>
                     <div className='col-md-4 d-flex flex-column align-items-center '>
                         <div className="profile-pic"></div>
                         <p className="profile-name">Rishi Patel</p>
-                        <p className="profile-position">Position</p>
+                        <p className="profile-position">Developer</p>
                     </div>
                 </div> 
 
@@ -65,7 +65,7 @@ const Team = () => {
 
     <div className="col-md-4 d-flex flex-column align-items-center profile-card">
         <h3>Dev Patel</h3>
-        <p style={{color: 'black'}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <p style={{color: 'black'}}>I'm a 2nd-year CS student at Toronto Metropolitan University, passionate about AI in healthcare and tech innovation.</p>
         <button className="social-button">LinkedIn</button>
         <button className="social-button">GitHub</button>
     </div>
