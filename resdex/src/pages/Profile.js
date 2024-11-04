@@ -272,6 +272,7 @@ const updateInterests = useCallback(async (newInterests) => {
     const userDocRef = doc(db, 'users', profileUser.uid);
     await updateDoc(userDocRef, { interests: interestValues.join(', ') });
     console.log("Interests updated in Firestore.");
+    window.location.reload();
   } catch (error) {
     console.error("Error updating interests in Firestore: ", error);
   }
@@ -313,7 +314,6 @@ const updateInterests = useCallback(async (newInterests) => {
     const newInterestsString = selectedInterests.map(i => i.value).join(', ');
     if (newInterestsString !== interests) {
       updateInterests(selectedInterests);
-      window.location.reload();
     }    setIsModalOpen(false);
   };
 
