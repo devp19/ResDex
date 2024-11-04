@@ -7,7 +7,7 @@ import ProfilePictureUpload from './ProfilePictureUpload';
 import PDFUpload from './PDFUpload';
 import { s3 } from '../awsConfig';
 import Select from 'react-select';
-
+import Carousel from 'react-bootstrap/Carousel';
 
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
@@ -508,7 +508,7 @@ Edit Profile
           </div>
 
        
-        <div className='container upload-cont'>
+        {/* <div className='container upload-cont'>
   <h4 style={{marginTop: '-20px', marginBottom: '30px'}}> Completed Research</h4>
 
   <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center bg-white'>
@@ -618,9 +618,87 @@ Edit Profile
       </div>
     )}
 </div>
-</div>
-       
+</div> */}
+<div className=' upload-cont mt-5'>
+  <div className='row'>
+  <div className='d-flex justify-content-center'>
+
+        <div className='col-md-5' style={{marginRight: '100px'}}>
+         <h4>Completed Research</h4>
+         </div>
+
+      <label className='col-md-4'>
+      <div style={{textAlign: 'right'}}>                    
+                  {isOwnProfile && (
+                      <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
+                    )
+                    }
+              </div>
+      </label>
         </div>
+        <div className='col-md-4'>
+        <h4></h4>
+        </div>
+        </div>
+        <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
+
+          <div className='col-md-10'>
+          <div style={{
+            margin: '10px',
+            minHeight: '300px',
+            borderRadius: '5px',
+            padding: '20px',
+            border: '1px solid white'
+          }} className='col-md-12'>
+            {pdfs.length > 0 ? (
+              <Carousel>
+              {pdfs.map((pdf, index) => (
+                <Carousel.Item key={index}>
+                  <div className='d-flex justify-content-center'>
+                    <div className='row'>
+                      <div className='col-md-5'>
+                        <iframe
+                          title='pdf'
+                          src={pdf.url}
+                          style={{
+                            width: '100%',
+                            height: '300px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            pointerEvents: 'none'
+                          }}
+                        />
+                      </div>
+                      <div className='col-md-7 d-flex flex-column align-items-center'>
+                        <div className="text-white mt-3">
+                          <h5>{pdf.title}</h5>
+                          <p>{pdf.description}</p>
+                          <button className="custom" onClick={() => window.open(pdf.url, '_blank')}>
+                            View Full Paper ⇗
+                          </button>
+                          <br />
+                          {isOwnProfile && (
+                            <button className="custom" onClick={() => handleRemove(pdf)}>
+                              Remove Paper
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+            
+            ) : (
+              <div className="d-flex align-items-center justify-content-center text-white top" style={{marginTop: '10px'}}>
+                No Documents Uploaded
+              </div>
+            )}
+          </div>
+          </div>
+        </div>
+      </div>
 
       </div>
 
@@ -680,6 +758,7 @@ Edit Profile
         </Modal.Footer>
       </Modal>
       
+    </div>
     </div>
   );
 
