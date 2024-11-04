@@ -252,7 +252,7 @@ const fetchPDFs = useCallback(async (userId) => {
 
   const handleModalOpen = () => {
     setNewAbout(about);
-    setNewOrganization(organization)
+    setNewOrganization(organization);
     setIsModalOpen(true);
   };
 
@@ -262,7 +262,7 @@ const fetchPDFs = useCallback(async (userId) => {
 
   const handleAboutSubmit = () => {
     updateAbout(newAbout);
-    updateOrganization(newOrganization)
+    updateOrganization(newOrganization);
     setIsModalOpen(false);
   };
 
