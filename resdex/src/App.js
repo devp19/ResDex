@@ -37,7 +37,7 @@ function App() {
       <div className="App">
         {isMobile ? (
           <div className="center-container">
-            ResDex → Coming to Mobile Soon!
+            Check out Resdex on a larger screen!
             <br></br>
             <br></br>
           </div>
