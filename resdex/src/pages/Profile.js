@@ -40,7 +40,6 @@ const Profile = () => {
   const [organization, setOrganization] = useState('');
   const [interests, setInterests] = useState('');
   const [newOrganization, setNewOrganization] = useState('');
-  const [newInterests, setNewInterests] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAbout, setNewAbout] = useState('');
   const [loading, setLoading] = useState(true);
@@ -180,7 +179,7 @@ const fetchPDFs = useCallback(async (userId) => {
         setProfileUser(userData);
         setProfilePicture(userData.profilePicture || null);
         setAbout(userData.about || '');
-        setOrganization(userData.about || '');
+        setOrganization(userData.organization || '');
         setInterests(userData.interests || '');
         const interestsArray = userData.interests ? userData.interests.split(', ') : [];
         setSelectedInterests(interestsArray.map(interest => ({ value: interest, label: interest })));
@@ -305,10 +304,10 @@ const updateInterests = useCallback(async (newInterests) => {
   };
 
   const handleAboutSubmit = () => {
-    if(newAbout != about){
+    if(newAbout !== about){
       updateAbout(newAbout);
     }
-    if(newOrganization != organization){
+    if(newOrganization !== organization){
       updateOrganization(newOrganization);
     }
     const newInterestsString = selectedInterests.map(i => i.value).join(', ');
@@ -329,13 +328,13 @@ const updateInterests = useCallback(async (newInterests) => {
   
 
   const isOwnProfile = currentUser && currentUser.uid === profileUser.uid;
-  const isOptionDisabled = (option) => selectedInterests.length >= 3;
+  // const isOptionDisabled = (option) => selectedInterests.length >= 3;
 
-  const handleInterestsChange = (selected) => {
-    if (selected.length <= 3) {
-      setSelectedInterests(selected);
-    }
-  };
+  // const handleInterestsChange = (selected) => {
+  //   if (selected.length <= 3) {
+  //     setSelectedInterests(selected);
+  //   }
+  // };
 
 
   const customStyles = {
@@ -549,6 +548,7 @@ Edit Profile
           <div className='row' style={{ width: '100%' }}>
             <div className='col-md-5'>
             <iframe 
+              title='pdf'
               src={pdfs[currentPdfIndex].url}
               style={{
                 width: '100%',
