@@ -710,11 +710,11 @@ Edit Profile
           classNamePrefix="select"
           value={editedTags}
           onChange={(selected) => {
-            if (selected.length <= 1) {
+            if (selected.length <= 3) {
               setEditedTags(selected);
             }
           }}
-          isOptionDisabled={() => editedTags.length >= 1}
+          isOptionDisabled={() => editedTags.length >= 3}
           placeholder="Select a topic!"
           styles={customStyles}
         />
