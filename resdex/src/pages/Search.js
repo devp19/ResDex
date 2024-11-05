@@ -94,11 +94,11 @@ const Search = () => {
       backgroundColor: state.isSelected ? '#007bff' : 'white',
       color: state.isSelected ? 'white' : 'black',
       ':hover': {
-        backgroundColor: '#007bff',
+        backgroundColor: 'black',
         color: 'white',
       },
       fontSize: '14px',
-      padding: '8px 12px',
+      padding: '10px 12px',
     }),
     indicatorSeparator: () => ({ display: 'none' }),
   };

@@ -47,6 +47,10 @@ const Profile = () => {
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update so user can changeeee
   const [selectedInterests, setSelectedInterests] = useState([]);
+
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [pdfToRemove, setPdfToRemove] = useState(null);
+
   
 
   const interestOptions = [
@@ -57,22 +61,17 @@ const Profile = () => {
     { value: 'Engineering', label: 'Engineering' },
   ];
   
-const nextPdf = () => {
-  if (currentPdfIndex < pdfs.length - 1) {
-    setCurrentPdfIndex(currentPdfIndex + 1);
-  }
-};
 
-const previousPdf = () => {
-  if (currentPdfIndex > 0) {
-    setCurrentPdfIndex(currentPdfIndex - 1);
-  }
-};
-
-const handleRemove = async (pdfToRemove) => {
+const handleRemove = (pdf) => {
   if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
     return;
   }
+  setPdfToRemove(pdf);
+  setShowRemoveModal(true);
+};
+
+const confirmRemove = async () => {
+  if (!pdfToRemove) return;
 
   try {
     const key = decodeURIComponent(pdfToRemove.url.split('resdex-bucket.s3.amazonaws.com/')[1]);
@@ -97,9 +96,12 @@ const handleRemove = async (pdfToRemove) => {
     console.error("Error removing PDF:", error);
     console.error("Full error details:", error.message);
     alert("Failed to remove PDF. Please try again.");
+  } finally {
+    setShowRemoveModal(false);
+    setPdfToRemove(null);
   }
 };
-  
+
 const fetchPDFs = useCallback(async (userId) => {
   try {
     const userDocRef = doc(db, 'users', userId);
@@ -328,14 +330,6 @@ const updateInterests = useCallback(async (newInterests) => {
   
 
   const isOwnProfile = currentUser && currentUser.uid === profileUser.uid;
-  // const isOptionDisabled = (option) => selectedInterests.length >= 3;
-
-  // const handleInterestsChange = (selected) => {
-  //   if (selected.length <= 3) {
-  //     setSelectedInterests(selected);
-  //   }
-  // };
-
 
   const customStyles = {
     option: (provided, state) => ({
@@ -349,6 +343,8 @@ const updateInterests = useCallback(async (newInterests) => {
     multiValue: (provided) => ({
       ...provided,
       backgroundColor: 'black',
+      padding:'5px',
+      borderRadius: '5px'
     }),
     multiValueLabel: (provided) => ({
       ...provided,
@@ -507,118 +503,6 @@ Edit Profile
             
           </div>
 
-       
-        {/* <div className='container upload-cont'>
-  <h4 style={{marginTop: '-20px', marginBottom: '30px'}}> Completed Research</h4>
-
-  <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center bg-white'>
-  <div style={{
-    margin: '10px',
-    minHeight: '300px',
-    borderRadius: '5px',
-    padding: '20px'
-  }} className='col-md-7 bg-black'>
-    {pdfs.length > 0 ? (
-      <div className="d-flex flex-column h-100">
-        <div className="d-flex align-items-center" style={{ height: '100%' }}>
-          {currentPdfIndex > 0 && (
-            <button 
-            onClick={previousPdf}
-            className="btn btn-link"
-            style={{ 
-              position: 'absolute', 
-              left: '50px',
-              color: 'white',
-              backgroundColor: 'black',
-              borderRadius: '50%',
-              width: '30px',
-              textDecoration: 'none',
-              height: '30px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0',
-              border: 'none'
-            }}
-          >
-            ←
-          </button>
-          )}
-          
-          <div className='row' style={{ width: '100%' }}>
-            <div className='col-md-5'>
-            <iframe 
-              title='pdf'
-              src={pdfs[currentPdfIndex].url}
-              style={{
-                width: '100%',
-                height: '300px',
-                border: 'none',
-                borderRadius: '5px',
-                pointerEvents: 'none'
-              }}
-            />
-            </div>
-            <div className='col-md-7'>
-
-            <div className="text-white mt-3">
-              <h5>{pdfs[currentPdfIndex].title}</h5>
-              <p>{pdfs[currentPdfIndex].description}</p>
-              <button 
-                  className="custom"
-                  onClick={() => window.open(pdfs[currentPdfIndex].url, '_blank')}
-                > View Full Paper ⇗</button>
-                <br></br>
-                {isOwnProfile && (
-              <button 
-                  className="custom"
-                  onClick={() => handleRemove(pdfs[currentPdfIndex])}
-                > Remove Paper </button>
-                )}
-            </div>
-            </div>
-          </div>
-
-          {currentPdfIndex < pdfs.length - 1 && (
-            <button 
-            onClick={nextPdf}
-            className="btn btn-link"
-            style={{ 
-              position: 'absolute', 
-              right: '50px',
-              color: 'white',
-              backgroundColor: 'black',
-              textDecoration: 'none',
-              borderRadius: '50%',
-              width: '30px',
-              height: '30px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0',
-              border: 'none'
-            }}
-            >
-              →
-            </button>
-          )}
-        </div>
-      </div>
-    ) : (
-      <div className="d-flex align-items-center justify-content-center h-100 text-white">
-        No Documents Uploaded
-      </div>
-    )}
-  </div>
-  
-    {isOwnProfile && (
-      <div style={{alignSelf: 'center', height: '300px', borderRadius: '5px', marginLeft: '20px'}} 
-      className='col-md-3 bg-black d-flex align-items-center justify-content-center'>
-      <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
-      </div>
-    )}
-</div>
-</div> */}
 <div className=' upload-cont mt-5'>
   <div className='row'>
   <div className='d-flex justify-content-center'>
@@ -637,7 +521,6 @@ Edit Profile
       </label>
         </div>
         <div className='col-md-4'>
-        <h4></h4>
         </div>
         </div>
         <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
@@ -707,24 +590,24 @@ Edit Profile
           <Modal.Title style={{color: 'black'}}>Edit Profile</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p><strong style={{color: 'black'}}>Edit About</strong></p>
+          <p><strong style={{color: 'black'}}>About</strong></p>
           <textarea
             maxLength="300"
             value={newAbout}
             onChange={(e) => setNewAbout(e.target.value)}
-            rows="4"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none" }}
+            rows="6"
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
           />
           <br></br>
           <br></br>
 
-          <p><strong style={{color: 'black'}}>Edit Organization</strong></p>
+          <p><strong style={{color: 'black'}}>Organization</strong></p>
           <textarea
             maxLength="40"
             value={newOrganization}
             onChange={(e) => setNewOrganization(e.target.value)}
             rows="1"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none" }}
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
           />
 
 <br></br>
@@ -759,6 +642,24 @@ Edit Profile
       </Modal>
       
     </div>
+
+    <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title style={{color: 'black'}}>Confirm Removal</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{color: 'black'}}>
+    Are you sure you want to remove this paper?
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowRemoveModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="dark" onClick={confirmRemove}>
+      Remove
+    </Button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 
