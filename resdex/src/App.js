@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
 import Navbar from './pages/Navbar';
@@ -7,7 +7,6 @@ import Login from './pages/Login';
 import Footer from './pages/Footer';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
-// import PrivateRoute from './pages/privateroute';
 import Search from './pages/Search';
 import Signup from './pages/signup';
 import Profile from './pages/Profile';
@@ -16,6 +15,16 @@ import Success from './pages/Success';
 import ReleaseDocs from './pages/ReleaseDocs'
 import V101 from './Releases/V101'
 
+// ScrollToTop component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -34,6 +43,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <div className="App">
         {isMobile ? (
           <div className="center-container">
@@ -57,7 +67,6 @@ function App() {
               <Route path="/releasedocs" element={<ReleaseDocs />} />
               <Route path="/releasedocs/v101" element={<V101 />} />
               <Route path="/profile/:username" element={<Profile />} />
-
             </Routes>
             <Footer />
           </>
