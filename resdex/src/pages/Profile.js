@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { auth, db } from '../firebaseConfig';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
@@ -51,6 +51,8 @@ const Profile = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [pdfToRemove, setPdfToRemove] = useState(null);
 
+  const [editedTitle, setEditedTitle] = useState('');
+  const [editedDescription, setEditedDescription] = useState('');
   
 
   const interestOptions = [
@@ -62,13 +64,36 @@ const Profile = () => {
   ];
   
 
-const handleRemove = (pdf) => {
-  if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
-    return;
-  }
-  setPdfToRemove(pdf);
-  setShowRemoveModal(true);
-};
+const handleEdit = (pdf) => {
+    if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
+      return;
+    }
+    setPdfToRemove(pdf);
+    setEditedTitle(pdf.title);
+    setEditedDescription(pdf.description);
+    setShowRemoveModal(true);
+  };
+
+  const saveChanges = async () => {
+    if (!pdfToRemove) return;
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const updatedPdfs = pdfs.map(pdf => 
+        pdf.url === pdfToRemove.url 
+          ? { ...pdf, title: editedTitle, description: editedDescription }
+          : pdf
+      );
+      await updateDoc(userDocRef, { pdfs: updatedPdfs });
+      setPdfs(updatedPdfs);
+      console.log("Successfully updated PDF in Firestore");
+    } catch (error) {
+      console.error("Error updating PDF:", error);
+      alert("Failed to update PDF. Please try again.");
+    } finally {
+      setShowRemoveModal(false);
+      setPdfToRemove(null);
+    }
+  };
 
 const confirmRemove = async () => {
   if (!pdfToRemove) return;
@@ -557,12 +582,12 @@ Edit Profile
                           <h5>{pdf.title}</h5>
                           <p>{pdf.description}</p>
                           <button className="custom" onClick={() => window.open(pdf.url, '_blank')}>
-                            View Full Paper ⇗
+                            View ⇗
                           </button>
                           <br />
                           {isOwnProfile && (
-                            <button className="custom" onClick={() => handleRemove(pdf)}>
-                              Remove Paper
+                            <button className="custom" onClick={() => handleEdit(pdf)}>
+                              Edit Paper
                             </button>
                           )}
                         </div>
@@ -642,24 +667,47 @@ Edit Profile
       </Modal>
       
     </div>
-
-    <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
+    <Modal  show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
   <Modal.Header closeButton>
-    <Modal.Title style={{color: 'black'}}>Confirm Removal</Modal.Title>
+    <Modal.Title style={{color: 'black'}}>Edit Document</Modal.Title>
   </Modal.Header>
   <Modal.Body style={{color: 'black'}}>
-    Are you sure you want to remove this paper?
+    <Form>
+      <Form.Group className="mb-3" controlId="formDocumentTitle">
+        <Form.Label><strong style={{color: 'black'}}>Document Title</strong></Form.Label>
+        <Form.Control 
+          type="text" 
+          placeholder="Enter new title" 
+          value={editedTitle}
+          onChange={(e) => setEditedTitle(e.target.value)}
+        />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formDocumentDescription">
+        <Form.Label><strong style={{color: 'black'}}>Document Description</strong></Form.Label>
+        <Form.Control 
+          as="textarea" 
+          rows={3} 
+          placeholder="Enter new description"
+          value={editedDescription}
+          onChange={(e) => setEditedDescription(e.target.value)}
+        />
+      </Form.Group>
+    </Form>
   </Modal.Body>
   <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowRemoveModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="dark" onClick={confirmRemove}>
+    <Button className='custom-view' onClick={confirmRemove}>
       Remove
     </Button>
+    <div className="ms-auto">
+      <Button variant="secondary" onClick={() => setShowRemoveModal(false)} className="me-2">
+        Cancel
+      </Button>
+      <Button className='custom-view' onClick={saveChanges}>
+        Save Changes
+      </Button>
+    </div>
   </Modal.Footer>
 </Modal>
-
     </div>
   );
 

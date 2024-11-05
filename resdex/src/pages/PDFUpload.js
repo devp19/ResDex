@@ -146,7 +146,7 @@ Upload Research
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Title*</Form.Label>
+              <Form.Label style={{color: 'black'}}>Title</Form.Label>
               <Form.Control
                 maxLength="50"
                 type="text"
@@ -156,8 +156,8 @@ Upload Research
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Description*</Form.Label>
+            <Form.Group className="mb-3 pt-3">
+              <Form.Label style={{color: 'black'}}>Description</Form.Label>
               <Form.Control
                 maxLength="300"
                 as="textarea"
@@ -171,10 +171,10 @@ Upload Research
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <button className="custom border" onClick={() => setShowModal(false)}>
+          <button className="custom-read border" onClick={() => setShowModal(false)}>
             Cancel
           </button>
-          <button className="custom" onClick={handleUpload} disabled={!title.trim()}>
+          <button className="custom-view" onClick={handleUpload} disabled={!title.trim()}>
             Upload
           </button>
         </Modal.Footer>
