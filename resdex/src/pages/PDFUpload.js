@@ -5,9 +5,18 @@ import { db } from '../firebaseConfig';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import Select from 'react-select';
 
-const MAX_FILE_SIZE_MB = 5; // so that someone doesn't upload a file of like 1000gb 
-const MAX_UPLOADS_PER_DAY = 10; // just so someone doesn't try to fill up the S3 Bucket..
+const MAX_FILE_SIZE_MB = 5;
+const MAX_UPLOADS_PER_DAY = 10;
+
+const interestOptions = [
+  { value: 'Technology', label: 'Technology' },
+  { value: 'Healthcare', label: 'Healthcare' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Construction', label: 'Construction' },
+  { value: 'Engineering', label: 'Engineering' },
+];
 
 const PDFUpload = ({ user, onUploadComplete }) => {
   const [loading, setLoading] = useState(false);
@@ -17,6 +26,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedTopics, setSelectedTopics] = useState([]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -70,6 +80,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         title: title,
         description: description,
         uploadDate: new Date().toISOString(),
+        topics: selectedTopics.map(topic => topic.value),
       };
 
       if (!docSnapshot.exists()) {
@@ -86,6 +97,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
       setDescription('');
       setSelectedFile(null);
       setErrorMessage('');
+      setSelectedTopics([]);
       window.location.reload();
     } catch (error) {
       console.error('Error uploading PDF: ', error);
@@ -115,6 +127,35 @@ const PDFUpload = ({ user, onUploadComplete }) => {
     }
   };
 
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      color: state.isSelected ? 'white' : 'black',
+      backgroundColor: state.isSelected ? 'rgba(189,197,209,.3)' : 'white',
+      '&:hover': {
+        backgroundColor: 'rgba(189,197,209,.3)',
+      },
+    }),
+    multiValue: (provided) => ({
+      ...provided,
+      backgroundColor: 'black',
+      padding: '5px',
+      borderRadius: '5px'
+    }),
+    multiValueLabel: (provided) => ({
+      ...provided,
+      color: 'white',
+    }),
+    multiValueRemove: (provided) => ({
+      ...provided,
+      color: 'white',
+      ':hover': {
+        backgroundColor: 'black',
+        color: 'white',
+      },
+    }),
+  };
+
   return (
     <div>
       <input
@@ -125,17 +166,15 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         onChange={handleFileChange}
       />
       <div
-        // style={styles.uploadArea}
         style={{padding: '10px'}}
         onClick={() => document.getElementById('pdfInput').click()}
       >
-      
-      <button className='custom-edit'> 
-      <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
-  <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
-</svg>
-Upload Research
-                      </button>
+        <button className='custom-edit'> 
+          <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" className="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
+          </svg>
+          Upload Research
+        </button>
       </div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -168,6 +207,25 @@ Upload Research
                 required
               />
             </Form.Group>
+            <Form.Group className="mb-3 pt-3">
+              <Form.Label style={{color: 'black'}}>Relevant Topics</Form.Label>
+              <Select
+                isMulti
+                name="topics"
+                options={interestOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                value={selectedTopics}
+                onChange={(selected) => {
+                  if (selected.length <= 3) {
+                    setSelectedTopics(selected);
+                  }
+                }}
+                isOptionDisabled={() => selectedTopics.length >= 3}
+                placeholder="Select up to 3 topics"
+                styles={customStyles}
+              />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -193,7 +251,6 @@ Upload Research
           </button>
         </Modal.Footer>
       </Modal>
-
 
       {loading && (
         <div style={styles.loadingOverlay}>
