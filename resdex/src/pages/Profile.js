@@ -54,6 +54,7 @@ const Profile = () => {
   const [editedTitle, setEditedTitle] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
   
+  const [editedTags, setEditedTags] = useState([]);
 
   const interestOptions = [
     { value: 'Technology', label: 'Technology' },
@@ -71,6 +72,7 @@ const handleEdit = (pdf) => {
     setPdfToRemove(pdf);
     setEditedTitle(pdf.title);
     setEditedDescription(pdf.description);
+    setEditedTags(pdf.topics ? pdf.topics.map(topic => ({ value: topic, label: topic })) : []);
     setShowRemoveModal(true);
   };
 
@@ -80,7 +82,12 @@ const handleEdit = (pdf) => {
       const userDocRef = doc(db, 'users', currentUser.uid);
       const updatedPdfs = pdfs.map(pdf => 
         pdf.url === pdfToRemove.url 
-          ? { ...pdf, title: editedTitle, description: editedDescription }
+          ? { 
+              ...pdf, 
+              title: editedTitle, 
+              description: editedDescription,
+              topics: editedTags.map(tag => tag.value)
+            } 
           : pdf
       );
       await updateDoc(userDocRef, { pdfs: updatedPdfs });
@@ -578,20 +585,32 @@ Edit Profile
                         />
                       </div>
                       <div className='col-md-7 d-flex flex-column align-items-center'>
-                        <div className="text-white mt-3">
-                          <h5>{pdf.title}</h5>
-                          <p>{pdf.description}</p>
-                          <button className="custom" onClick={() => window.open(pdf.url, '_blank')}>
-                            View ⇗
-                          </button>
-                          <br />
-                          {isOwnProfile && (
-                            <button className="custom" onClick={() => handleEdit(pdf)}>
-                              Edit Paper
-                            </button>
-                          )}
-                        </div>
-                      </div>
+  <div className="text-white mt-3">
+    <h5>{pdf.title}</h5>
+    <p>{pdf.description}</p>
+    {pdf.topics && pdf.topics.length > 0 && (
+      <div style={{ marginBottom: '10px' }}>
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-tags-fill" viewBox="0 0 16 16">
+          <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+          <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z"/>
+        </svg>
+        {pdf.topics.map((topic, index) => (
+          <span key={index} className="interest-pill">
+            {topic}
+          </span>
+        ))}
+      </div>
+    )}
+    <button className="custom" style={{marginRight: '10px'}} onClick={() => window.open(pdf.url, '_blank')}>
+      View ⇗
+    </button>
+    {isOwnProfile && (
+      <button className="custom" onClick={() => handleEdit(pdf)}>
+        Edit Paper
+      </button>
+    )}
+  </div>
+</div>
                     </div>
                   </div>
                 </Carousel.Item>
@@ -637,7 +656,7 @@ Edit Profile
 
 <br></br>
 <br></br>
-<p><strong style={{color: 'black'}}>Edit Interests</strong></p>
+<p><strong style={{color: 'black'}}>Interests</strong></p>
 <Select
      isMulti
      name="interests"
@@ -667,7 +686,7 @@ Edit Profile
       </Modal>
       
     </div>
-    <Modal  show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
+    <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
   <Modal.Header closeButton>
     <Modal.Title style={{color: 'black'}}>Edit Document</Modal.Title>
   </Modal.Header>
@@ -675,21 +694,29 @@ Edit Profile
     <Form>
       <Form.Group className="mb-3" controlId="formDocumentTitle">
         <Form.Label><strong style={{color: 'black'}}>Document Title</strong></Form.Label>
-        <Form.Control 
-          type="text" 
-          placeholder="Enter new title" 
-          value={editedTitle}
-          onChange={(e) => setEditedTitle(e.target.value)}
-        />
+        <Form.Control type="text" placeholder="Enter new title" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formDocumentDescription">
         <Form.Label><strong style={{color: 'black'}}>Document Description</strong></Form.Label>
-        <Form.Control 
-          as="textarea" 
-          rows={3} 
-          placeholder="Enter new description"
-          value={editedDescription}
-          onChange={(e) => setEditedDescription(e.target.value)}
+        <Form.Control as="textarea" rows={3} placeholder="Enter new description" value={editedDescription} onChange={(e) => setEditedDescription(e.target.value)} />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="formDocumentTags">
+        <Form.Label><strong style={{color: 'black'}}>Related Topic</strong></Form.Label>
+        <Select
+          isMulti
+          name="tags"
+          options={interestOptions}
+          className="basic-multi-select"
+          classNamePrefix="select"
+          value={editedTags}
+          onChange={(selected) => {
+            if (selected.length <= 1) {
+              setEditedTags(selected);
+            }
+          }}
+          isOptionDisabled={() => editedTags.length >= 1}
+          placeholder="Select a topic!"
+          styles={customStyles}
         />
       </Form.Group>
     </Form>
