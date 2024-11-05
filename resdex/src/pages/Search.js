@@ -56,8 +56,14 @@ const Search = () => {
           user.fullName.toLowerCase().includes(processedTerm)
         );
       } else if (searchType.value === "papers") {
-        filteredResults = allUsers.filter(user => 
-          user.pdfs && user.pdfs.some(pdf => pdf.title.toLowerCase().includes(processedTerm))
+        filteredResults = allUsers.flatMap(user => 
+          (user.pdfs || [])
+            .filter(pdf => 
+              pdf.title.toLowerCase().includes(processedTerm) || 
+              pdf.description.toLowerCase().includes(processedTerm) ||
+              (pdf.topics && pdf.topics.some(topic => topic.toLowerCase().includes(processedTerm)))
+            )
+            .map(pdf => ({ ...user, matchedPdf: pdf }))
         );
       }
       setResults(filteredResults);
@@ -110,7 +116,6 @@ const Search = () => {
         <br />
         <div className='center input mt-3'>
           <div className="input-group search-input-group" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
-    
             <Select
               value={searchType}
               onChange={handleSearchTypeChange}
@@ -133,34 +138,39 @@ const Search = () => {
         <div className="mt-3 center">
           {results.length > 0 ? (
             <div className="row" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: results.length === 1 ? 'center' : 'space-between' }}>
-              {results.map((user, index) => (
+              {results.map((result, index) => (
                 <div key={index} className="col" style={{ backgroundColor:'white', padding:'20px', borderRadius:'10px', flex: results.length === 1 ? '0 0 100%' : '0 0 calc(50% - 10px)', marginBottom: '20px', maxWidth: results.length === 1 ? '600px' : 'none' }}>
                   <div className="d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center" style={{marginRight: '30px'}}>
-                      <img src={user.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'} alt={`${user.fullName}'s profile`} style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }} />
+                      <img src={result.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'} alt={`${result.fullName}'s profile`} style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }} />
                       <div>
-                        <strong style={{color: 'black'}}>{user.fullName}</strong>
+                        <strong style={{color: 'black'}}>{result.fullName}</strong>
                         <br></br>
-                        <span><i style={{color: 'gray'}}>'{user.username}'</i></span>
+                        <span><i style={{color: 'gray'}}>'{result.username}'</i></span>
                       </div>
                     </div>
-                    <button className="custom-view" onClick={() => goToProfile(user.username)}>
+                    <button className="custom-view" onClick={() => goToProfile(result.username)}>
                       View Profile ↗︎
                     </button>
                   </div>
-                  {searchType.value === "papers" && user.pdfs && (
-                    <div style={{ marginTop: '20px', width: '100%' }}>
-                      {user.pdfs.map((pdf, pdfIndex) => (
-                        pdf.title.toLowerCase().includes(searchTerm.toLowerCase()) && (
-                          <div key={pdfIndex} style={{ marginBottom: '20px' }}>
-                            <h5 style={{color: 'black'}}>{pdf.title}</h5>
-                            <p style={{color: 'black'}}>{pdf.description}</p>
-                            <iframe src={pdf.url} title={pdf.title} width="100%" height="400px" style={{ border: '1px solid #ccc' }}></iframe>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  )}
+                  {searchType.value === "papers" && result.matchedPdf && (
+  <div style={{ marginTop: '20px', width: '100%' }}>
+    <div style={{ marginBottom: '20px' }}>
+      <h5 style={{color: 'black'}}>{result.matchedPdf.title}</h5>
+      <p style={{color: 'black'}}>{result.matchedPdf.description}</p>
+      {result.matchedPdf.topics && result.matchedPdf.topics.length > 0 && (
+        <div style={{marginTop: '10px'}}>
+          {result.matchedPdf.topics.map((topic, index) => (
+            <span key={index} className='interest-pill-black'>
+              {topic}
+            </span>
+          ))}
+        </div>
+      )}
+      <iframe src={result.matchedPdf.url} title={result.matchedPdf.title} width="100%" height="400px" style={{ border: '1px solid #ccc', marginTop: '10px' }}></iframe>
+    </div>
+  </div>
+)}
                 </div>
               ))}
             </div>
