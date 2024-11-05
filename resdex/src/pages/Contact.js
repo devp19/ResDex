@@ -54,6 +54,7 @@ const Contact = () => {
       <div>
         <div className="container" style={{ marginTop: '60px' }}>
           <div className="row center">
+            <div className='col-md-7'>
             <Form className="contact-form" onSubmit={sendTicket}>
               <Form.Group className="mb-3" controlId="formBasicFullName">
                 <Form.Label>Full Name</Form.Label>
@@ -103,6 +104,7 @@ const Contact = () => {
                 Submit Ticket
               </Button>
             </Form>
+            </div>
           </div>
         </div>
       </div>
