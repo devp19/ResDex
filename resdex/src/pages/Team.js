@@ -5,8 +5,8 @@ import Deep from '../images/DeepPfP.jpg'
 const Team = () => {
     return (
         <div>
-            <div className='center primary monarque' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex – Team</div>
-            <p className='center primary' style={{fontSize: '15px'}}>Meet the creators of ResDex!</p>
+            <div className='center primary pt-4' style={{ fontSize: "200px", marginTop: "30px" }}>ResDex – Team</div>
+            <p className='center primary' style={{fontSize: '40px'}}>Meet the creators of ResDex!</p>
             <div className='row d-flex justify-content-center display'>
             <div className='col-md-3 d-flex flex-column align-items-center box right'>
     <div className="profile-pic">
@@ -21,7 +21,7 @@ const Team = () => {
     <p className="profile-position minus">Full-Stack Developer</p>
     <a href="https://www.linkedin.com/in/devp19/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
 
-        <button className="custom-view mt-2">GitHub</button>
+    <a href="https://github.com/devp19" target="_blank" rel="noopener noreferrer" className="custom-view mt-2">GitHub</a>
                         
                        
               
@@ -41,7 +41,7 @@ const Team = () => {
     <p className="profile-position">Co-Founder &</p>
     <p className="profile-position minus">Project Manager</p>
     <a href="https://www.linkedin.com/in/fenilshah05/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
-        <button className="custom-view mt-2">GitHub</button>
+    <a href="https://github.com/Fshah05" target="_blank" rel="noopener noreferrer" className="custom-view mt-2">GitHub</a>
                     </div>
                     <div className='col-md-3 d-flex flex-column align-items-center box'>
                     <div className="profile-pic">
@@ -74,7 +74,7 @@ const Team = () => {
                         <p className="profile-name primary">Rishi Patel</p>
                         <p className="profile-position">Developer</p>
                         <a href="https://www.linkedin.com/in/rishi-patel-a84010290/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
-        <button className="custom-view mt-2">GitHub</button>
+                        <a href="https://github.com/Rishi-245" target="_blank" rel="noopener noreferrer" className="custom-view mt-2">GitHub</a>
                     </div>
                 </div> 
             </div>
