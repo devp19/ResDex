@@ -23,6 +23,7 @@
   font-style: italic;
 }
 
+
 .primary {
   color: #1a1a1a;
 }
@@ -269,8 +270,8 @@ code {
 }
 
 .custom {
-  color:black;
-  background-color: white;
+  color:rgb(255, 255, 255);
+  background-color: #1a1a1a;
   text-decoration: none;
   margin-top: 30px;
   font-size: 15px;
@@ -318,7 +319,7 @@ code {
 
 .custom-view {
   color:rgb(255, 255, 255);
-  background-color: rgb(0, 0, 0);
+  background-color: #1a1a1a;
   text-decoration: none;
   font-size: 15px;
   border: none;
@@ -348,15 +349,15 @@ input:focus, select:focus, button:focus {
 
 .custom:hover,
 .custom-read:hover{
-  color: white;
-  background-color: black;
+  color: #1a1a1a;
+  background-color: #E5E3DF;
   border: 1px solid white;
 
 }
 
 .custom-view:hover{
-  color: rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
+  color: #1a1a1a;
+  background-color: #E5E3DF;
   border: 1px solid rgb(0, 0, 0);
   
 }
