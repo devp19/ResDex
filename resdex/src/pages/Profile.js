@@ -324,10 +324,9 @@ const updateInterests = useCallback(async (newInterests) => {
   const handleModalOpen = () => {
     setNewAbout(about);
     setNewOrganization(organization);
-    const currentInterests = interests.split(', ').map(interest => ({
-      value: interest,
-      label: interest
-    }));
+    const currentInterests = interests
+        ? interests.split(', ').map(interest => ({ value: interest, label: interest }))
+        : [];
     setSelectedInterests(currentInterests);
     setIsModalOpen(true);
   };
