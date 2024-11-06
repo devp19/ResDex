@@ -117,7 +117,7 @@ const Search = () => {
         <h1 className='center monarque primary'>Discover & Connect</h1>
         <br />
         <div className='center input mt-3'>
-          <div className="input-group search-input-group" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
+          <div className="input-group search-input-group box" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
             <Select
               value={searchType}
               onChange={handleSearchTypeChange}
@@ -177,7 +177,7 @@ const Search = () => {
               ))}
             </div>
           ) : (
-            searchTerm.trim() !== "" && <p>No results found</p>
+            searchTerm.trim() !== "" && <p className='primary'>No results found</p>
           )}
         </div>
       </div>

@@ -350,17 +350,21 @@ input:focus, select:focus, button:focus {
 
 .custom:hover,
 .custom-read:hover{
-  color: #1a1a1a;
-  background-color: #E5E3DF;
+  color: white;
+  background-color: #555;
   border: 1px solid white;
 
 }
 
 .custom-view:hover{
-  color: #1a1a1a;
-  background-color: #E5E3DF;
+  color: white;
+  background-color: #555;
   border: 1px solid rgb(0, 0, 0);
   
+}
+
+.disable {
+  overflow: hidden;
 }
 
 .up{
