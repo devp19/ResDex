@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import FooterIcon from '../images/logo.png';
+import FooterIcon from '../images/logo-icon.png';
 import { auth, db } from '../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -33,28 +33,29 @@ const Footer = () => {
         <div>
             <div className='last-container'>
                 <img className="img-fluid" id="navbar-logo" src={FooterIcon} alt='ResDex Logo' />
+                <p className='primary medium monarque' style={{marginLeft: '15px', marginTop: '12px'}}> ResDex</p>
             </div>
             
             <div className='center'>
                 <div className='row d-flex justify-content-center' style={{lineHeight: '40px'}}>
                     <div className='col-md-2 left'>
-                        <Link className='link' to="/about">About</Link>
+                        <Link className='link' to="/about"><span className='primary'>About</span></Link>
                     </div>
                     <div className='col-md-2 left'>
-                        <Link className='link' to="/team">Team</Link>
+                        <Link className='link' to="/team"><span className='primary'>Team</span></Link>
                     </div>
                     <div className='col-md-2 left'>
-                        <Link className='link' to="/contact">Contact</Link>
+                        <Link className='link' to="/contact"><span className='primary'>Contact</span></Link>
                     </div>
                     <div className='col-md-2 left'>
-                        <Link className='link' to="/releasedocs">Releases</Link>
+                        <Link className='link' to="/releasedocs"><span className='primary'>Releases</span></Link>
                     </div>
                 </div>
             </div>
-            <div className="center">
+            <div className="center primary">
                 ©2024, ResDex. All Rights Reserved.
             </div>
-            <div className="center reduce">
+            <div className="center reduce primary">
                 By using this website, you accept our Terms of Use and Privacy Policy.
             </div>
         </div>
