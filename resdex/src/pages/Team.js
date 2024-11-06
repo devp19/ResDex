@@ -1,6 +1,7 @@
 import React from 'react';
 import Fenil from '../images/FenilPFP.png'
 import Dev from '../images/dev.png'
+import Deep from '../images/DeepPfP.jpg'
 const Team = () => {
     return (
         <div>
@@ -18,7 +19,8 @@ const Team = () => {
     <p className="profile-name primary">Dev Patel</p>
     <p className="profile-position">Co-Founder &</p>
     <p className="profile-position minus">Full-Stack Developer</p>
-    <button className="custom-view">LinkedIn</button>
+    <a href="https://www.linkedin.com/in/devp19/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
+
         <button className="custom-view mt-2">GitHub</button>
                         
                        
@@ -38,15 +40,21 @@ const Team = () => {
     <p className="profile-name primary">Fenil Shah</p>
     <p className="profile-position">Co-Founder &</p>
     <p className="profile-position minus">Project Manager</p>
-    <button className="custom-view">LinkedIn</button>
+    <a href="https://www.linkedin.com/in/fenilshah05/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
         <button className="custom-view mt-2">GitHub</button>
                     </div>
                     <div className='col-md-3 d-flex flex-column align-items-center box'>
-                        <div className="profile-pic"></div>
+                    <div className="profile-pic">
+        <img 
+            src={Deep} 
+            alt="Profile of Deep Patel" 
+            className="profile-img"
+        />
+    </div>
                         <p className="profile-name primary">Deep Patel</p>
                         <p className="profile-position">Medical Outsourcing</p><br></br>
-                        <button className="custom-view">LinkedIn</button>
-                        <button className="custom-view mt-2">Email</button>
+                        <a href="https://www.linkedin.com/in/deepptll/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
+                        <a href="mailto:dpptl16@gmail.com" className="custom-view mt-2">Email</a>
 
                     </div>
                 </div>  
@@ -57,15 +65,15 @@ const Team = () => {
                         <div className="profile-pic"></div>
                         <p className="profile-name primary">Bhavi Singh</p>
                         <p className="profile-position">Medical Outsourcing</p>
-                        <button className="custom-view">LinkedIn</button>
-                        <button className="custom-view mt-2">Email</button>
+                        <a href="https://www.linkedin.com/in/bhavendra-singh-75bbb129b/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
+                        <a href="mailto:bhavendrasingh08.com" className="custom-view mt-2">Email</a>
 
                     </div>
                     <div className='col-md-3 box d-flex flex-column align-items-center right'>
                         <div className="profile-pic"></div>
                         <p className="profile-name primary">Rishi Patel</p>
                         <p className="profile-position">Developer</p>
-                        <button className="custom-view">LinkedIn</button>
+                        <a href="https://www.linkedin.com/in/rishi-patel-a84010290/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
         <button className="custom-view mt-2">GitHub</button>
                     </div>
                 </div> 
