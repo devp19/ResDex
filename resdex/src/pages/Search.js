@@ -7,7 +7,7 @@ import Select, { components } from 'react-select';
 const DropdownIndicator = (props) => {
   return (
     <components.DropdownIndicator {...props}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="black" viewBox="0 0 16 16">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="white" viewBox="0 0 16 16">
         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
       </svg>
     </components.DropdownIndicator>
@@ -80,8 +80,9 @@ const Search = () => {
     control: (provided) => ({
       ...provided,
       width: '100px',
-      borderTopRightRadius: '0px',
-      borderBottomRightRadius: '0px',
+      borderTopRightRadius: '5px',
+      borderBottomRightRadius: '5px',
+      backgroundColor: '#1a1a1a',
     }),
     valueContainer: (provided) => ({
       ...provided,
@@ -90,6 +91,7 @@ const Search = () => {
     singleValue: (provided) => ({
       ...provided,
       marginLeft: '0px',
+      color: 'white'
     }),
     menu: (provided) => ({
       ...provided,
@@ -97,10 +99,10 @@ const Search = () => {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? '#007bff' : 'white',
-      color: state.isSelected ? 'white' : 'black',
+      backgroundColor: state.isSelected ? '#1a1a1a' : 'white',
+      color: state.isSelected ? 'white' : '#1a1a1a',
       ':hover': {
-        backgroundColor: 'black',
+        backgroundColor: '#1a1a1a',
         color: 'white',
       },
       fontSize: '14px',
@@ -112,10 +114,10 @@ const Search = () => {
   return (
     <div className="container">
       <div className='row top'>
-        <h1 className='center'>Discover & Connect</h1>
+        <h1 className='center monarque primary'>Discover & Connect</h1>
         <br />
         <div className='center input mt-3'>
-          <div className="input-group search-input-group" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
+          <div className="input-group search-input-group box" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
             <Select
               value={searchType}
               onChange={handleSearchTypeChange}
@@ -139,7 +141,7 @@ const Search = () => {
           {results.length > 0 ? (
             <div className="row" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: results.length === 1 ? 'center' : 'space-between' }}>
               {results.map((result, index) => (
-                <div key={index} className="col" style={{ backgroundColor:'white', padding:'20px', borderRadius:'10px', flex: results.length === 1 ? '0 0 100%' : '0 0 calc(50% - 10px)', marginBottom: '20px', maxWidth: results.length === 1 ? '600px' : 'none' }}>
+                <div key={index} className="col box" style={{padding:'20px', borderRadius:'10px', flex: results.length === 1 ? '0 0 100%' : '0 0 calc(50% - 10px)', marginBottom: '20px', maxWidth: results.length === 1 ? '600px' : 'none' }}>
                   <div className="d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center" style={{marginRight: '30px'}}>
                       <img src={result.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'} alt={`${result.fullName}'s profile`} style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }} />
@@ -175,7 +177,7 @@ const Search = () => {
               ))}
             </div>
           ) : (
-            searchTerm.trim() !== "" && <p>No results found</p>
+            searchTerm.trim() !== "" && <p className='primary'>No results found</p>
           )}
         </div>
       </div>

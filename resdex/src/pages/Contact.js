@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import emailjs from 'emailjs-com'; // Import EmailJS
+import emailjs from 'emailjs-com';
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -48,16 +48,16 @@ const Contact = () => {
   return (
     <div>
       <br />
-      <h1 className="center">Question, Issue, Feature?</h1>
-      <p className="center">Send a ticket down below!</p>
+      <h1 className="center primary  monarque">Question, Issue, Feature?</h1>
+      <p className="center primary">Send a ticket down below!</p>
 
       <div>
         <div className="container" style={{ marginTop: '60px' }}>
           <div className="row center">
-            <div className='col-md-7'>
+            <div className='col-md-7 box'>
             <Form className="contact-form" onSubmit={sendTicket}>
               <Form.Group className="mb-3" controlId="formBasicFullName">
-                <Form.Label>Full Name</Form.Label>
+                <Form.Label className='primary'>Full Name</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter full name"
@@ -67,7 +67,7 @@ const Contact = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
+                <Form.Label className='primary'>Email address</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="Enter email"
@@ -77,7 +77,7 @@ const Contact = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicSubject">
-                <Form.Label>Subject</Form.Label>
+                <Form.Label className='primary'>Subject</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter subject"
@@ -86,7 +86,7 @@ const Contact = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicBody">
-                <Form.Label>Body</Form.Label>
+                <Form.Label className='primary'>Body</Form.Label>
                 <Form.Control
                   as="textarea"
                   placeholder="Enter Message (Max 1500 Characters)"
