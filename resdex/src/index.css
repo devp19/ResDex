@@ -287,7 +287,8 @@ code {
 .custom-edit {
   /* color:black; */
   /* background-color: white; */
-  color: black;
+  color: rgb(255, 255, 255);
+  background-color: #1a1a1a;
   text-decoration: none;
   font-size: 15px;
   border: none;
@@ -590,8 +591,8 @@ border-top: 1px solid white;
 
 .interest-pill {
   display: inline-block;
-  background-color: #ffffff;
-  color: rgb(0, 0, 0);
+  background-color: #1a1a1a;
+  color: white;
   padding: 5px 20px;
   border-radius: 20px;
   margin-right: 5px;
@@ -616,7 +617,22 @@ border-top: 1px solid white;
 
 .interest-pill:hover{
   transform: translateY(-10px);
-  background-color: black;
+  background-color: #888;
   color: white;
 }
 
+.carousel-control-prev-icon {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='primary' viewBox='0 0 16 16'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L6.707 7l4.647 4.646a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
+}
+
+.carousel-control-next-icon {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='primary' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l5 5a.5.5 0 0 1 0 .708l-5 5a.5.5 0 1 1-.708-.708L9.293 7l-4.647-4.646a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+}
+
+.carousel-indicators {
+  color: #1a1a1a;
+}
+
+.carousel-indicators .active {
+  background-color: #1a1a1a;
+}

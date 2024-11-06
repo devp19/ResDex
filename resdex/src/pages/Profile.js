@@ -394,9 +394,86 @@ const updateInterests = useCallback(async (newInterests) => {
   return (
     <div>
       <div className='center top'>
-        <div className='row'>
-          <div className='d-flex justify-content-center' 
+        <div className='row '>
+          <div className='row d-flex justify-content-center' 
                style={{marginBottom: '20px'}}>
+            {/* <label className='col-md-5 justify-content-center d-flex box'>
+              <div 
+                style={{
+                  width: '150px',
+                  height: '150px',
+                  borderRadius: '50%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  backgroundColor: '#ccc',
+                  cursor: isOwnProfile ? 'pointer' : 'default',
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={isOwnProfile ? handleProfilePictureClick : undefined}
+              >
+                {profilePicture ? (
+                  <img
+                    src={profilePicture}
+                    alt="Profile"
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    No Image
+                  </div>
+                )}
+                {isOwnProfile && isHovering && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Change Picture
+                  </div>
+                  
+                )}
+    
+                
+              </div>
+      
+            </label> */}
+            <label className='col-md-9 box'>
+            <div style={{position:'relative', textAlign: 'right', marginTop:'10px'}}>                    
+                  {isOwnProfile && (
+                      <button className='custom-edit' onClick={handleModalOpen}> 
+                      <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="bi bi-pencil-square" fill="white" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+</svg>
+Edit Profile
+                      </button>
+                    )
+                    }
+              </div>
             <label className='col-md-5'>
               <div 
                 style={{
@@ -454,28 +531,70 @@ const updateInterests = useCallback(async (newInterests) => {
                   >
                     Change Picture
                   </div>
+                  
                 )}
+    
+                
               </div>
+      
             </label>
-            <label className='offset-md-1 col-md-4'></label>
-          </div>
-          <div className='col'>
-            <div className='row d-flex justify-content-center'>
-  <h1 className='col-md-5'>{profileUser.fullName}
+            <h1 className='primary'>{profileUser.fullName}
     {(username === "dev" || username === "fenil" || username === "deep" || username === "rishi" || username === "bhavi") && (
-        <svg style={{ marginLeft: '20px' }} xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-patch-check-fill" viewBox="0 0 16 16" title="Verified user">
+        <svg style={{ marginLeft: '20px' }} xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" className="bi bi-patch-check-fill" viewBox="0 0 16 16" title="Verified user">
           <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
         </svg>
-      
     )}
-    
 
   </h1>
+  
+  <p className='primary' style={{marginTop: '20px'}}>{about}</p>
+  <div className='col-md-12 box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '30px'}}>
+    <h4 className='monarque primary'>Highlights</h4>
+
+    {organization && (
+      <p className='primary'>
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-buildings" viewBox="0 0 16 16">
+          <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z"/>
+          <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z"/>
+        </svg>
+        {organization}
+      </p>
+    )}
+
+    {interests && interests.length > 0 && (
+      <div>
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-tags-fill" viewBox="0 0 16 16">
+          <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+          <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z"/>
+        </svg>
+        {interests.split(', ').map((interest, index) => (
+          <span key={index} className="interest-pill">
+            {interest}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+            </label>
+          </div>
+          <div className='col'>
+{/*             
+            <div className='row d-flex justify-content-center'>
+              
+  <h1 className='col-md-5 primary box border-black'>{profileUser.fullName}
+    {(username === "dev" || username === "fenil" || username === "deep" || username === "rishi" || username === "bhavi") && (
+        <svg style={{ marginLeft: '20px' }} xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" className="bi bi-patch-check-fill" viewBox="0 0 16 16" title="Verified user">
+          <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
+        </svg>
+    )}
+
+  </h1>
+  
   <label className='offset-md-1 col-md-4'>
   <div style={{textAlign: 'right'}}>                    
                   {isOwnProfile && (
                       <button className='custom-edit' onClick={handleModalOpen}> 
-                      <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="bi bi-pencil-square" fill="black" viewBox="0 0 16 16">
+                      <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="bi bi-pencil-square" fill="white" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
 </svg>
@@ -486,16 +605,19 @@ Edit Profile
               </div>
   </label>
 
-</div>
-
+</div> */}
+{/* 
 <div className='row d-flex justify-content-center'>
-  <div className='col-md-5'>
-    <p>{about}</p>
+  <div className='col-md-5 box'>
+    <h4 className='monarque primary'>About</h4>
+    <p className='primary'>{about}</p>
     </div>
-    <div className='offset-md-1 col-md-4' style={{textAlign: 'right', borderLeft: '1px solid white'}}>
+    <div className='offset-md-1 col-md-4 box' style={{textAlign: 'right', borderLeft: '1px solid white'}}>
+    <h4 className='monarque primary'>Highlights</h4>
+
     {organization && (
-      <p>
-        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-buildings" viewBox="0 0 16 16">
+      <p className='primary'>
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-buildings" viewBox="0 0 16 16">
           <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z"/>
           <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z"/>
         </svg>
@@ -505,7 +627,7 @@ Edit Profile
 
     {interests && interests.length > 0 && (
       <div>
-        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-tags-fill" viewBox="0 0 16 16">
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-tags-fill" viewBox="0 0 16 16">
           <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
           <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z"/>
         </svg>
@@ -529,33 +651,20 @@ Edit Profile
                   />
                 </>
               )}
-            </div>
+            </div> */}
             
           </div>
 
 <div className=' upload-cont mt-5'>
-  <div className='row'>
-  <div className='d-flex justify-content-center'>
 
-        <div className='col-md-5' style={{marginRight: '100px'}}>
-         <h4>Completed Research</h4>
-         </div>
+        <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
 
-      <label className='col-md-4'>
-      <div style={{textAlign: 'right'}}>                    
-                  {isOwnProfile && (
+          <div className='col-md-10 box'>
+          <h4 className='monarque primary'>Completed Research</h4>
+          {isOwnProfile && (
                       <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
                     )
                     }
-              </div>
-      </label>
-        </div>
-        <div className='col-md-4'>
-        </div>
-        </div>
-        <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
-
-          <div className='col-md-10'>
           <div style={{
             margin: '10px',
             minHeight: '300px',
@@ -584,11 +693,11 @@ Edit Profile
                       </div>
                       <div className='col-md-7 d-flex flex-column align-items-center'>
   <div className="text-white mt-3">
-    <h5>{pdf.title}</h5>
-    <p>{pdf.description}</p>
+    <h5 className='primary'>{pdf.title}</h5>
+    <p className='primary'>{pdf.description}</p>
     {pdf.topics && pdf.topics.length > 0 && (
       <div style={{ marginBottom: '10px' }}>
-        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-tags-fill" viewBox="0 0 16 16">
+        <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-tags-fill" viewBox="0 0 16 16">
           <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
           <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z"/>
         </svg>
