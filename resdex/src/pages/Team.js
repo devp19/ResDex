@@ -5,8 +5,8 @@ import Deep from '../images/DeepPfP.jpg'
 const Team = () => {
     return (
         <div>
-            <div className='center primary pt-4' style={{ fontSize: "200px", marginTop: "30px" }}>ResDex – Team</div>
-            <p className='center primary' style={{fontSize: '40px'}}>Meet the creators of ResDex!</p>
+            <div className='center primary monarque pt-4' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex – Team</div>
+            <p className='center primary' style={{fontSize: '15px'}}>Meet the creators of ResDex!</p>
             <div className='row d-flex justify-content-center display'>
             <div className='col-md-3 d-flex flex-column align-items-center box right'>
     <div className="profile-pic">
