@@ -6,6 +6,8 @@ import MAC from '../images/mac.png';
 import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
+import Dev from '../images/dev.png'
+
 
 const Home = () => {
 
@@ -60,6 +62,12 @@ const Home = () => {
           <div className='center pt-2 fade-in'>
             <p className='monarque primary' style={{ fontSize: '25px' }}>"For students, by students"</p>
           </div>
+
+          <div className='row d-flex justify-content-center'>
+        <div className='col-md-6 box'>
+        <p className='primary text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
+        </div>
+        </div>
         </div>
       </div>
 
@@ -85,10 +93,8 @@ const Home = () => {
             </div>        </div>
       </div>
 
-      <div className='horizontal-line fade-in'></div>
-
-      <div className='container fade-in'>
-        <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p>
+      <div className='container fade-in top'>
+        {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
         <div className='row d-flex justify-content-center fade-in'>
         <div class="scroller box" data-direction="right" data-speed="slow">
             <div class="scroller__inner">
@@ -98,10 +104,72 @@ const Home = () => {
               <img style={{height: '60px'}} src={UFT} alt="" />
               <img style={{height: '60px'}} src={LOO} alt="" />
             </div>
-      </div>        </div>
+      </div>        
+      </div>
       </div>
 
-      <div className='center-sample fade-in'>
+<div className='horizontal-line' style={{marginTop: '90px'}}></div>
+    <div className='container'>
+    <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>" Testimonials "</p>
+
+    <div className='row d-flex justify-content-center'>
+     
+      <div className='col-md-3 box' style={{marginRight: '20px', paddingBottom: '20px'}}>
+      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
+      <div className='row'>
+
+      <div className='col-md-4'>
+      <div className="profile-pic-2">
+        <img 
+            src={Dev} 
+            alt="Profile of Dev Patel" 
+            className="profile-img"
+        />
+    </div>
+      </div>
+
+      <p className='col-md-12 primary'>Elon Musk <br></br> Founder & CEO, Tesla</p>
+    </div>
+      </div>
+      <div className='col-md-3 box' style={{marginRight: '20px'}}>
+      <p style={{padding: '20px'}}><i className='primary'>"ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity. It’s wonderful to see a platform so dedicated to supporting students and emerging researchers!"</i></p>
+      <div className='row' style={{paddingLeft: '20px'}}>
+
+      <div className='col-md-4'>
+      <div className="profile-pic-2">
+        <img 
+            src={Dev} 
+            alt="Profile of Dev Patel" 
+            className="profile-img"
+        />
+    </div>
+      </div>
+
+      <p className='col-md-12 primary'>Jensen Huang <br></br> Chief Executive Officer, NVIDIA</p>
+    </div>
+      </div>
+      <div className='col-md-3 box' style={{marginRight: '20px'}}>
+      <p className='primary' style={{padding: '20px'}}><i className='primary'>"The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts and encouraging collaborative work. ResDex is fostering a new era of research accessibility and community."</i></p>
+      <div className='row'>
+
+      <div className='col-md-4'>
+      <div className="profile-pic-2">
+        <img 
+            src={Dev} 
+            alt="Profile of Dev Patel" 
+            className="profile-img"
+        />
+    </div>
+      </div>
+
+      <p className='col-md-12 primary'>Donald Trump <br></br> President, United States of America</p>
+    </div>
+      </div>
+    </div>
+    </div>
+
+
+      <div className='center-sample fade-in top'>
         <div className='row'>
           <div className='col-md-8 mx-auto title-2 primary fade-in'>
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="primary" className="bi bi-arrow-down" viewBox="0 0 16 16">

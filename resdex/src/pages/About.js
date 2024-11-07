@@ -8,7 +8,7 @@ const About = () => {
    
       <div className='row d-flex justify-content-center display center-container'>
         
-        <div className='col-md-6 box'>
+        <div className='col-md-6 box fade-in'>
         <h3 className='primary monarque'>About – ResDex</h3>
         <br></br>
         <p className='primary'>ResDex is a student-led organization aimed towards bridging the gap between academia and industry-level research publications, making it easier for students to find research-assistant positions and go beyond the traditional academic scope to create impactful research papers.</p>
@@ -29,7 +29,7 @@ const About = () => {
        
         </div>
         
-      <div className='col-md-6 box offset-md-1'>
+      <div className='col-md-6 box offset-md-1 fade-in'>
       <h3 className='primary monarque'>Mission Statement – ResDex</h3>
     <br></br>
       <p className='primary'>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in.</p>
