@@ -114,9 +114,9 @@ const Search = () => {
   return (
     <div className="container">
       <div className='row top'>
-        <h1 className='center monarque primary'>Discover & Connect</h1>
+        <h1 className='center monarque primary fade-in'>Discover & Connect</h1>
         <br />
-        <div className='center input mt-3'>
+        <div className='center input mt-3 fade-in'>
           <div className="input-group search-input-group box" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
             <Select
               value={searchType}

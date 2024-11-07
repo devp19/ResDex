@@ -5,10 +5,10 @@ import Deep from '../images/DeepPfP.jpg'
 const Team = () => {
     return (
         <div>
-            <div className='center primary monarque pt-4' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex – Team</div>
-            <p className='center primary' style={{fontSize: '15px'}}>Meet the creators of ResDex!</p>
+            <div className='center primary monarque pt-4 fade-in' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex – Team</div>
+            <p className='center primary fade-in' style={{fontSize: '15px'}}>Meet the creators of ResDex!</p>
             <div className='row d-flex justify-content-center display'>
-            <div className='col-md-3 d-flex flex-column align-items-center box right'>
+            <div className='col-md-3 d-flex flex-column align-items-center box right fade-in'>
     <div className="profile-pic">
         <img 
             src={Dev} 
@@ -29,7 +29,7 @@ const Team = () => {
 
 
 
-                    <div className='col-md-3 d-flex flex-column align-items-center box right'>
+                    <div className='col-md-3 d-flex flex-column align-items-center box right fade-in'>
     <div className="profile-pic">
         <img 
             src={Fenil} 
@@ -43,7 +43,7 @@ const Team = () => {
     <a href="https://www.linkedin.com/in/fenilshah05/" target="_blank" rel="noopener noreferrer" className="custom-view">LinkedIn</a>
     <a href="https://github.com/Fshah05" target="_blank" rel="noopener noreferrer" className="custom-view mt-2">GitHub</a>
                     </div>
-                    <div className='col-md-3 d-flex flex-column align-items-center box'>
+                    <div className='col-md-3 d-flex flex-column align-items-center box fade-in'>
                     <div className="profile-pic">
         <img 
             src={Deep} 
@@ -61,7 +61,7 @@ const Team = () => {
 
              
                 <div className='row justify-content-center align-items-center pt-4'>
-                    <div className='col-md-3 box d-flex flex-column align-items-center right'>
+                    <div className='col-md-3 box d-flex flex-column align-items-center right fade-in'>
                         <div className="profile-pic"></div>
                         <p className="profile-name primary">Bhavi Singh</p>
                         <p className="profile-position">Medical Outsourcing</p>
@@ -69,7 +69,7 @@ const Team = () => {
                         <a href="mailto:bhavendrasingh08.com" className="custom-view mt-2">Email</a>
 
                     </div>
-                    <div className='col-md-3 box d-flex flex-column align-items-center right'>
+                    <div className='col-md-3 box d-flex flex-column align-items-center right fade-in'>
                         <div className="profile-pic"></div>
                         <p className="profile-name primary">Rishi Patel</p>
                         <p className="profile-position">Developer</p>

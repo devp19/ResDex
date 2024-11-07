@@ -393,7 +393,7 @@ const updateInterests = useCallback(async (newInterests) => {
 
   return (
     <div>
-      <div className='center top'>
+      <div className='center top fade-in'>
         <div className='row '>
           <div className='row d-flex justify-content-center' 
                style={{marginBottom: '20px'}}>
@@ -654,7 +654,16 @@ Edit Profile
             </div> */}
             
           </div>
-
+          {isOwnProfile && (
+                <>
+                  <ProfilePictureUpload
+                    user={currentUser}
+                    updateProfilePicture={updateProfilePicture}
+                    id="profilePictureInput"
+                    style={{ display: 'none' }}
+                  />
+                </>
+              )}
 <div className=' upload-cont mt-5'>
 
         <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
