@@ -462,7 +462,7 @@ const updateInterests = useCallback(async (newInterests) => {
       
             </label> */}
             <label className='col-md-9 box'>
-            <div style={{position:'relative', textAlign: 'right', marginTop:'10px'}}>                    
+            <div className='col' style={{position:'relative', textAlign: 'right', marginTop:'10px'}}>                    
                   {isOwnProfile && (
                       <button className='custom-edit' onClick={handleModalOpen}> 
                       <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="bi bi-pencil-square" fill="white" viewBox="0 0 16 16">
