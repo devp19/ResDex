@@ -54,14 +54,15 @@ const Login = () => {
   return (
     <div>
       <div className='container'>
-        <div className='row center top'>
-          <h3 className='center'> ResDex | Sign In</h3>
-          <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
-        </div>
-        <div className='row center'>
+        <div className='row d-flex justify-content-center'>
+          <div className='col-md-5 box'>
+              <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
+                <h3 className='center primary monarque'> ResDex – Sign In</h3>
+                <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
+              </div>
           <Form className='login-form' onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
+              <Form.Label className='primary'>Email address</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="Enter email"
@@ -71,7 +72,7 @@ const Login = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
+              <Form.Label className='primary'>Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Password"
@@ -79,18 +80,19 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
-            <Link className='regular' to="/recovery">Forgot your password?</Link>
+            <Link className='primary' to="/recovery">Forgot your password?</Link>
             <br></br>
             {error && <p className="error-text">{error}</p>}
             <Button className='custom' type="submit">
               Sign In
             </Button>
-            <p>
+            <p className='primary'>
               <br></br>
               <br></br>
-              Don't have an account? <Link className='regular' to="/signup">Sign Up</Link>
+              Don't have an account? <Link className='primary' to="/signup">Sign Up</Link>
             </p>
           </Form>
+          </div>
         </div>
       </div>
     </div>
