@@ -102,14 +102,17 @@ const Signup = () => {
   return (
     <div>
       <div className='container'>
-        <div className='row center top'>
-          <h3 className='center'>ResDex | Sign Up</h3>
-          <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
-        </div>
-        <div className='row center'>
+    
+        <div className='row d-flex justify-content-center'>
+            <div className='col-md-5 box'>
+            <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
+                <h3 className='center primary monarque'> ResDex – Sign In</h3>
+                <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
+              </div>
+              <div className='row d-flex justify-content-center'>
           <Form className='login-form' onSubmit={handleSignup}>
             <Form.Group className="mb-3" controlId="formBasicFullName">
-              <Form.Label>Full Name</Form.Label>
+              <Form.Label className='primary'>Full Name</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter full name"
@@ -119,7 +122,7 @@ const Signup = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicDisplayName">
-              <Form.Label>Display Name (Username)</Form.Label>
+              <Form.Label className='primary'>Display Name (Username)</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter display name"
@@ -129,7 +132,7 @@ const Signup = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
+              <Form.Label className='primary'>Email address</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="Enter email"
@@ -139,7 +142,7 @@ const Signup = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
+              <Form.Label className='primary'>Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Password"
@@ -149,7 +152,7 @@ const Signup = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPassword2">
-              <Form.Label>Confirm Password</Form.Label>
+              <Form.Label className='primary'>Confirm Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Retype Password"
@@ -169,11 +172,13 @@ const Signup = () => {
             <Button className='custom' type="submit">
               Sign Up
             </Button>
-            <p>
+            <p className='primary'>
               <br />
-              Already have an account? <Link className='regular' to="/login">Sign In</Link>
+              Already have an account? <Link className='primary' to="/login">Sign In</Link>
             </p>
           </Form>
+          </div>
+          </div>
         </div>
       </div>
     </div>

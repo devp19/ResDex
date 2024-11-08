@@ -63,7 +63,7 @@ const Home = () => {
             <p className='monarque primary' style={{ fontSize: '25px' }}>"For students, by students"</p>
           </div>
 
-          <div className='row d-flex justify-content-center'>
+          <div className='row d-flex justify-content-center pb-5'>
         <div className='col-md-6 box'>
         <p className='primary text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
         </div>
@@ -72,8 +72,9 @@ const Home = () => {
       </div>
 
 
-      <div className='bottom-container fade-in mt-4'>
-        <div className='row mt-4 justify-content-center'>
+      <div className='container fade-in mt-4'>
+        <div className='horizontal-line'></div>
+        <div className='row mt-4 justify-content-center pt-4'>
         <div className='col-md-3 box mx-3'>
               <div className='column-content'>
                 <h3 className='monarque primary'> CREDENTIALS </h3>
