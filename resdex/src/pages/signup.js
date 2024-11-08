@@ -106,7 +106,7 @@ const Signup = () => {
         <div className='row d-flex justify-content-center'>
             <div className='col-md-5 box'>
             <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
-                <h3 className='center primary monarque'> ResDex – Sign In</h3>
+                <h3 className='center primary monarque'> ResDex – Sign Up</h3>
                 <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
               </div>
               <div className='row d-flex justify-content-center'>
