@@ -41,7 +41,7 @@ const Home = () => {
 
   return (
     <div className='display'>
-      <div className='center-container fade-in' style={{marginTop: '-50px'}}>
+      <div className='center-container fade-in'>
         <div>
           <div className='row justify-content-center d-flex display fade-in'>
             <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
@@ -63,7 +63,7 @@ const Home = () => {
             <p className='monarque primary' style={{ fontSize: '25px' }}>"For students, by students"</p>
           </div>
 
-          <div className='row d-flex justify-content-center pb-5'>
+          <div className='row d-flex justify-content-center'>
         <div className='col-md-6 box'>
         <p className='primary text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
         </div>
@@ -72,9 +72,9 @@ const Home = () => {
       </div>
 
 
-      <div className='container fade-in mt-4'>
+      <div className='container fade-in'>
         <div className='horizontal-line'></div>
-        <div className='row mt-4 justify-content-center pt-4'>
+        <div className='row justify-content-center top'>
         <div className='col-md-3 box mx-3'>
               <div className='column-content'>
                 <h3 className='monarque primary'> CREDENTIALS </h3>
