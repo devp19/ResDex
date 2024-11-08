@@ -41,7 +41,7 @@ const Home = () => {
 
   return (
     <div className='display'>
-      <div className='center-container top fade-in'>
+      <div className='center-container fade-in' style={{marginTop: '-50px'}}>
         <div>
           <div className='row justify-content-center d-flex display fade-in'>
             <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
@@ -71,7 +71,8 @@ const Home = () => {
         </div>
       </div>
 
-      <div className='bottom-container fade-in'>
+
+      <div className='bottom-container fade-in mt-4'>
         <div className='row mt-4 justify-content-center'>
         <div className='col-md-3 box mx-3'>
               <div className='column-content'>
