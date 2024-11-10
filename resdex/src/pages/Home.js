@@ -7,6 +7,7 @@ import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
 import Dev from '../images/dev.png'
+import Alert from 'react-bootstrap/Alert';
 
 
 const Home = () => {
@@ -40,8 +41,13 @@ const Home = () => {
   }, []); // Empty dependency array ensures this only runs once on mount
 
   return (
-    <div className='display'>
+    <div>
+       <Alert key='secondary' variant='secondary' dismissible>
+         Note: ResDex is still under-development! Currently, ResDex is optimized for larger-screens! Thanks for visiting early!
+        </Alert>
+
       <div className='center-container fade-in'>
+
         <div>
           <div className='row justify-content-center d-flex display fade-in'>
             <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
@@ -59,13 +65,13 @@ const Home = () => {
               <path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/>
             </svg>
           </div>
-          <div className='center pt-2 fade-in'>
+          <div className='center fade-in'>
             <p className='monarque primary secondary'>"For students, by students"</p>
           </div>
 
-          <div className='row d-flex justify-content-center'>
+          <div className='row d-flex justify-content-center minus'>
         <div className='col-md-6 box'>
-        <p className='primary text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
+        <p className='primary small text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
         </div>
         </div>
         </div>
@@ -75,22 +81,22 @@ const Home = () => {
       <div className='container fade-in'>
         <div className='horizontal-line'></div>
         <div className='row justify-content-center top'>
-        <div className='col-md-3 box mx-3'>
+        <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content'>
                 <h3 className='monarque primary'> CREDENTIALS </h3>
-                <p className='primary'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
+                <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
               </div>
             </div>
-            <div className='col-md-3 box mx-3'>
+            <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
               <h3 className='monarque primary'> CONNECT </h3>
-                <p className='primary'>ResDex connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
+                <p className='primary mt-4'>ResDex connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
               </div>
             </div>
-            <div className='col-md-3 box mx-3'>
+            <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
               <h3 className='monarque primary'> PEER REVIEW </h3>
-                <p className='primary'>ResDex enables constructive peer review, helping students refine their research and enhance their academic skills.</p>
+                <p className='primary mt-4'>ResDex enables constructive peer review, helping students refine their research and enhance their academic skills.</p>
               </div>
             </div>        </div>
       </div>
@@ -112,13 +118,13 @@ const Home = () => {
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
-    <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>" Testimonials "</p>
+      <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>" Testimonials "</p>
 
-    <div className='row d-flex justify-content-center'>
+       <div className='row d-flex justify-content-center'>
      
-      <div className='col-md-3 box' style={{marginRight: '20px', paddingBottom: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
-      <div className='row'>
+      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It’s exactly what the academic community has been missing."</i></p>
+      <div className='row' style={{paddingLeft: '20px'}}>
 
       <div className='col-md-4'>
       <div className="profile-pic-2">
@@ -130,10 +136,29 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Elon Musk <br></br> Founder & CEO, Tesla</p>
+      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
     </div>
       </div>
-      <div className='col-md-3 box' style={{marginRight: '20px'}}>
+
+      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
+      <div className='row' style={{paddingLeft: '20px'}}>
+
+      <div className='col-md-4'>
+      <div className="profile-pic-2">
+        <img 
+            src={Dev} 
+            alt="Profile of Dev Patel" 
+            className="profile-img"
+        />
+    </div>
+      </div>
+
+      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
+    </div>
+      </div>
+      
+      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
       <p style={{padding: '20px'}}><i className='primary'>"ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity. It’s wonderful to see a platform so dedicated to supporting students and emerging researchers!"</i></p>
       <div className='row' style={{paddingLeft: '20px'}}>
 
@@ -147,12 +172,12 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Jensen Huang <br></br> Chief Executive Officer, NVIDIA</p>
+      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
     </div>
       </div>
-      <div className='col-md-3 box' style={{marginRight: '20px'}}>
+      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
       <p className='primary' style={{padding: '20px'}}><i className='primary'>"The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts and encouraging collaborative work. ResDex is fostering a new era of research accessibility and community."</i></p>
-      <div className='row'>
+      <div className='row' style={{paddingLeft: '20px'}}>
 
       <div className='col-md-4'>
       <div className="profile-pic-2">
@@ -164,14 +189,14 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Donald Trump <br></br> President, United States of America</p>
+      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
     </div>
       </div>
     </div>
     </div>
 
 
-      <div className='center-sample fade-in top'>
+      <div className='center-sample fade-in pt-4'>
         <div className='row'>
           <div className='col-md-8 mx-auto title-2 primary fade-in'>
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="primary" className="bi bi-arrow-down" viewBox="0 0 16 16">

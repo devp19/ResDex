@@ -116,8 +116,8 @@ const Search = () => {
       <div className='row top'>
         <h1 className='center monarque primary fade-in'>Discover & Connect</h1>
         <br />
-        <div className='center input mt-3 fade-in'>
-          <div className="input-group search-input-group box" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px'}}>
+        <div className='d-flex justify-content-center input fade-in'>
+          <div className="input-group search-input-group box d-flex" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px', marginBottom: '100px', padding: '20px'}}>
             <Select
               value={searchType}
               onChange={handleSearchTypeChange}
