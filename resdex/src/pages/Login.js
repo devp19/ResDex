@@ -60,38 +60,38 @@ const Login = () => {
                 <h3 className='center primary monarque'> ResDex – Sign In</h3>
                 <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
               </div>
-          <Form className='login-form' onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className='primary'>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
+            <Form className='login-form' onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label className='primary'>Email address</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label className='primary'>Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Link className='primary' to="/recovery">Forgot your password?</Link>
-            <br></br>
-            {error && <p className="error-text">{error}</p>}
-            <Button className='custom' type="submit">
-              Sign In
-            </Button>
-            <p className='primary'>
+              <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Label className='primary'>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Form.Group>
+              <Link className='primary' to="/recovery">Forgot your password?</Link>
               <br></br>
-              <br></br>
-              Don't have an account? <Link className='primary' to="/signup">Sign Up</Link>
-            </p>
-          </Form>
+              {error && <p className="error-text">{error}</p>}
+              <Button className='custom' type="submit">
+                Sign In
+              </Button>
+              <p className='primary'>
+                <br></br>
+                <br></br>
+                Don't have an account? <Link className='primary' to="/signup">Sign Up</Link>
+              </p>
+            </Form>
           </div>
         </div>
       </div>

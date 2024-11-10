@@ -43,7 +43,7 @@
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 20px;
+  padding-top: 20px;
   perspective: 1000px;
 
 }
@@ -194,7 +194,8 @@ code {
 }
 
 .login-form {
-  width: 500px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 
@@ -247,7 +248,7 @@ code {
   padding: 15px; 
   background-color: transparent;
   border: none;
-  border-top: 2px solid white;
+  /* border-top: 2px solid white; */
   text-align: center;
   margin-top: 10px;
 }
@@ -743,6 +744,10 @@ button {
   .title {
     font-size: 70px;
   }
+
+  .column-content h3{
+    font-size: 20px;
+  }
 }
 
 
@@ -755,7 +760,19 @@ button {
     font-size: 20px;
   };
   
-  .box {
-    background-color: red;
+}
+
+@media only screen and (max-width: 1015px) {
+  .column-content h3{
+    font-size: 18px;
   }
 }
+
+
+
+@media only screen and (max-width: 577px) {
+ .title {
+  font-size: 50px;
+ }
+}
+

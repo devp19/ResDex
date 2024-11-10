@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -27,31 +27,31 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [isMobile, setIsMobile] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
 
-  const checkMobileDevice = () => {
-    const mobileWidth = 768;
-    setIsMobile(window.innerWidth < mobileWidth);
-  };
+  // const checkMobileDevice = () => {
+  //   const mobileWidth = 768;
+  //   setIsMobile(window.innerWidth < mobileWidth);
+  // };
 
-  useEffect(() => {
-    checkMobileDevice();
-    window.addEventListener('resize', checkMobileDevice);
+  // useEffect(() => {
+  //   checkMobileDevice();
+  //   window.addEventListener('resize', checkMobileDevice);
     
-    return () => window.removeEventListener('resize', checkMobileDevice);
-  }, []);
+  //   return () => window.removeEventListener('resize', checkMobileDevice);
+  // }, []);
 
   return (
     <Router>
       <ScrollToTop />
       <div className="App">
-        {isMobile ? (
+        {/* {isMobile ? (
           <div className="center-container">
             Check out Resdex on a larger screen!
             <br></br>
             <br></br>
           </div>
-        ) : (
+        ) : ( */}
           <>
             <Navbar />
             <Routes>
@@ -70,7 +70,7 @@ function App() {
             </Routes>
             <Footer />
           </>
-        )}
+        )
       </div>
     </Router>
   );

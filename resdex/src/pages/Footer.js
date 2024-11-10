@@ -36,23 +36,25 @@ const Footer = () => {
                 <p className='primary medium monarque' style={{marginLeft: '15px', marginTop: '12px'}}> ResDex</p>
             </div>
             
-            <div className='center'>
+            <div>
                 <div className='row d-flex justify-content-center' style={{lineHeight: '40px'}}>
-                    <div className='col-md-2 left'>
+                    <div className='col-md-2 text-center'>
                         <Link className='link' to="/about"><span className='primary'>About</span></Link>
                     </div>
-                    <div className='col-md-2 left'>
+                    <div className='col-md-2 text-center'>
                         <Link className='link' to="/team"><span className='primary'>Team</span></Link>
                     </div>
-                    <div className='col-md-2 left'>
+                    <div className='col-md-2 text-center'>
                         <Link className='link' to="/contact"><span className='primary'>Contact</span></Link>
                     </div>
-                    <div className='col-md-2 left'>
+                    <div className='col-md-2 text-center'>
                         <Link className='link' to="/releasedocs"><span className='primary'>Releases</span></Link>
                     </div>
                 </div>
             </div>
             <div className="center primary">
+                <br></br>
+                <br></br>
                 ©2024, ResDex. All Rights Reserved.
             </div>
             <div className="center reduce primary">
