@@ -60,7 +60,7 @@ const Home = () => {
             </svg>
           </div>
           <div className='center pt-2 fade-in'>
-            <p className='monarque primary' style={{ fontSize: '25px' }}>"For students, by students"</p>
+            <p className='monarque primary secondary'>"For students, by students"</p>
           </div>
 
           <div className='row d-flex justify-content-center'>
