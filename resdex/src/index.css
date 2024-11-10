@@ -44,7 +44,6 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 20px;
-  
   perspective: 1000px;
 
 }
@@ -85,7 +84,7 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 90vh;
   width: 100%;
   background: none;
 }
@@ -719,4 +718,44 @@ label {
 
 button {
   pointer-events: all;
+}
+
+.secondary {
+  font-size: 25px;
+}
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+/* Media Queries */
+
+@media only screen and (max-height: 768px) {
+  .title {
+    font-size: 70px;
+  }
+}
+
+
+@media only screen and (max-height: 670px) {
+  .title {
+    font-size: 50px;
+  }
+
+  .secondary{
+    font-size: 20px;
+  };
+  
+  .box {
+    background-color: red;
+  }
 }
