@@ -48,7 +48,7 @@ const Contact = () => {
   return (
     <div>
       <br />
-      <h1 className="center primary  monarque">Question, Issue, Feature?</h1>
+      <h1 className="center primary monarque mt-3">Question, Issue, Feature?</h1>
       <p className="center primary">Send a ticket down below!</p>
 
       <div>
@@ -100,7 +100,7 @@ const Contact = () => {
               </Form.Group>
               {error && <p style={{ color: 'red' }}>{error}</p>}
               {success && <p style={{ color: 'green' }}>{success}</p>}
-              <Button className="custom" type="submit">
+              <Button className="custom" style={{marginBottom: '20px' }} type="submit">
                 Submit Ticket
               </Button>
             </Form>

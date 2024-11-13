@@ -80,6 +80,10 @@ code {
   outline: 2px solid rgb(255, 0, 0);
 }
 
+.border-blue {
+  outline: 2px solid rgb(81, 116, 255);
+}
+
 .center-container {
   display: flex;
   justify-content: center;
@@ -681,7 +685,7 @@ border-top: 1px solid white;
 }
 
 .scroller[data-speed="slow"] {
-  --_animation-duration: 30s;
+  --_animation-duration: 20s;
 }
 
 @keyframes scroll {
@@ -766,6 +770,13 @@ button {
   .column-content h3{
     font-size: 18px;
   }
+
+  .profile-img {
+    padding: 20px;
+    border-radius: 50%;
+
+  }
+
 }
 
 
@@ -775,4 +786,5 @@ button {
   font-size: 50px;
  }
 }
+
 
