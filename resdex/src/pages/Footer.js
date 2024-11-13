@@ -61,7 +61,7 @@ const Footer = () => {
                 By using this website, you accept our Terms of Use and Privacy Policy.
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Footer;
