@@ -57,7 +57,7 @@ const Footer = () => {
                 <br></br>
                 ©2024, ResDex. All Rights Reserved.
             </div>
-            <div className="center reduce primary">
+            <div className="center text-center reduce primary">
                 By using this website, you accept our Terms of Use and Privacy Policy.
             </div>
         </div>
