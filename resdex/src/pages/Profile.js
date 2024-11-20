@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { auth, db } from '../firebaseConfig';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
 import PDFUpload from './PDFUpload';
 import { s3 } from '../awsConfig';
@@ -10,6 +10,9 @@ import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// const CACHE_EXPIRATION = 1000; // 5 minutes in milliseconds
+
 
 const saveProfileToLocalStorage = (username, profileData) => {
   const dataToStore = {
@@ -31,6 +34,10 @@ const getProfileFromLocalStorage = (username) => {
 };
 
 const Profile = () => {
+  const [isFollowing, setIsFollowing] = useState(false);
+const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
   const { username } = useParams();
   const [profileUser, setProfileUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -63,6 +70,93 @@ const Profile = () => {
     { value: 'Engineering', label: 'Engineering' },
   ];
   
+
+
+
+  const checkFollowStatus = useCallback(async () => {
+    if (!currentUser || !profileUser) return;
+    
+    const profileUserRef = doc(db, 'users', profileUser.uid);
+  
+    try {
+      const profileUserDoc = await getDoc(profileUserRef);
+      
+      if (profileUserDoc.exists()) {
+        const userData = profileUserDoc.data();
+        const followers = userData.followers || [];
+        const following = userData.following || [];
+        
+        setIsFollowing(followers.includes(currentUser.uid));
+        setFollowerCount(followers.length);
+        setFollowingCount(following.length);
+  
+        // If viewing own profile, make sure following count is accurate
+        if (currentUser.uid === profileUser.uid) {
+          setFollowingCount(following.length);
+        } else {
+          // If viewing someone else's profile, get current user's following count
+          const currentUserDoc = await getDoc(profileUserRef);
+          if (currentUserDoc.exists()) {
+            const currentUserData = profileUserDoc.data();
+            setFollowingCount((currentUserData.following || []).length);
+          }
+        }
+      } else {
+        setIsFollowing(false);
+        setFollowerCount(0);
+        setFollowingCount(0);
+      }
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  }, [currentUser, profileUser]);
+
+  useEffect(() => {
+    if (currentUser && profileUser) {
+      checkFollowStatus();
+    }
+  }, [currentUser, profileUser, checkFollowStatus]);
+
+
+
+  const toggleFollow = async () => {
+    if (!currentUser || !profileUser) return;
+    try {
+      const currentUserRef = doc(db, 'users', currentUser.uid);
+      const profileUserRef = doc(db, 'users', profileUser.uid);
+  
+      if (isFollowing) {
+        // Unfollow
+        await updateDoc(currentUserRef, { following: arrayRemove(profileUser.uid) });
+        await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
+        setIsFollowing(false);
+        setFollowerCount(prev => prev - 1);
+      } else {
+        // Follow
+        await updateDoc(currentUserRef, { following: arrayUnion(profileUser.uid) });
+        await updateDoc(profileUserRef, { followers: arrayUnion(currentUser.uid) });
+        setIsFollowing(true);
+        setFollowerCount(prev => prev + 1);
+      }
+  
+      // Update the following count for the current user
+      const updatedCurrentUser = await getDoc(currentUserRef);
+      if (updatedCurrentUser.exists()) {
+        const userData = updatedCurrentUser.data();
+        setFollowingCount((userData.following || []).length);
+      }
+  
+      // Update the follower count for the profile user
+      const updatedProfileUser = await getDoc(profileUserRef);
+      if (updatedProfileUser.exists()) {
+        const profileData = updatedProfileUser.data();
+        setFollowerCount((profileData.followers || []).length);
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+    }
+    window.location.reload();
+  };
 
 const handleEdit = (pdf) => {
     if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
@@ -483,6 +577,11 @@ Edit Profile
 
       
             </div>
+
+            <div className='row'>
+              <div className='col-md'>
+
+         
             <h1 className='primary mt-4'>{profileUser.fullName}
     {(username === "dev" || username === "fenil" || username === "deep" || username === "rishi" || username === "bhavi") && (
         <svg style={{ marginLeft: '20px' }} xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" className="bi bi-patch-check-fill" viewBox="0 0 16 16" title="Verified user">
@@ -491,6 +590,31 @@ Edit Profile
     )}
 
   </h1>
+  </div>
+
+<div className='col-md d-flex justify-content-end align-items-center '>
+{!isOwnProfile && (
+  <button 
+    className="custom-edit" 
+    onClick={toggleFollow}
+  >
+    {isFollowing ? <p style={{ position: 'relative', top: '7px' }}>Unfollow  <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+  <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+</svg></p> : <p style={{ position: 'relative', top: '7px' }}>Follow  <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+  <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+  <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+</svg></p>}
+  </button>
+)}
+</div>
+
+            </div>
+           
+  <p className='primary'> <strong className='primary'>Followers:</strong> {followerCount}
+   <span className='primary' style={{marginLeft: '40px'}}><strong className='primary'>Following:</strong> {followingCount}</span>
+</p>
+
   
   <p className='primary' style={{marginTop: '20px'}}>{about}</p>
   <div className='col-md-12 box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '30px', marginBottom: '20px', padding: '20px'}}>
