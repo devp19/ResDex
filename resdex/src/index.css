@@ -642,12 +642,10 @@ border-top: 1px solid white;
   background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='primary' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l5 5a.5.5 0 0 1 0 .708l-5 5a.5.5 0 1 1-.708-.708L9.293 7l-4.647-4.646a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
 }
 
-.carousel-indicators {
-  color: #1a1a1a;
-}
-
-.carousel-indicators .active {
-  background-color: #1a1a1a;
+.carousel-indicators [data-bs-target] {
+  background-color: black;
+  top: 40px;
+  position: relative;
 }
 
 .scroller {
