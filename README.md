@@ -1,7 +1,7 @@
 # ResDex
 *“Research made easy. A platform tailored for students by students.”*
 
-`Platform Launching Soon!` | [Visit ResDex](https://resdex.vercel.app)
+Platform Launching Soon | [Visit ResDex](https://resdex.vercel.app)
 ___
 
 ![ResDex Banner](https://github.com/user-attachments/assets/8a7f5869-7c6a-4e1d-a8a4-f40965d0191a)
