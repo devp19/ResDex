@@ -643,37 +643,16 @@ Edit Profile
         ))}
       </div>
     )}
+
+
+    
   </div>
-            </div>
-</div>
-          <div className='col'>
-            
-          </div>
-          {isOwnProfile && (
-                <>
-                  <ProfilePictureUpload
-                    user={currentUser}
-                    updateProfilePicture={updateProfilePicture}
-                    id="profilePictureInput"
-                    style={{ display: 'none' }}
-                  />
-                </>
-              )}
 
+  <div className='mt-5'>
 
-      </div>
+        <div style={{borderRadius: '5px', margin: '0px'}} className='row d-flex justify-content-center'>
 
-
-      
-
-
-
-
-      <div className='upload-cont mt-5'>
-
-        <div style={{borderRadius: '5px'}} className='row d-flex justify-content-center'>
-
-          <div className='col-md-10 box'>
+          <div className='col-md-12 box'>
             <div className='row'>
 <div className='col d-flex align-items-center'>
             <h4 className='monarque primary'>Completed Research</h4>
@@ -688,19 +667,19 @@ Edit Profile
          
           </div>
           <div style={{
-            margin: '10px',
-            minHeight: '300px',
             borderRadius: '5px',
             padding: '20px',
-            border: '1px solid white'
-          }} className='col-md-12'>
+            paddingBottom: '50px',
+            border: '1px solid white',
+            marginBottom: '10px'
+          }} className='col-md-12 justify-content-center align-items-center'>
             {pdfs.length > 0 ? (
               <Carousel>
               {pdfs.map((pdf, index) => (
                 <Carousel.Item key={index}>
                   <div className='d-flex justify-content-center'>
                     <div className='row'>
-                      <div className='col-md-5'>
+                      <div className='col-md-4'>
                         <iframe
                           title='pdf'
                           src={pdf.url}
@@ -813,6 +792,32 @@ Edit Profile
       </Modal>
       
     </div>
+            </div>
+</div>
+
+
+
+          <div className='col'>
+            
+          </div>
+          {isOwnProfile && (
+                <>
+                  <ProfilePictureUpload
+                    user={currentUser}
+                    updateProfilePicture={updateProfilePicture}
+                    id="profilePictureInput"
+                    style={{ display: 'none' }}
+                  />
+                </>
+              )}
+
+
+      </div>
+
+
+      
+
+      
     <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
   <Modal.Header closeButton>
     <Modal.Title style={{color: 'black'}}>Edit Document</Modal.Title>
