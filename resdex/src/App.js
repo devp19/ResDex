@@ -15,7 +15,6 @@ import Success from './pages/Success';
 import ReleaseDocs from './pages/ReleaseDocs'
 import V101 from './Releases/V101'
 
-// ScrollToTop component
 function ScrollToTop() {
   const { pathname } = useLocation();
   
@@ -27,31 +26,12 @@ function ScrollToTop() {
 }
 
 function App() {
-  // const [isMobile, setIsMobile] = useState(false);
-
-  // const checkMobileDevice = () => {
-  //   const mobileWidth = 768;
-  //   setIsMobile(window.innerWidth < mobileWidth);
-  // };
-
-  // useEffect(() => {
-  //   checkMobileDevice();
-  //   window.addEventListener('resize', checkMobileDevice);
-    
-  //   return () => window.removeEventListener('resize', checkMobileDevice);
-  // }, []);
 
   return (
     <Router>
       <ScrollToTop />
       <div className="App">
-        {/* {isMobile ? (
-          <div className="center-container">
-            Check out Resdex on a larger screen!
-            <br></br>
-            <br></br>
-          </div>
-        ) : ( */}
+       
           <>
             <Navbar />
             <Routes>
