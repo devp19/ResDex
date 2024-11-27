@@ -2,13 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { auth, db } from '../firebaseConfig';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import ProfilePictureUpload from './ProfilePictureUpload';
 import PDFUpload from './PDFUpload';
 import { s3 } from '../awsConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
-import Notifications from './Notifications';
 
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -123,40 +122,40 @@ const [followerCount, setFollowerCount] = useState(0);
 
   const toggleFollow = async () => {
     if (!currentUser || !profileUser) return;
-  
     try {
       const currentUserRef = doc(db, 'users', currentUser.uid);
       const profileUserRef = doc(db, 'users', profileUser.uid);
   
-      if (!isFollowing) {
-        // Follow logic
-        await updateDoc(currentUserRef, {
-          following: arrayUnion(profileUser.uid)
-        });
-        await updateDoc(profileUserRef, {
-          followers: arrayUnion(currentUser.uid)
-        });
+      if (isFollowing) {
+        await updateDoc(currentUserRef, { following: arrayRemove(profileUser.uid) });
+        await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
+        setIsFollowing(false);
+        setFollowerCount(prev => prev - 1);
+      } else {
+        await updateDoc(currentUserRef, { following: arrayUnion(profileUser.uid) });
+        await updateDoc(profileUserRef, { followers: arrayUnion(currentUser.uid) });
         setIsFollowing(true);
         setFollowerCount(prev => prev + 1);
-  
-        // Create notification
-        await addDoc(collection(db, 'notifications'), {
-          recipientId: profileUser.uid,
-          senderId: currentUser.uid,
-          type: 'follow',
-          message: `${currentUser.displayName} started following you`,
-          timestamp: serverTimestamp(),
-          read: false
-        });
-      } else {
-        // Unfollow logic (unchanged)
+
       }
   
-      // Update follower and following counts (unchanged)
+      const updatedCurrentUser = await getDoc(currentUserRef);
+      if (updatedCurrentUser.exists()) {
+        const userData = updatedCurrentUser.data();
+        setFollowingCount((userData.following || []).length);
+      }
+  
+      const updatedProfileUser = await getDoc(profileUserRef);
+      if (updatedProfileUser.exists()) {
+        const profileData = updatedProfileUser.data();
+        setFollowerCount((profileData.followers || []).length);
+      }
     } catch (error) {
       console.error("Error toggling follow status:", error);
     }
+    window.location.reload();
   };
+
 
 const handleEdit = (pdf) => {
     if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
@@ -810,10 +809,6 @@ Edit Profile
                   />
                 </>
               )}
-
-{isOwnProfile && (
-      <Notifications userId={currentUser.uid} />
-    )}
 
       </div>
 
