@@ -12,8 +12,6 @@ import Carousel from 'react-bootstrap/Carousel';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-// const CACHE_EXPIRATION = 1000; // 5 minutes in milliseconds
-
 
 const saveProfileToLocalStorage = (username, profileData) => {
   const dataToStore = {
@@ -52,7 +50,7 @@ const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [pdfs, setPdfs] = useState([]);
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
-  const [isHovering, setIsHovering] = useState(false); // check hovering for profile pic update so user can changeeee
+  const [isHovering, setIsHovering] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -72,8 +70,6 @@ const [followerCount, setFollowerCount] = useState(0);
   ];
   
 
-
-
   const checkFollowStatus = useCallback(async () => {
     if (!currentUser || !profileUser) return;
     
@@ -91,11 +87,9 @@ const [followerCount, setFollowerCount] = useState(0);
         setFollowerCount(followers.length);
         setFollowingCount(following.length);
   
-        // If viewing own profile, make sure following count is accurate
         if (currentUser.uid === profileUser.uid) {
           setFollowingCount(following.length);
         } else {
-          // If viewing someone else's profile, get current user's following count
           const currentUserDoc = await getDoc(profileUserRef);
           if (currentUserDoc.exists()) {
             const currentUserData = profileUserDoc.data();
@@ -132,45 +126,41 @@ const [followerCount, setFollowerCount] = useState(0);
         await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
         setIsFollowing(false);
         setFollowerCount(prev => prev - 1);
-
-
-        const unfollowNotification = `${currentUser.displayName} unfollowed you`;
-      await updateDoc(profileUserRef, {
-        notifications: arrayUnion(unfollowNotification)
-      });
-
-
-
+  
+        const unfollowNotification = {
+          message: `${currentUser.displayName} unfollowed you`,
+          timestamp: new Date().toISOString() 
+        };
+        await updateDoc(profileUserRef, {
+          notifications: arrayUnion(unfollowNotification)
+        });
+  
       } else {
+        // Follow logic
         await updateDoc(currentUserRef, { following: arrayUnion(profileUser.uid) });
         await updateDoc(profileUserRef, { followers: arrayUnion(currentUser.uid) });
         setIsFollowing(true);
         setFollowerCount(prev => prev + 1);
   
-        // Add notification to profile user's notifications array
-        const notificationMessage = `${currentUser.displayName} followed you`; // Customize as needed
+        const followNotification = {
+          message: `${currentUser.displayName} followed you`,
+          timestamp: new Date().toISOString() 
+        };
   
-        // Check if notifications field exists; if not, initialize it
         const profileUserDoc = await getDoc(profileUserRef);
         if (profileUserDoc.exists()) {
-          const profileData = profileUserDoc.data();
-          const notifications = profileData.notifications || []; // Get existing notifications or initialize
-  
-          // Add new notification
           await updateDoc(profileUserRef, {
-            notifications: arrayUnion(notificationMessage)
+            notifications: arrayUnion(followNotification)
           });
         }
       }
   
-      // Update following count for current user
       const updatedCurrentUser = await getDoc(currentUserRef);
       if (updatedCurrentUser.exists()) {
         const userData = updatedCurrentUser.data();
         setFollowingCount((userData.following || []).length);
       }
   
-      // Update follower count for profile user
       const updatedProfileUser = await getDoc(profileUserRef);
       if (updatedProfileUser.exists()) {
         const profileData = updatedProfileUser.data();
@@ -180,6 +170,7 @@ const [followerCount, setFollowerCount] = useState(0);
       console.error("Error toggling follow status:", error);
     }
   };
+  
   
   
   
