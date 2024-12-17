@@ -122,29 +122,55 @@ const [followerCount, setFollowerCount] = useState(0);
 
   const toggleFollow = async () => {
     if (!currentUser || !profileUser) return;
-    try {
-      const currentUserRef = doc(db, 'users', currentUser.uid);
-      const profileUserRef = doc(db, 'users', profileUser.uid);
   
+    const currentUserRef = doc(db, 'users', currentUser.uid);
+    const profileUserRef = doc(db, 'users', profileUser.uid);
+  
+    try {
       if (isFollowing) {
         await updateDoc(currentUserRef, { following: arrayRemove(profileUser.uid) });
         await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
         setIsFollowing(false);
         setFollowerCount(prev => prev - 1);
+
+
+        const unfollowNotification = `${currentUser.displayName} unfollowed you`;
+      await updateDoc(profileUserRef, {
+        notifications: arrayUnion(unfollowNotification)
+      });
+
+
+
       } else {
         await updateDoc(currentUserRef, { following: arrayUnion(profileUser.uid) });
         await updateDoc(profileUserRef, { followers: arrayUnion(currentUser.uid) });
         setIsFollowing(true);
         setFollowerCount(prev => prev + 1);
-
+  
+        // Add notification to profile user's notifications array
+        const notificationMessage = `${currentUser.displayName} followed you`; // Customize as needed
+  
+        // Check if notifications field exists; if not, initialize it
+        const profileUserDoc = await getDoc(profileUserRef);
+        if (profileUserDoc.exists()) {
+          const profileData = profileUserDoc.data();
+          const notifications = profileData.notifications || []; // Get existing notifications or initialize
+  
+          // Add new notification
+          await updateDoc(profileUserRef, {
+            notifications: arrayUnion(notificationMessage)
+          });
+        }
       }
   
+      // Update following count for current user
       const updatedCurrentUser = await getDoc(currentUserRef);
       if (updatedCurrentUser.exists()) {
         const userData = updatedCurrentUser.data();
         setFollowingCount((userData.following || []).length);
       }
   
+      // Update follower count for profile user
       const updatedProfileUser = await getDoc(profileUserRef);
       if (updatedProfileUser.exists()) {
         const profileData = updatedProfileUser.data();
@@ -153,8 +179,10 @@ const [followerCount, setFollowerCount] = useState(0);
     } catch (error) {
       console.error("Error toggling follow status:", error);
     }
-    window.location.reload();
   };
+  
+  
+  
 
 
 const handleEdit = (pdf) => {
