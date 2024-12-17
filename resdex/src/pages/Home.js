@@ -6,7 +6,8 @@ import MAC from '../images/mac.png';
 import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
-import Dev from '../images/dev.png'
+import Dev from '../images/dev.png';
+import Empty from '../images/empty.webp';
 import Alert from 'react-bootstrap/Alert';
 
 
@@ -129,14 +130,14 @@ const Home = () => {
       <div className='col-md-4'>
       <div className="profile-pic-2">
         <img 
-            src={Dev} 
+            src={Empty} 
             alt="Profile of Dev Patel" 
-            className="profile-img"
+            className="profile-img-2"
         />
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Joseph J.<br></br> Co-Founder, ResDex</p>
     </div>
       </div>
 
@@ -147,14 +148,14 @@ const Home = () => {
       <div className='col-md-4'>
       <div className="profile-pic-2">
         <img 
-            src={Dev} 
+             src={Empty}  
             alt="Profile of Dev Patel" 
-            className="profile-img"
+            className="profile-img-2"
         />
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Lamar B. <br></br> Co-Founder, ResDex</p>
     </div>
       </div>
       
@@ -165,14 +166,14 @@ const Home = () => {
       <div className='col-md-4'>
       <div className="profile-pic-2">
         <img 
-            src={Dev} 
+             src={Empty}  
             alt="Profile of Dev Patel" 
-            className="profile-img"
+            className="profile-img-2"
         />
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Darnold J. <br></br> Co-Founder, ResDex</p>
     </div>
       </div>
       <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
@@ -182,14 +183,14 @@ const Home = () => {
       <div className='col-md-4'>
       <div className="profile-pic-2">
         <img 
-            src={Dev} 
+             src={Empty}  
             alt="Profile of Dev Patel" 
-            className="profile-img"
+            className="profile-img-2"
         />
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Dev Patel <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Catherine M.<br></br> Co-Founder, ResDex</p>
     </div>
       </div>
     </div>
