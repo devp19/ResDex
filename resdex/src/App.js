@@ -12,8 +12,9 @@ import Signup from './pages/signup';
 import Profile from './pages/Profile';
 import Recovery from './pages/recovery';
 import Success from './pages/Success';
-import ReleaseDocs from './pages/ReleaseDocs'
-import V101 from './Releases/V101'
+import ReleaseDocs from './pages/ReleaseDocs';
+import V101 from './Releases/V101';
+import Notifications from './pages/Notifications';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -44,6 +45,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/search" element={<Search />} />
               <Route path="/success" element={<Success />} />
+              <Route path="/notifications" element={<Notifications />} />
               <Route path="/releasedocs" element={<ReleaseDocs />} />
               <Route path="/releasedocs/v101" element={<V101 />} />
               <Route path="/profile/:username" element={<Profile />} />

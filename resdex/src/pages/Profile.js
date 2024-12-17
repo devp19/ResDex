@@ -443,7 +443,7 @@ const updateInterests = useCallback(async (newInterests) => {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p className='primary'>Loading...</p>;
   }
 
   if (!profileUser) {
