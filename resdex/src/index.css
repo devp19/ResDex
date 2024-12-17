@@ -319,7 +319,8 @@ code {
   transition: 0.5s;
 }
 
-.custom-view {
+.custom-view,
+.custom-view-2 {
   color:rgb(255, 255, 255);
   background-color: #1a1a1a;
   text-decoration: none;
@@ -794,6 +795,7 @@ button {
  .title {
   font-size: 50px;
  }
+
 }
 
 
