@@ -1,7 +1,7 @@
 import React from 'react';
-import Fenil from '../images/FenilPFP.png'
-import Dev from '../images/dev.png'
-import Deep from '../images/DeepPfP.jpg'
+// import Fenil from '../images/FenilPFP.png'
+// import Dev from '../images/dev.png'
+// import Deep from '../images/DeepPfP.jpg'
 import Empty from '../images/empty.webp'
 const Team = () => {
     return (

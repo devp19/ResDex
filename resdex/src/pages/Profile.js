@@ -617,8 +617,6 @@ Edit Profile
   
   <p className='primary' style={{marginTop: '20px'}}>{about}</p>
   <div className='col-md-12 box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '30px', marginBottom: '20px', padding: '20px'}}>
-    <h4 className='monarque primary'>Highlights</h4>
-
     {organization && (
       <p className='primary'>
         <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-buildings" viewBox="0 0 16 16">
