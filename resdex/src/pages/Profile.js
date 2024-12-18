@@ -36,6 +36,7 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
   const { username } = useParams();
   const [profileUser, setProfileUser] = useState(null);
@@ -52,6 +53,7 @@ const [followerCount, setFollowerCount] = useState(0);
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [pdfToRemove, setPdfToRemove] = useState(null);
@@ -75,37 +77,43 @@ const [followerCount, setFollowerCount] = useState(0);
     if (!currentUser || !profileUser) return;
     
     const profileUserRef = doc(db, 'users', profileUser.uid);
+    const currentUserRef = doc(db, 'users', currentUser.uid);
   
     try {
-      const profileUserDoc = await getDoc(profileUserRef);
+      const [profileUserDoc, currentUserDoc] = await Promise.all([
+        getDoc(profileUserRef),
+        getDoc(currentUserRef)
+      ]);
       
-      if (profileUserDoc.exists()) {
-        const userData = profileUserDoc.data();
-        const followers = userData.followers || [];
-        const following = userData.following || [];
-        
+      if (profileUserDoc.exists() && currentUserDoc.exists()) {
+        const profileUserData = profileUserDoc.data();
+        const currentUserData = currentUserDoc.data();
+        const followers = profileUserData.followers || [];
+        const following = profileUserData.following || [];
+        const pendingRequests = currentUserData.pendingFollowRequests || [];
+        setRequestSent(pendingRequests.includes(profileUser.uid));
+                
         setIsFollowing(followers.includes(currentUser.uid));
         setFollowerCount(followers.length);
         setFollowingCount(following.length);
+        setHasPendingRequest(pendingRequests.includes(profileUser.uid));
   
         if (currentUser.uid === profileUser.uid) {
           setFollowingCount(following.length);
         } else {
-          const currentUserDoc = await getDoc(profileUserRef);
-          if (currentUserDoc.exists()) {
-            const currentUserData = profileUserDoc.data();
-            setFollowingCount((currentUserData.following || []).length);
-          }
+          setFollowingCount((currentUserData.following || []).length);
         }
       } else {
         setIsFollowing(false);
         setFollowerCount(0);
         setFollowingCount(0);
+        setHasPendingRequest(false);
       }
     } catch (error) {
       console.error("Error checking follow status:", error);
     }
   }, [currentUser, profileUser]);
+  
 
   useEffect(() => {
     if (currentUser && profileUser) {
@@ -116,7 +124,9 @@ const [followerCount, setFollowerCount] = useState(0);
 
 
   const toggleFollow = async () => {
-    if (!currentUser || !profileUser) return;
+    if (!currentUser || !profileUser || isRequestInProgress) return;
+  
+    setIsRequestInProgress(true);
   
     const currentUserRef = doc(db, 'users', currentUser.uid);
     const profileUserRef = doc(db, 'users', profileUser.uid);
@@ -137,7 +147,7 @@ const [followerCount, setFollowerCount] = useState(0);
           status: 'pending'
         };
   
-        // Add follow request notification to the profile user's notifications
+        await updateDoc(currentUserRef, { pendingFollowRequests: arrayUnion(profileUser.uid) });
         await updateDoc(profileUserRef, {
           notifications: arrayUnion(followRequest),
           followRequests: arrayUnion(followRequest)
@@ -147,23 +157,14 @@ const [followerCount, setFollowerCount] = useState(0);
         console.log(`${currentUser.displayName} sent a follow request to ${profileUser.fullName}`);
       }
   
-      // Update following count for current user
-      const updatedCurrentUser = await getDoc(currentUserRef);
-      if (updatedCurrentUser.exists()) {
-        const userData = updatedCurrentUser.data();
-        setFollowingCount((userData.following || []).length);
-      }
-  
-      // Update follower count for profile user
-      const updatedProfileUser = await getDoc(profileUserRef);
-      if (updatedProfileUser.exists()) {
-        const profileData = updatedProfileUser.data();
-        setFollowerCount((profileData.followers || []).length);
-      }
+      // Update following and follower counts...
     } catch (error) {
       console.error("Error toggling follow status:", error);
+    } finally {
+      setIsRequestInProgress(false);
     }
   };
+  
   
   
   
@@ -612,25 +613,27 @@ Edit Profile
   <button 
     className="custom-edit" 
     onClick={toggleFollow}
-    disabled={requestSent}
-  >
-    {isFollowing ? (
-      <p style={{ position: 'relative', top: '7px' }}>
-        Unfollow  
-        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
-          <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-        </svg>
-      </p>
-    ) : requestSent ? (
-      <p style={{ position: 'relative', top: '7px' }}>
-        Request Sent
-        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-          <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-        </svg>
-      </p>
-    ) : (
+    disabled={isRequestInProgress || requestSent}
+    >
+    {!isFollowing && !requestSent ? (
+  <button onClick={toggleFollow} className="custom-edit">
+    <p style={{ position: 'relative', top: '7px' }}>Follow
+      <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-plus-fill" viewBox="0 0 16 16">
+        <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+        <path fillRule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+      </svg>
+    </p>
+  </button>
+) : requestSent ? (
+  <button disabled className="custom-edit">
+    <p style={{ position: 'relative', top: '7px' }}>Request Sent
+      <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clock" viewBox="0 0 16 16">
+        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+      </svg>
+    </p>
+  </button>
+) : (
       <p style={{ position: 'relative', top: '7px' }}>
         Follow  
         <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
