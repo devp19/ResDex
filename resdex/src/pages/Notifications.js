@@ -89,11 +89,17 @@ const Notifications = () => {
   const handleDeclineRequest = async (request) => {
     try {
       const userDocRef = doc(db, 'users', currentUserId);
+      const requesterRef = doc(db, 'users', request.requesterId);
       
-      // Remove the request from notifications
+      // Remove the request from notifications and followRequests
       await updateDoc(userDocRef, {
         notifications: arrayRemove(request),
-        followRequests: arrayRemove(request) // Remove from followRequests array as well
+        followRequests: arrayRemove(request)
+      });
+  
+      // Remove the pending request from the requester's pendingFollowRequests
+      await updateDoc(requesterRef, {
+        pendingFollowRequests: arrayRemove(currentUserId)
       });
   
       // Update local state
@@ -106,6 +112,7 @@ const Notifications = () => {
       console.error("Error declining follow request:", error);
     }
   };
+  
   
 
   const loadMoreNotifications = () => {
