@@ -58,7 +58,8 @@ const [followerCount, setFollowerCount] = useState(0);
 
   const [editedTitle, setEditedTitle] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
-  
+  const [requestSent, setRequestSent] = useState(false);
+
   const [editedTags, setEditedTags] = useState([]);
 
   const interestOptions = [
@@ -122,45 +123,38 @@ const [followerCount, setFollowerCount] = useState(0);
   
     try {
       if (isFollowing) {
+        // Unfollowing logic (unchanged)
         await updateDoc(currentUserRef, { following: arrayRemove(profileUser.uid) });
         await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
         setIsFollowing(false);
         setFollowerCount(prev => prev - 1);
-  
-        const unfollowNotification = {
-          message: `${currentUser.displayName} unfollowed you`,
-          timestamp: new Date().toISOString() 
+      } else if (!requestSent) {
+        // Create a follow request
+        const followRequest = {
+          requesterId: currentUser.uid,
+          requesterName: currentUser.displayName,
+          timestamp: new Date().toISOString(),
+          status: 'pending'
         };
+  
+        // Add follow request notification to the profile user's notifications
         await updateDoc(profileUserRef, {
-          notifications: arrayUnion(unfollowNotification)
+          notifications: arrayUnion(followRequest),
+          followRequests: arrayUnion(followRequest)
         });
   
-      } else {
-        // Follow logic
-        await updateDoc(currentUserRef, { following: arrayUnion(profileUser.uid) });
-        await updateDoc(profileUserRef, { followers: arrayUnion(currentUser.uid) });
-        setIsFollowing(true);
-        setFollowerCount(prev => prev + 1);
-  
-        const followNotification = {
-          message: `${currentUser.displayName} followed you`,
-          timestamp: new Date().toISOString() 
-        };
-  
-        const profileUserDoc = await getDoc(profileUserRef);
-        if (profileUserDoc.exists()) {
-          await updateDoc(profileUserRef, {
-            notifications: arrayUnion(followNotification)
-          });
-        }
+        setRequestSent(true);
+        console.log(`${currentUser.displayName} sent a follow request to ${profileUser.fullName}`);
       }
   
+      // Update following count for current user
       const updatedCurrentUser = await getDoc(currentUserRef);
       if (updatedCurrentUser.exists()) {
         const userData = updatedCurrentUser.data();
         setFollowingCount((userData.following || []).length);
       }
   
+      // Update follower count for profile user
       const updatedProfileUser = await getDoc(profileUserRef);
       if (updatedProfileUser.exists()) {
         const profileData = updatedProfileUser.data();
@@ -170,6 +164,9 @@ const [followerCount, setFollowerCount] = useState(0);
       console.error("Error toggling follow status:", error);
     }
   };
+  
+  
+  
   
   
   
@@ -615,16 +612,36 @@ Edit Profile
   <button 
     className="custom-edit" 
     onClick={toggleFollow}
+    disabled={requestSent}
   >
-    {isFollowing ? <p style={{ position: 'relative', top: '7px' }}>Unfollow  <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
-  <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-</svg></p> : <p style={{ position: 'relative', top: '7px' }}>Follow  <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
-  <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-  <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
-</svg></p>}
+    {isFollowing ? (
+      <p style={{ position: 'relative', top: '7px' }}>
+        Unfollow  
+        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+          <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+        </svg>
+      </p>
+    ) : requestSent ? (
+      <p style={{ position: 'relative', top: '7px' }}>
+        Request Sent
+        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+          <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+        </svg>
+      </p>
+    ) : (
+      <p style={{ position: 'relative', top: '7px' }}>
+        Follow  
+        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+          <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+          <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+        </svg>
+      </p>
+    )}
   </button>
 )}
+
 </div>
 
             </div>

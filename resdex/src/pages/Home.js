@@ -137,7 +137,7 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Joseph J.<br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Joseph J.<br></br> Health Sciences, McMaster</p>
     </div>
       </div>
 
@@ -155,7 +155,7 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Lamar B. <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Lamar B. <br></br> Nursing, University of Toronto</p>
     </div>
       </div>
       
@@ -173,7 +173,7 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Darnold J. <br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Darnold J. <br></br> High School Student</p>
     </div>
       </div>
       <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
@@ -190,7 +190,7 @@ const Home = () => {
     </div>
       </div>
 
-      <p className='col-md-12 primary'>Catherine M.<br></br> Co-Founder, ResDex</p>
+      <p className='col-md-12 primary'>Catherine M.<br></br> Professor, McMaster</p>
     </div>
       </div>
     </div>
