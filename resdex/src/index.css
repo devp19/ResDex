@@ -17,6 +17,12 @@
   font-style: normal;
 }
 
+a {
+
+  cursor: pointer;
+
+}
+
 .monarque {
   font-family: Monarque;
   font-weight: normal;

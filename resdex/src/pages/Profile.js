@@ -75,34 +75,35 @@ const [followerCount, setFollowerCount] = useState(0);
 
   const checkFollowStatus = useCallback(async () => {
     if (!currentUser || !profileUser) return;
-    
+
     const profileUserRef = doc(db, 'users', profileUser.uid);
     const currentUserRef = doc(db, 'users', currentUser.uid);
-  
+
     try {
       const [profileUserDoc, currentUserDoc] = await Promise.all([
         getDoc(profileUserRef),
         getDoc(currentUserRef)
       ]);
-      
+
       if (profileUserDoc.exists() && currentUserDoc.exists()) {
         const profileUserData = profileUserDoc.data();
         const currentUserData = currentUserDoc.data();
-        const followers = profileUserData.followers || [];
-        const following = profileUserData.following || [];
-        const pendingRequests = currentUserData.pendingFollowRequests || [];
-        setRequestSent(pendingRequests.includes(profileUser.uid));
-                
-        setIsFollowing(followers.includes(currentUser.uid));
-        setFollowerCount(followers.length);
-        setFollowingCount(following.length);
-        setHasPendingRequest(pendingRequests.includes(profileUser.uid));
-  
-        if (currentUser.uid === profileUser.uid) {
-          setFollowingCount(following.length);
-        } else {
-          setFollowingCount((currentUserData.following || []).length);
-        }
+
+        const profileUserFollowers = profileUserData.followers || [];
+        const profileUserFollowing = profileUserData.following || [];
+
+        const currentUserFollowing = currentUserData.following || [];
+        const currentUserPendingRequests = currentUserData.pendingFollowRequests || [];
+
+        // Check if currentUser is following profileUser
+        setIsFollowing(currentUserFollowing.includes(profileUser.uid));
+
+        // Check if currentUser has sent a request to profileUser
+        setRequestSent(currentUserPendingRequests.includes(profileUser.uid));
+
+        // Set counts based on profileUser
+        setFollowerCount(profileUserFollowers.length);
+        setFollowingCount(profileUserFollowing.length);
       } else {
         setIsFollowing(false);
         setFollowerCount(0);
@@ -605,47 +606,45 @@ Edit Profile
         </svg>
     )}
 
+    
+
   </h1>
+  
   </div>
-
-<div className='col-md d-flex justify-content-end align-items-center '>
-{!isOwnProfile && (
-  <button 
-    className="custom-edit" 
-    onClick={toggleFollow}
-    disabled={isRequestInProgress || requestSent}
+  
+  <div className='col-md d-flex justify-content-end mt-4' style={{maxHeight: '50px'}}>
+  {!isOwnProfile && (
+    <a
+      className="custom-view" 
+      onClick={toggleFollow}
+      disabled={isRequestInProgress || requestSent}
     >
-    {!isFollowing && !requestSent ? (
-  <button onClick={toggleFollow} className="custom-edit">
-    <p style={{ position: 'relative', top: '7px' }}>Follow
-      <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-plus-fill" viewBox="0 0 16 16">
-        <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-        <path fillRule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
-      </svg>
-    </p>
-  </button>
-) : requestSent ? (
-  <button disabled className="custom-edit">
-    <p style={{ position: 'relative', top: '7px' }}>Request Sent
-      <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clock" viewBox="0 0 16 16">
-        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-      </svg>
-    </p>
-  </button>
-) : (
-      <p style={{ position: 'relative', top: '7px' }}>
-        Follow  
-        <svg style={{marginLeft: '30px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
-          <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-          <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
-        </svg>
-      </p>
-    )}
-  </button>
-)}
-
+      {requestSent ? (
+        <span style={{ position: 'relative', top: '7px' }}>Request Sent
+         <svg style={{marginLeft: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-send-plus-fill" viewBox="0 0 16 16">
+  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 1.59 2.498C8 14 8 13 8 12.5a4.5 4.5 0 0 1 5.026-4.47zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
+  <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/>
+</svg>
+        </span>
+      ) : isFollowing ? (
+        <span style={{ position: 'relative', top: '7px' }}>Unfollow
+        <svg style={{marginLeft: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-people-fill" viewBox="0 0 16 16">
+  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+</svg>
+        </span>
+      ) : (
+        <span style={{ position: 'relative', top: '7px' }}>Follow
+         <svg style={{marginLeft: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+  <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+</svg>
+        </span>
+      )}
+    </a>
+  )}
 </div>
+
+  
 
             </div>
            

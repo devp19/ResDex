@@ -82,7 +82,9 @@ const Login = () => {
               </Form.Group>
               <Link className='primary' to="/recovery">Forgot your password?</Link>
               <br></br>
-              {error && <p className="error-text">{error}</p>}
+              <br></br>
+
+              {error && <strong className="error-text primary">{error}</strong>}
               <Button className='custom' type="submit">
                 Sign In
               </Button>

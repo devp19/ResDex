@@ -62,49 +62,69 @@ const Notifications = () => {
     const currentUserRef = doc(db, 'users', currentUserId);
   
     try {
-      // Add each other as followers
-      await updateDoc(currentUserRef, { followers: arrayUnion(request.requesterId) });
-      await updateDoc(requesterRef, { following: arrayUnion(currentUserId) });
+      // Add the requester to followers and remove the request
+      await updateDoc(currentUserRef, {
+        followers: arrayUnion(request.requesterId),
+        followRequests: arrayRemove(request),
+        notifications: arrayRemove(request), // Remove the notification
+      });
   
-      // Remove the request from notifications
-      await handleDismissNotification(request);
+      // Add the current user to following and remove pending request
+      await updateDoc(requesterRef, {
+        following: arrayUnion(currentUserId),
+        pendingFollowRequests: arrayRemove(currentUserId),
+      });
   
-      // Send a notification to the requester
+      // Send acceptance notification
       const acceptanceNotification = {
         message: `Your follow request has been accepted by ${currentUser.displayName}!`,
         timestamp: new Date().toISOString(),
-        status: 'accepted'
+        status: 'accepted',
       };
       await updateDoc(requesterRef, {
-        notifications: arrayUnion(acceptanceNotification)
+        notifications: arrayUnion(acceptanceNotification),
       });
-      
+  
+      // Update local notifications state
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((n) => n !== request)
+      );
+  
       console.log(`You have accepted ${request.requesterName}'s follow request.`);
     } catch (error) {
       console.error("Error accepting follow request:", error);
     }
   };
   
-
   const handleDeclineRequest = async (request) => {
+    const requesterRef = doc(db, 'users', request.requesterId);
+    const currentUserRef = doc(db, 'users', currentUserId);
+  
     try {
-      const userDocRef = doc(db, 'users', currentUserId);
-      const requesterRef = doc(db, 'users', request.requesterId);
-      
-      // Remove the request from notifications and followRequests
-      await updateDoc(userDocRef, {
+      // Remove the request from followRequests and notifications
+      await updateDoc(currentUserRef, {
+        followRequests: arrayRemove(request),
         notifications: arrayRemove(request),
-        followRequests: arrayRemove(request)
       });
   
-      // Remove the pending request from the requester's pendingFollowRequests
+      // Remove the current user's UID from the requester's pendingFollowRequests
       await updateDoc(requesterRef, {
-        pendingFollowRequests: arrayRemove(currentUserId)
+        pendingFollowRequests: arrayRemove(currentUserId),
       });
   
-      // Update local state
-      setNotifications(prevNotifications => 
-        prevNotifications.filter(n => n !== request)
+      // Optionally send a rejection notification
+      /* const rejectionNotification = {
+        message: `Your follow request has been declined by ${currentUser.displayName}.`,
+        timestamp: new Date().toISOString(),
+        status: 'declined',
+      };
+      await updateDoc(requesterRef, {
+        notifications: arrayUnion(rejectionNotification),
+      }); */
+  
+      // Update local notifications state
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((n) => n !== request)
       );
   
       console.log(`You have declined ${request.requesterName}'s follow request.`);
@@ -112,7 +132,6 @@ const Notifications = () => {
       console.error("Error declining follow request:", error);
     }
   };
-  
   
 
   const loadMoreNotifications = () => {
