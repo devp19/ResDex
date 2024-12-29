@@ -95,13 +95,10 @@ const [followerCount, setFollowerCount] = useState(0);
         const currentUserFollowing = currentUserData.following || [];
         const currentUserPendingRequests = currentUserData.pendingFollowRequests || [];
 
-        // Check if currentUser is following profileUser
         setIsFollowing(currentUserFollowing.includes(profileUser.uid));
 
-        // Check if currentUser has sent a request to profileUser
         setRequestSent(currentUserPendingRequests.includes(profileUser.uid));
 
-        // Set counts based on profileUser
         setFollowerCount(profileUserFollowers.length);
         setFollowingCount(profileUserFollowing.length);
       } else {
@@ -134,13 +131,11 @@ const [followerCount, setFollowerCount] = useState(0);
   
     try {
       if (isFollowing) {
-        // Unfollowing logic (unchanged)
         await updateDoc(currentUserRef, { following: arrayRemove(profileUser.uid) });
         await updateDoc(profileUserRef, { followers: arrayRemove(currentUser.uid) });
         setIsFollowing(false);
         setFollowerCount(prev => prev - 1);
       } else if (!requestSent) {
-        // Create a follow request
         const followRequest = {
           requesterId: currentUser.uid,
           requesterName: currentUser.displayName,
@@ -158,7 +153,6 @@ const [followerCount, setFollowerCount] = useState(0);
         console.log(`${currentUser.displayName} sent a follow request to ${profileUser.fullName}`);
       }
   
-      // Update following and follower counts...
     } catch (error) {
       console.error("Error toggling follow status:", error);
     } finally {

@@ -12,10 +12,10 @@ const Notifications = () => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setCurrentUserId(user.uid);
-        setCurrentUser(user); // Add this line to set the entire user object
+        setCurrentUser(user);
       } else {
         setCurrentUserId(null);
-        setCurrentUser(null); // Also set currentUser to null when logged out
+        setCurrentUser(null); 
       }
     });
   
@@ -101,18 +101,16 @@ const Notifications = () => {
     const currentUserRef = doc(db, 'users', currentUserId);
   
     try {
-      // Remove the request from followRequests and notifications
       await updateDoc(currentUserRef, {
         followRequests: arrayRemove(request),
         notifications: arrayRemove(request),
       });
   
-      // Remove the current user's UID from the requester's pendingFollowRequests
       await updateDoc(requesterRef, {
         pendingFollowRequests: arrayRemove(currentUserId),
       });
   
-      // Optionally send a rejection notification
+      // reject notification system but not sure if we need this...
       /* const rejectionNotification = {
         message: `Your follow request has been declined by ${currentUser.displayName}.`,
         timestamp: new Date().toISOString(),
@@ -122,7 +120,6 @@ const Notifications = () => {
         notifications: arrayUnion(rejectionNotification),
       }); */
   
-      // Update local notifications state
       setNotifications((prevNotifications) =>
         prevNotifications.filter((n) => n !== request)
       );
