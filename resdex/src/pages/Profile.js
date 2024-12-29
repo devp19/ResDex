@@ -50,6 +50,7 @@ const [followerCount, setFollowerCount] = useState(0);
   const [newAbout, setNewAbout] = useState('');
   const [loading, setLoading] = useState(true);
   const [pdfs, setPdfs] = useState([]);
+  const [contributionsCount, setContributionsCount] = useState(profileUser ? profileUser.contributions : 0);
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
@@ -69,9 +70,36 @@ const [followerCount, setFollowerCount] = useState(0);
     { value: 'Healthcare', label: 'Healthcare' },
     { value: 'Finance', label: 'Finance' },
     { value: 'Construction', label: 'Construction' },
-    { value: 'Engineering', label: 'Engineering' },
+    { value: 'Education', label: 'Education' },
+    { value: 'Hospitality', label: 'Hospitality' },
+    { value: 'Law', label: 'Law' },
+    { value: 'Arts', label: 'Arts' }
+
   ];
   
+
+  useEffect(() => {
+    if (profileUser) {
+      setContributionsCount(profileUser.contributions || 0);
+    }
+  }, [profileUser]);
+
+  const increaseContributions = async () => {
+    try {
+      const updatedCount = contributionsCount + 1;
+      setContributionsCount(updatedCount);
+  
+      if (profileUser) {
+        const userDocRef = doc(db, 'users', profileUser.uid);
+        await updateDoc(userDocRef, { contributions: updatedCount });
+        console.log("Contributions updated in Firestore.");
+      }
+    } catch (error) {
+      console.error("Error updating contributions:", error);
+    }
+  };
+
+
 
   const checkFollowStatus = useCallback(async () => {
     if (!currentUser || !profileUser) return;
@@ -266,6 +294,7 @@ const fetchPDFs = useCallback(async (userId) => {
     } else {
       setPdfs([]);
     }
+
   } catch (error) {
     console.error("Error fetching PDFs:", error);
     setPdfs([]);
@@ -477,8 +506,9 @@ const updateInterests = useCallback(async (newInterests) => {
     }),
     multiValue: (provided) => ({
       ...provided,
-      backgroundColor: 'black',
-      padding:'5px',
+      backgroundColor: '#1a1a1a',
+      padding:'10px',
+      margin: '1px',
       borderRadius: '5px'
     }),
     multiValueLabel: (provided) => ({
@@ -489,8 +519,9 @@ const updateInterests = useCallback(async (newInterests) => {
       ...provided,
       color: 'white',
       ':hover': {
-        backgroundColor: 'black',
+        backgroundColor: '#1a1a1a',
         color: 'white',
+       
       },
     }),
   };
@@ -642,13 +673,14 @@ Edit Profile
 
             </div>
            
-  <p className='primary'> <strong className='primary'>Followers:</strong> {followerCount}
-   <span className='primary' style={{marginLeft: '40px'}}><strong className='primary'>Following:</strong> {followingCount}</span>
-</p>
+  {/* <p className='primary'> 
+   <span className='primary'><strong className='primary'>Following:</strong> {followingCount}</span>
+</p> */}
 
   
-  <p className='primary' style={{marginTop: '20px'}}>{about}</p>
-  <div className='col-md-12 box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '30px', marginBottom: '20px', padding: '20px'}}>
+  <p className='primary'>{about}</p>
+  <div className='row d-flex justify-content-center' style={{margin: '0px'}}>
+  <div className='col-md-5 box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '10px', marginBottom: '20px', padding: '20px', margin: '5px'}}>
     {organization && (
       <p className='primary'>
         <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-buildings" viewBox="0 0 16 16">
@@ -676,6 +708,30 @@ Edit Profile
 
     
   </div>
+  <div className='col-md  box' style={{textAlign: 'left', borderLeft: '1px solid white', marginTop: '10px', marginBottom: '20px', padding: '20px', margin: '5px'}}>
+  <div className='row'>
+  <br>
+  </br>
+  <div className='col-md-5' style={{borderRight: '1px solid black'}}>
+    <h2 className=' primary'>{profileUser.contributions || 0} 
+    </h2>
+    <p className=' primary'>Contributions</p>
+  </div>
+  <div className='col-md offset-md-1'>
+    <h2 className=' primary'>{followerCount} 
+    </h2>
+    <p className=' primary'>Followers</p>
+  </div>
+    </div>
+  
+
+    {/* <button className="custom" onClick={increaseContributions}>
+  Increase Contributions
+</button> */}
+    
+  </div>
+  </div>
+  
 
   <div className='mt-5'>
 
@@ -755,7 +811,7 @@ Edit Profile
             </Carousel>
             
             ) : (
-              <div className="d-flex align-items-center justify-content-center text-white top" style={{marginTop: '10px'}}>
+              <div className=" text-center primary" style={{marginTop: '40px'}}>
                 No Documents Uploaded
               </div>
             )}
@@ -764,34 +820,39 @@ Edit Profile
         </div>
  
 
-      <Modal show={isModalOpen} onHide={handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title style={{color: 'black'}}>Edit Profile</Modal.Title>
+      <Modal show={isModalOpen} onHide={handleModalClose} className='box'>
+        <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
+          <Modal.Title className='primary'>Edit Profile</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <p><strong style={{color: 'black'}}>About</strong></p>
+        <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+          <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
+           <p><strong className='primary'>About</strong></p>
           <textarea
+          spellcheck="false"
             maxLength="300"
             value={newAbout}
             onChange={(e) => setNewAbout(e.target.value)}
             rows="6"
             style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
           />
+          </div>
           <br></br>
-          <br></br>
-
-          <p><strong style={{color: 'black'}}>Organization</strong></p>
+        
+<div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
+          <p><strong className='primary'>Organization</strong></p>
           <textarea
+          spellcheck="false"
             maxLength="40"
             value={newOrganization}
             onChange={(e) => setNewOrganization(e.target.value)}
             rows="1"
             style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
           />
+          </div>
+
 
 <br></br>
-<br></br>
-<p><strong style={{color: 'black'}}>Interests</strong></p>
+<p><strong className='primary'>Interests</strong></p>
 <Select
      isMulti
      name="interests"
@@ -799,6 +860,7 @@ Edit Profile
      className="basic-multi-select"
      classNamePrefix="select"
      value={selectedInterests}
+     rows='1'
      onChange={(selected) => {
        if (selected.length <= 3) {
          setSelectedInterests(selected);
@@ -808,15 +870,15 @@ Edit Profile
      placeholder="Select up to 3 interests"
      styles={customStyles}
 
-  />
+  /><br></br>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalClose}>
+        <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+          <a className='custom-view'  onClick={handleModalClose}>
             Cancel
-          </Button>
-          <Button variant="primary" className='custom-view' onClick={handleAboutSubmit}>
+          </a>
+          <a  className='custom-view' onClick={handleAboutSubmit}>
             Save
-          </Button>
+          </a>
         </Modal.Footer>
       </Modal>
       

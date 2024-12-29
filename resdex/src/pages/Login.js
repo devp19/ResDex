@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import Logo from '../images/index.png';
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,10 +21,12 @@ const Login = () => {
       const user = userCredential.user;
       const token = await user.getIdToken();
       
-      if(user.emailVerified){
+      if (user.emailVerified) {
         localStorage.setItem('authToken', token);
         console.log('Login successful');
         
+       
+
         const userDocRef = doc(db, 'users', user.uid);
         const userDocSnap = await getDoc(userDocRef);
         
@@ -42,7 +46,7 @@ const Login = () => {
           setError('User data not found. Please contact support.');
         }
       } else {
-        setError('Email has not been verified. Please verify before continuing!')
+        setError('Email has not been verified. Please verify before continuing!');
         await signOut(auth);
       }
     } catch (err) {
@@ -56,10 +60,10 @@ const Login = () => {
       <div className='container'>
         <div className='row d-flex justify-content-center'>
           <div className='col-md-5 box'>
-              <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
-                <h3 className='center primary monarque'> ResDex – Sign In</h3>
-                <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
-              </div>
+            <div className='row d-flex justify-content-center' style={{ marginTop: '50px' }}>
+              <h3 className='center primary monarque'> ResDex – Sign In</h3>
+              <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
+            </div>
             <Form className='login-form' onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label className='primary'>Email address</Form.Label>
@@ -82,9 +86,9 @@ const Login = () => {
               </Form.Group>
               <Link className='primary' to="/recovery">Forgot your password?</Link>
               <br></br>
-              <br></br>
 
-              {error && <strong className="error-text primary">{error}</strong>}
+              {error && <strong className="error-text primary">{error}<br></br></strong>}
+              
               <Button className='custom' type="submit">
                 Sign In
               </Button>

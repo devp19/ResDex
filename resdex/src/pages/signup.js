@@ -78,6 +78,7 @@ const Signup = () => {
         email: email,
         profilePicture: null,
         username: username,
+        contributions: 0,
       });
 
       console.log("Firestore write operations completed successfully");
