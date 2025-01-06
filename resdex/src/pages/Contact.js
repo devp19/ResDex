@@ -48,11 +48,11 @@ const Contact = () => {
   return (
     <div>
       <br />
-      <h1 className="center primary monarque mt-3">Question, Issue, Feature?</h1>
-      <p className="center primary">Send a ticket down below!</p>
+      <h1 className="center primary monarque mt-3 fade-in">Question, Issue, Feature?</h1>
+      <p className="center primary fade-in">Send a ticket down below!</p>
 
       <div>
-        <div className="container" style={{ marginTop: '60px' }}>
+        <div className="container fade-in" style={{ marginTop: '60px' }}>
           <div className="row center">
             <div className='col-md-7 box'>
             <Form className="contact-form" onSubmit={sendTicket}>
