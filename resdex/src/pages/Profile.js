@@ -720,7 +720,7 @@ Edit Profile
   <div className='col-md offset-md-1'>
     <h2 className=' primary'>{followerCount} 
     </h2>
-    <p className=' primary'>Followers</p>
+    <p className=' primary'>Research Fellows</p>
   </div>
     </div>
   

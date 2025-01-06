@@ -28,7 +28,6 @@ const Notifications = () => {
       if (!currentUserId) return;
 
       const userDocRef = doc(db, 'users', currentUserId);
-      
       try {
         const userDocSnapshot = await getDoc(userDocRef);
         if (userDocSnapshot.exists()) {
@@ -62,20 +61,21 @@ const Notifications = () => {
     const currentUserRef = doc(db, 'users', currentUserId);
   
     try {
-      // Add the requester to followers and remove the request
+   
       await updateDoc(currentUserRef, {
         followers: arrayUnion(request.requesterId),
+        following: arrayUnion(request.requesterId), 
         followRequests: arrayRemove(request),
-        notifications: arrayRemove(request), // Remove the notification
+        notifications: arrayRemove(request), 
+      
       });
   
-      // Add the current user to following and remove pending request
       await updateDoc(requesterRef, {
         following: arrayUnion(currentUserId),
+        followers: arrayUnion(currentUserId),
         pendingFollowRequests: arrayRemove(currentUserId),
       });
   
-      // Send acceptance notification
       const acceptanceNotification = {
         message: `Your follow request has been accepted by ${currentUser.displayName}!`,
         timestamp: new Date().toISOString(),
@@ -85,12 +85,11 @@ const Notifications = () => {
         notifications: arrayUnion(acceptanceNotification),
       });
   
-      // Update local notifications state
       setNotifications((prevNotifications) =>
         prevNotifications.filter((n) => n !== request)
       );
   
-      console.log(`You have accepted ${request.requesterName}'s follow request.`);
+      console.log(`You have accepted ${request.requesterName}'s follow request and are now following them.`);
     } catch (error) {
       console.error("Error accepting follow request:", error);
     }
@@ -150,7 +149,7 @@ const Notifications = () => {
                     </svg>
                     {notification.status === 'pending' ? (
                       <>
-                        {notification.requesterName} sent you a follow request
+                        <a className='primary' target="_blank" href={`https://resdex.vercel.app/profile/${notification.requesterName}`}>{notification.requesterName}</a> sent you a follow request
                         <a className='custom-view' style={{marginLeft: '25px', marginRight: '10px'}} onClick={() => handleAcceptRequest(notification)}>Accept</a>
                         <a className='custom-view m-1' onClick={() => handleDeclineRequest(notification)}>Decline</a>
                       </>
