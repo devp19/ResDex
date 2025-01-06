@@ -530,7 +530,7 @@ const updateInterests = useCallback(async (newInterests) => {
   return (
     <div>
     
-        <div className='row d-flex justify-content-center mt-3' 
+        <div className='row d-flex justify-content-center mt-3 fade-in' 
                style={{marginBottom: '20px'}}>
 
 
@@ -738,12 +738,12 @@ Edit Profile
         <div style={{borderRadius: '5px', margin: '0px'}} className='row d-flex justify-content-center'>
 
           <div className='col-md-12 box'>
-            <div className='row'>
-<div className='col d-flex align-items-center'>
-            <h4 className='monarque primary'>Completed Research</h4>
+            <div className='row' style={{marginTop: "-10px"}}>
+<div className='col-md d-flex align-items-center'>
+            <h4 className='primary'>Completed Research</h4>
             </div>
             
-          <div className='col' style={{position: 'relative', textAlign: 'right'}}>
+          <div className='col-md' style={{position: 'relative', textAlign: 'right'}}>
           {isOwnProfile && (
                       <PDFUpload user={currentUser} onUploadComplete={() => fetchPDFs(currentUser.uid)} />
                     )
@@ -756,14 +756,16 @@ Edit Profile
             padding: '20px',
             paddingBottom: '50px',
             border: '1px solid white',
-            marginBottom: '10px'
-          }} className='col-md-12 justify-content-center align-items-center'>
+            marginBottom: '10px',
+            
+          }} className='row justify-content-center align-items-center'>
             {pdfs.length > 0 ? (
               <Carousel>
               {pdfs.map((pdf, index) => (
                 <Carousel.Item key={index}>
-                  <div className='d-flex justify-content-center'>
-                    <div className='row'>
+                  <div style={{marginLeft:'150px',
+            marginRight:'150px'}} className='d-flex  justify-content-center mb-4'>
+                    <div className='row mt-3 '>
                       <div className='col-md-4'>
                         <iframe
                           title='pdf'
@@ -773,14 +775,15 @@ Edit Profile
                             height: '300px',
                             border: 'none',
                             borderRadius: '5px',
-                            pointerEvents: 'none'
+                            pointerEvents: 'none',
                           }}
                         />
                       </div>
-                      <div className='col-md-7 d-flex flex-column align-items-center'>
-  <div className="text-white mt-3">
+                      <div className='col-md d-flex justify-content-center align-items-top'> 
+  <div className="text-white mt-3" style={{borderLeft: '1px solid #1a1a1a', paddingLeft: '30px'}}>
     <h5 className='primary'>{pdf.title}</h5>
     <p className='primary'>{pdf.description}</p>
+
     {pdf.topics && pdf.topics.length > 0 && (
       <div style={{ marginBottom: '10px' }}>
         <svg style={{marginRight: '10px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-tags-fill" viewBox="0 0 16 16">
@@ -908,22 +911,22 @@ Edit Profile
       
 
       
-    <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
-  <Modal.Header closeButton>
+    <Modal show={showRemoveModal}  className='box' onHide={() => setShowRemoveModal(false)}>
+  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
     <Modal.Title style={{color: 'black'}}>Edit Document</Modal.Title>
   </Modal.Header>
-  <Modal.Body style={{color: 'black'}}>
-    <Form>
+  <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    <Form style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
       <Form.Group className="mb-3" controlId="formDocumentTitle">
-        <Form.Label><strong style={{color: 'black'}}>Document Title</strong></Form.Label>
+        <Form.Label className='primary'>Title</Form.Label>
         <Form.Control type="text" placeholder="Enter new title" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formDocumentDescription">
-        <Form.Label><strong style={{color: 'black'}}>Document Description</strong></Form.Label>
-        <Form.Control as="textarea" rows={3} placeholder="Enter new description" value={editedDescription} onChange={(e) => setEditedDescription(e.target.value)} />
+        <Form.Label className='primary'>Description</Form.Label>
+        <Form.Control as="textarea" rows={3} maxLength={150} placeholder="Enter new description" value={editedDescription} onChange={(e) => setEditedDescription(e.target.value)} />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formDocumentTags">
-        <Form.Label><strong style={{color: 'black'}}>Related Topic</strong></Form.Label>
+        <Form.Label className='primary'>Related Topic</Form.Label>
         <Select
           isMulti
           name="tags"
@@ -943,14 +946,14 @@ Edit Profile
       </Form.Group>
     </Form>
   </Modal.Body>
-  <Modal.Footer>
+  <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
     <Button className='custom-view' onClick={confirmRemove}>
       Remove
     </Button>
     <div className="ms-auto">
-      <Button variant="secondary" onClick={() => setShowRemoveModal(false)} className="me-2">
+      {/* <Button onClick={() => setShowRemoveModal(false)} className="me-2 custom-view">
         Cancel
-      </Button>
+      </Button> */}
       <Button className='custom-view' onClick={saveChanges}>
         Save Changes
       </Button>

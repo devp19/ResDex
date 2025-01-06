@@ -135,8 +135,8 @@ const Notifications = () => {
   };
 
   return (
-    <div className='mt-4'>
-      <h1 className='primary text-center'>Notifications</h1>
+    <div className='mt-4 fade-in'>
+      <h1 className='primary monarque text-center'>Notifications</h1>
       <div className='row d-flex justify-content-center' style={{ marginRight: '20px', marginTop: '30px' }}>
         <div className='col-md-7 d-flex justify-content-center'>  
           <ul className='mt-4'>

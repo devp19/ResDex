@@ -105,8 +105,8 @@ const Home = () => {
       <div className='container fade-in top'>
         {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
         <div className='row d-flex justify-content-center fade-in'>
-        <div class="scroller box" data-direction="right" data-speed="slow">
-            <div class="scroller__inner">
+        <div class="scroller box " data-direction="right" data-speed="slow">
+            <div class="scroller__inner mb-4">
               <img style={{height: '60px', marginRight: '30px'}} src={TMU} alt="" />
               <img style={{height: '60px',  marginRight: '30px', marginLeft: '30px'}} src={MAC} alt="" />
               <img style={{height: '60px'}} src={OTTAWA} alt="" />
@@ -119,7 +119,7 @@ const Home = () => {
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
-      <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>" Testimonials "</p>
+      <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>Testimonials</p>
 
        <div className='row d-flex justify-content-center'>
      

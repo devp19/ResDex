@@ -368,6 +368,7 @@ input:focus, select:focus, button:focus {
   color: white;
   background-color: #555;
   border: 1px solid rgb(0, 0, 0);
+  cursor: pointer;
   
 }
 

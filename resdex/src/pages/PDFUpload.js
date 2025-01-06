@@ -177,11 +177,11 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         </button>
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
+      <Modal show={showModal} className='box' onHide={() => setShowModal(false)}>
+        <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
           <Modal.Title style={{color: 'black'}}>Document Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
           <Form>
             <Form.Group className="mb-3">
@@ -228,8 +228,8 @@ const PDFUpload = ({ user, onUploadComplete }) => {
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
-          <button className="custom-read border" onClick={() => setShowModal(false)}>
+        <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+          <button className="custom-view" onClick={() => setShowModal(false)}>
             Cancel
           </button>
           <button className="custom-view" onClick={handleUpload} disabled={!title.trim()}>
