@@ -10,6 +10,7 @@ import Contact from './pages/Contact';
 import Search from './pages/Search';
 import Signup from './pages/signup';
 import Profile from './pages/Profile';
+import Create from './pages/Create';
 import Recovery from './pages/recovery';
 import Success from './pages/Success';
 import ReleaseDocs from './pages/ReleaseDocs';
@@ -45,6 +46,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/search" element={<Search />} />
               <Route path="/success" element={<Success />} />
+              <Route path="/create" element={<Create />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/releasedocs" element={<ReleaseDocs />} />
               <Route path="/releasedocs/v101" element={<V101 />} />
