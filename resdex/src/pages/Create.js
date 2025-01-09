@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { auth, db } from '../firebaseConfig'; // Assuming you have firebaseConfig set up
-import { doc, getDoc } from 'firebase/firestore';
+import { components } from 'react-select';
+import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 const Create = () => {
   const interestOptions = [
@@ -26,6 +27,43 @@ const Create = () => {
   const [selectedCollaborators, setSelectedCollaborators] = useState([]);
   const [collaboratorOptions, setCollaboratorOptions] = useState([]);
 
+
+
+  const CustomOption = (props) => {
+    return (
+      <components.Option {...props}>
+        <div  style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src={props.data.profilePicture || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
+            alt={`${props.data.label}'s profile`}
+            style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }}
+          />
+          <span className='primary'>{props.data.label}</span>
+        </div>
+      </components.Option>
+    );
+  };
+
+
+  const CustomMultiValue = (props) => {
+    return (
+      <components.MultiValue {...props}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src={props.data.profilePicture || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
+            alt={`${props.data.label}'s profile`}
+            style={{ width: '20px', height: '20px', borderRadius: '50%', marginRight: '5px' }}
+          />
+          <span style={{ color: 'white' }}>{props.data.label}</span>
+        </div>
+      </components.MultiValue>
+    );
+  };
+
+
+
+
+
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
@@ -39,7 +77,7 @@ const Create = () => {
       ...provided,
       backgroundColor: 'black',
       padding: '5px',
-      borderRadius: '5px'
+      borderRadius: '5px',
     }),
     multiValueLabel: (provided) => ({
       ...provided,
@@ -55,8 +93,9 @@ const Create = () => {
     }),
   };
 
-  useEffect(() => {
-    const fetchResearchFellows = async () => {
+  // Function to load collaborators when the select box is opened
+  const loadCollaborators = async () => {
+    if (collaboratorOptions.length === 0) {
       try {
         const user = auth.currentUser;
         if (user) {
@@ -64,26 +103,74 @@ const Create = () => {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            const researchFellows = userData.following || []; // Assuming 'following' contains the list of research fellows
-
-            researchFellows.forEach(fellow => {
-                console.log('Research Fellow:', fellow);
-              });
-              
-            const options = researchFellows.map(fellow => ({
-              value: fellow.uid, // Assuming each fellow has a unique ID
-              label: fellow.displayName || fellow.username // Assuming each fellow has a displayName or username
-            }));
+            const researchFellows = userData.following || [];
+  
+            const fellowPromises = researchFellows.map(async (fellowId) => {
+              const fellowDocRef = doc(db, 'users', fellowId);
+              const fellowDoc = await getDoc(fellowDocRef);
+              if (fellowDoc.exists()) {
+                const fellowData = fellowDoc.data();
+                return {
+                  value: fellowId,
+                  label: fellowData.fullName || 'Unknown',
+                  profilePicture: fellowData.profilePicture, // Ensure this field is available
+                };
+              } else {
+                return null;
+              }
+            });
+  
+            const optionsArray = await Promise.all(fellowPromises);
+            const options = optionsArray.filter((option) => option !== null);
             setCollaboratorOptions(options);
           }
         }
       } catch (error) {
         console.error("Error fetching research fellows:", error);
       }
-    };
+    }
+  };
 
-    fetchResearchFellows();
-  }, []);
+
+  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+  
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const username = userData.username; // Ensure this field is available
+  
+          const newResearch = {
+            title: Title,
+            description: description,
+            interests: selectedTopics.map(topic => topic.label),
+            collaborators: selectedCollaborators.map(collaborator => collaborator.label),
+            createdAt: new Date(),
+          };
+  
+          // Update the user's document with the new research entry
+          await updateDoc(userDocRef, {
+            collaboratedResearch: arrayUnion(newResearch)
+          });
+  
+          setSuccess('Research created successfully!');
+          setError('');
+          navigate(`/profile/${username}`); // Use the actual username
+        }
+      }
+    } catch (error) {
+      console.error("Error saving research:", error);
+      setError('Failed to create research. Please try again.');
+      setSuccess('');
+    }
+  };
+
 
   return (
     <div>
@@ -150,24 +237,27 @@ const Create = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label style={{ color: 'black' }}>Collaborators</Form.Label>
-                <Select
-                  isMulti
-                  name="collaborators"
-                  options={collaboratorOptions}
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  value={selectedCollaborators}
-                  onChange={(selected) => setSelectedCollaborators(selected)}
-                  placeholder="Select collaborators"
-                  styles={customStyles}
-                />
-              </Form.Group>
+        <Form.Label style={{ color: 'black' }}>Collaborators</Form.Label>
+        <Select
+          isMulti
+          name="collaborators"
+          options={collaboratorOptions}
+          className="basic-multi-select primary"
+          classNamePrefix="select"
+          value={selectedCollaborators}
+          onChange={(selected) => setSelectedCollaborators(selected)}
+          placeholder="Select collaborators"
+          styles={customStyles}
+          onMenuOpen={loadCollaborators} // Load collaborators when menu opens
+  components={{ Option: CustomOption, MultiValue: CustomMultiValue }} // Use the custom MultiValue component
+
+        />
+      </Form.Group>
               {error && <p style={{ color: 'red' }}>{error}</p>}
               {success && <p style={{ color: 'green' }}>{success}</p>}
-              <Button className="custom" style={{ marginBottom: '20px' }} type="submit">
-                Submit Ticket
-              </Button>
+              <Button className="custom" style={{ marginBottom: '20px' }} type="submit" onClick={handleSubmit}>
+  Create
+</Button>
             </Form>
           </div>
         </div>
