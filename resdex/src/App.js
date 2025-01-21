@@ -33,7 +33,7 @@ function App() {
 
   const handleAccessCodeSubmit = (e) => {
     e.preventDefault();
-    if (accessCode === 'devp19') {
+    if (accessCode === process.env.REACT_APP_ACCESS_CODE) {
       setHasAccess(true);
     } else {
       alert('Incorrect access code');
