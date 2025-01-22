@@ -50,7 +50,7 @@ function App() {
           <input
           className='primary'
           style={{borderRadius: '5px', padding: '5px', marginTop: '20px', border: '1px solid black'}}
-            type="text"
+            type="password"
             value={accessCode}
             onChange={(e) => setAccessCode(e.target.value)}
             placeholder="Early Access Code"
