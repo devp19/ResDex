@@ -561,10 +561,11 @@ Edit Profile
                 style={{
                   width: '150px',
                   height: '150px',
-                  borderRadius: '5%',
+                  borderRadius: '50%',
+                  border: '1px solid white',
                   position: 'relative',
                   overflow: 'hidden',
-                  backgroundColor: '#ccc',
+                  backgroundColor: 'transparent',
                   cursor: isOwnProfile ? 'pointer' : 'default',
                 }}
                 onMouseEnter={handleMouseEnter}
@@ -578,8 +579,9 @@ Edit Profile
                     style={{
                       width: '150px',
                       height: '150px',
-                      // borderRadius: '50%',
-                      objectFit: 'cover'
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      backgroundColor: 'transparent'
                     }}
                   />
                 ) : (
@@ -589,7 +591,8 @@ Edit Profile
                       height: '150px',
                       display: 'flex',
                       justifyContent: 'center',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      backgroundColor: 'transparent'
                      }}
                   >
                     No Image
