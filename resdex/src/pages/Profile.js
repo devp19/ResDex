@@ -589,8 +589,8 @@ Edit Profile
                       height: '150px',
                       display: 'flex',
                       justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
+                      alignItems: 'center'
+                     }}
                   >
                     No Image
                   </div>

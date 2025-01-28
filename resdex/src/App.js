@@ -28,40 +28,40 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [accessCode, setAccessCode] = useState('');
-  const [hasAccess, setHasAccess] = useState(false);
+  // const [accessCode, setAccessCode] = useState('');
+  // const [hasAccess, setHasAccess] = useState(false);
 
-  const handleAccessCodeSubmit = (e) => {
-    e.preventDefault();
-    if (accessCode === process.env.REACT_APP_ACCESS_CODE) {
-      setHasAccess(true);
-    } else {
-      alert('Incorrect access code');
-    }
-  };
+  // const handleAccessCodeSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (accessCode === process.env.REACT_APP_ACCESS_CODE) {
+  //     setHasAccess(true);
+  //   } else {
+  //     alert('Incorrect access code');
+  //   }
+  // };
 
-  if (!hasAccess) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '20%' }}>
-        <h1 className='primary monarque'>You're Early!</h1>
-        <p className='primary'>ResDex is currently in development mode. <br></br>Please check out our LinkedIn for more updates!</p>
+  // if (!hasAccess) {
+//     return (
+//       <div style={{ textAlign: 'center', marginTop: '20%' }}>
+//         <h1 className='primary monarque'>You're Early!</h1>
+//         <p className='primary'>ResDex is currently in development mode. <br></br>Please check out our LinkedIn for more updates!</p>
 
-        <form onSubmit={handleAccessCodeSubmit}>
-          <input
-          className='primary'
-          style={{borderRadius: '5px', padding: '5px', marginTop: '20px', border: '1px solid black'}}
-            type="password"
-            value={accessCode}
-            onChange={(e) => setAccessCode(e.target.value)}
-            placeholder="Early Access Code"
-          />
-          <br></br>
-<button type='submit' className="custom" style={{marginBottom: '20px' }}>
-                Enter
-              </button>        </form>
-      </div>
-    );
-  }
+//         <form onSubmit={handleAccessCodeSubmit}>
+//           <input
+//           className='primary'
+//           style={{borderRadius: '5px', padding: '5px', marginTop: '20px', border: '1px solid black'}}
+//             type="password"
+//             value={accessCode}
+//             onChange={(e) => setAccessCode(e.target.value)}
+//             placeholder="Early Access Code"
+//           />
+//           <br></br>
+// <button type='submit' className="custom" style={{marginBottom: '20px' }}>
+//                 Enter
+//               </button>        </form>
+//       </div>
+//     );
+//   }
 
   return (
     <Router>
@@ -91,5 +91,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;
