@@ -6,7 +6,6 @@ import MAC from '../images/mac.png';
 import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
-import Dev from '../images/dev.png';
 import Empty from '../images/empty.webp';
 import Alert from 'react-bootstrap/Alert';
 

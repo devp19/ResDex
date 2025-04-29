@@ -8,7 +8,7 @@ import PDFUpload from './PDFUpload';
 import { s3 } from '../awsConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
-import blank from '/src/images/empty.webp';
+import blank from '../images/empty.webp';
 
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
