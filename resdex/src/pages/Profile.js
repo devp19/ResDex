@@ -8,6 +8,7 @@ import PDFUpload from './PDFUpload';
 import { s3 } from '../awsConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
+import blank from '/src/images/empty.webp';
 
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -585,18 +586,17 @@ Edit Profile
                     }}
                   />
                 ) : (
-                  <div
+                  <img
+                    src={blank}
+                    alt="Profile"
                     style={{
                       width: '150px',
                       height: '150px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
                       backgroundColor: 'transparent'
-                     }}
-                  >
-                    No Image
-                  </div>
+                    }}
+                  />
                 )}
                 {isOwnProfile && isHovering && (
                   <div
