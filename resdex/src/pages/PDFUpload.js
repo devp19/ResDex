@@ -67,7 +67,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
       formData.append('file', selectedFile);
       formData.append('userId', user.uid);
 
-      const response = await fetch('http://localhost:5001/upload', {
+      const response = await fetch('https://resdex.onrender.com/upload', {
         method: 'POST',
         body: formData,
       });
