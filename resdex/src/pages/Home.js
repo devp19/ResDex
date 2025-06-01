@@ -7,7 +7,7 @@ import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
 import Alert from 'react-bootstrap/Alert';
-import Empty from '../images/empty.webp';
+import Empty from '../images/empty-pic.webp';
 
 
 const Home = () => {

@@ -9,8 +9,7 @@ import PDFUpload from './PDFUpload';
 import { s3 } from '../cloudflareConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
-import blank from '../images/empty.webp';
-
+import blank from '../images/empty-pic.webp';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
