@@ -24,24 +24,21 @@ const s3 = new AWS.S3({
 
 
 app.post('/delete', express.json(), async (req, res) => {
-  const { userId, objectKey } = req.body;
-
-  if (!userId || !objectKey) {
-    return res.status(400).json({ success: false, message: 'Missing userId or objectKey' });
-  }
-
-  const params = {
-    Bucket: process.env.R2_BUCKET,
-    Key: objectKey,
-  };
-
   try {
+    const { userId, objectKey } = req.body;
+
+    if (!userId || !objectKey) {
+      return res.status(400).json({ success: false, message: 'Missing userId or objectKey' });
+    }
+
+    const params = { Bucket: process.env.R2_BUCKET, Key: objectKey };
     await s3.deleteObject(params).promise();
+
     console.log(`Deleted ${objectKey} from R2`);
     res.json({ success: true });
   } catch (error) {
     console.error('Delete error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete object', error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
