@@ -7,5 +7,6 @@ const s3 = new AWS.S3({
   region: process.env.REACT_APP_R2_REGION,  // Cloudflare recommends 'auto'
   signatureVersion: 'v4',  // Required for R2 compatibility
 });
-
+ 
 export { s3 };
+ 
