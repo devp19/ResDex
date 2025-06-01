@@ -44,11 +44,17 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     // 🔥 Manually construct the public URL:
     const publicUrl = `https://${process.env.R2_PUBLIC_DOMAIN}/${key}`;
 
-    res.json({
-      success: true,
-      url: publicUrl,         // ✅ send this to frontend
-      objectKey: key,
-    });
+    const workerUrl = result.Location.replace(
+  'https://resdex.9941bc70add85a39ce1bc8141c669eca.r2.cloudflarestorage.com',
+  'https://resdex-r2-proxy.devptl841806.workers.dev'
+);
+
+res.json({
+  success: true,
+  url: workerUrl,      // ← this now returns the Worker URL!
+  objectKey: key,
+});
+
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({

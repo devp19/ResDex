@@ -273,26 +273,10 @@ const fetchPDFs = useCallback(async (userId) => {
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     const userData = userDoc.data();
-    
+
     if (userData && userData.pdfs && userData.pdfs.length > 0) {
-      const validPdfs = [];
-      
-      for (const pdfData of userData.pdfs) {
-        try {
-          const response = await fetch(pdfData.url, { method: 'HEAD' });
-          if (response.ok) {
-            validPdfs.push(pdfData);
-          }
-        } catch (error) {
-          console.error("PDF no longer exists:", error);
-        }
-      }
-
-      if (validPdfs.length !== userData.pdfs.length) {
-        await updateDoc(userDocRef, { pdfs: validPdfs });
-      }
-
-      setPdfs(validPdfs);
+      // Directly use saved PDFs without fetch checking
+      setPdfs(userData.pdfs);
     } else {
       setPdfs([]);
     }
@@ -302,6 +286,9 @@ const fetchPDFs = useCallback(async (userId) => {
     setPdfs([]);
   }
 }, []);
+
+
+
 
   const fetchProfileData = useCallback(async () => {
 

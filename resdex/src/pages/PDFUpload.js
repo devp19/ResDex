@@ -78,14 +78,20 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         throw new Error('Upload failed');
       }
 
-      const pdfData = {
-        url: result.url,          // full public Worker URL or R2 URL
-        objectKey: result.objectKey,  // saved in case you need it
-        title: title,
-        description: description,
-        uploadDate: new Date().toISOString(),
-        topics: selectedTopics.map(topic => topic.value),
-      };
+      const workerUrl = result.url.replace(
+  'https://pub-b9219a60c2ea4807b8bb38a7c82cf268.r2.dev',
+  'https://resdex-r2-proxy.devptl841806.workers.dev'
+);
+
+const pdfData = {
+  url: workerUrl,          // swap in the Worker URL
+  objectKey: result.objectKey,  // keep the internal key if you need it later
+  title: title,
+  description: description,
+  uploadDate: new Date().toISOString(),
+  topics: selectedTopics.map(topic => topic.value),
+};
+
 
       if (!docSnapshot.exists()) {
         await setDoc(userDocRef, { pdfs: [pdfData] });
