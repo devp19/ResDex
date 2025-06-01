@@ -239,33 +239,37 @@ const confirmRemove = async () => {
   if (!pdfToRemove) return;
 
   try {
-    const key = decodeURIComponent(pdfToRemove.url.split('resdex-bucket.s3.amazonaws.com/')[1]);
-    console.log(key);
-    console.log("Attempting to delete object with key:", key);
-    
-    const params = { Bucket: 'resdex-bucket', Key: key };
-    await s3.deleteObject(params).promise();
+    const response = await fetch('https://your-backend.onrender.com/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: currentUser.uid,
+        objectKey: pdfToRemove.objectKey,  // Save this when you upload!
+      }),
+    });
 
-    const userDocRef = doc(db, 'users', currentUser.uid);
-    const updatedPdfs = pdfs.filter(pdf => pdf.url !== pdfToRemove.url);
-    await updateDoc(userDocRef, { pdfs: updatedPdfs });
+    const result = await response.json();
+
+    if (!result.success) throw new Error(result.message);
+
+    const updatedPdfs = pdfs.filter(pdf => pdf.objectKey !== pdfToRemove.objectKey);
+    await updateDoc(doc(db, 'users', currentUser.uid), { pdfs: updatedPdfs });
 
     setPdfs(updatedPdfs);
     if (currentPdfIndex >= updatedPdfs.length) {
       setCurrentPdfIndex(Math.max(0, updatedPdfs.length - 1));
     }
 
-    console.log("Successfully removed PDF from both S3 and Firestore");
-
+    console.log("Successfully removed PDF from both R2 and Firestore");
   } catch (error) {
     console.error("Error removing PDF:", error);
-    console.error("Full error details:", error.message);
     alert("Failed to remove PDF. Please try again.");
   } finally {
     setShowRemoveModal(false);
     setPdfToRemove(null);
   }
 };
+
 
 const fetchPDFs = useCallback(async (userId) => {
   try {
