@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { s3 } from '../awsConfig';
+// import { s3 } from '../awsConfig';
+import { s3 } from '../cloudflareConfig';
 import { doc, updateDoc, getDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Spinner from 'react-bootstrap/Spinner';
