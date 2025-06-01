@@ -239,7 +239,7 @@ const confirmRemove = async () => {
   if (!pdfToRemove) return;
 
   try {
-    const response = await fetch('https://your-backend.onrender.com/delete', {
+    const response = await fetch('https://resdex.onrender.com/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
