@@ -1,6 +1,4 @@
 import { useState } from 'react';
-// import { s3 } from '../awsConfig';
-import { s3 } from '../cloudflareConfig';
 import { doc, updateDoc, getDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Spinner from 'react-bootstrap/Spinner';
@@ -64,20 +62,25 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         setErrorModal(true);
         return;
       }
-      setErrorModal(false);
-      setErrorMessage('')
-      const params = {
-        Bucket: 'resdex-bucket',
-        Key: `pdfs/${user.uid}/${selectedFile.name}`,
-        Body: selectedFile,
-        ContentType: 'application/pdf',
-      };
 
-      const options = { partSize: 5 * 1024 * 1024, queueSize: 1 };
-      const data = await s3.upload(params, options).promise();
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('userId', user.uid);
+
+      const response = await fetch('http://localhost:5001/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error('Upload failed');
+      }
 
       const pdfData = {
-        url: data.Location,
+        url: result.url,          // full public Worker URL or R2 URL
+        objectKey: result.objectKey,  // saved in case you need it
         title: title,
         description: description,
         uploadDate: new Date().toISOString(),
@@ -103,6 +106,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
     } catch (error) {
       console.error('Error uploading PDF: ', error);
       setErrorMessage('Failed to upload. Please try again.');
+      setErrorModal(true);
     } finally {
       setLoading(false);
     }
@@ -166,12 +170,9 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         accept=".pdf"
         onChange={handleFileChange}
       />
-      <div
-        style={{padding: '10px'}}
-        onClick={() => document.getElementById('pdfInput').click()}
-      >
+      <div style={{ padding: '10px' }} onClick={() => document.getElementById('pdfInput').click()}>
         <button className='custom-edit'> 
-          <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+          <svg style={{ marginRight: '14px' }} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
             <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
           </svg>
           Upload Research
@@ -179,14 +180,14 @@ const PDFUpload = ({ user, onUploadComplete }) => {
       </div>
 
       <Modal show={showModal} className='box' onHide={() => setShowModal(false)}>
-        <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
-          <Modal.Title style={{color: 'black'}}>Document Details</Modal.Title>
+        <Modal.Header style={{ background: '#e5e3df', borderBottom: '1px solid white' }} closeButton>
+          <Modal.Title style={{ color: 'black' }}>Document Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+        <Modal.Body style={{ background: '#e5e3df', borderBottom: '1px solid white' }}>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label style={{color: 'black'}}>Title</Form.Label>
+              <Form.Label style={{ color: 'black' }}>Title</Form.Label>
               <Form.Control
                 maxLength="50"
                 type="text"
@@ -197,7 +198,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
               />
             </Form.Group>
             <Form.Group className="mb-3 pt-3">
-              <Form.Label style={{color: 'black'}}>Description</Form.Label>
+              <Form.Label style={{ color: 'black' }}>Description</Form.Label>
               <Form.Control
                 maxLength="300"
                 as="textarea"
@@ -209,7 +210,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
               />
             </Form.Group>
             <Form.Group className="mb-3 pt-3">
-              <Form.Label style={{color: 'black'}}>Relevant Topics</Form.Label>
+              <Form.Label style={{ color: 'black' }}>Relevant Topics</Form.Label>
               <Select
                 isMulti
                 name="topics"
@@ -229,7 +230,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+        <Modal.Footer style={{ background: '#e5e3df', borderBottom: '1px solid white' }}>
           <button className="custom-view" onClick={() => setShowModal(false)}>
             Cancel
           </button>
@@ -247,7 +248,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </Modal.Body>
         <Modal.Footer>
-          <button className="custom border" onClick={() =>  {setErrorModal(false); window.location.reload();}}>
+          <button className="custom border" onClick={() => { setErrorModal(false); window.location.reload(); }}>
             Close
           </button>
         </Modal.Footer>
