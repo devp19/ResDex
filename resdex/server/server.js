@@ -7,13 +7,10 @@ const cors = require('cors');
 const app = express();
 const port = 5001;
 
-// Enable CORS for your React app
 app.use(cors());
 
-// Multer setup for file handling
 const upload = multer();
 
-// AWS S3 client (for Cloudflare R2)
 const s3 = new AWS.S3({
   accessKeyId: process.env.R2_ACCESS_KEY_ID,
   secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
@@ -43,7 +40,6 @@ app.post('/delete', express.json(), async (req, res) => {
 });
 
 
-// Upload route
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
@@ -62,7 +58,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     console.log(`Uploaded ${key} to R2`);
 
-    // 🔥 Manually construct the public URL:
     const publicUrl = `https://${process.env.R2_PUBLIC_DOMAIN}/${key}`;
 
     const workerUrl = result.Location.replace(
@@ -72,7 +67,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
 res.json({
   success: true,
-  url: workerUrl,      // ← this now returns the Worker URL!
+  url: workerUrl,      
   objectKey: key,
 });
 
@@ -87,7 +82,6 @@ res.json({
 });
 
 
-// Start server
 app.listen(port, () => {
-  console.log(`🚀 Backend server running at http://localhost:${port}`);
+  console.log(`Backend server running at http://localhost:${port}`);
 });

@@ -84,8 +84,8 @@ const PDFUpload = ({ user, onUploadComplete }) => {
 );
 
 const pdfData = {
-  url: workerUrl,          // swap in the Worker URL
-  objectKey: result.objectKey,  // keep the internal key if you need it later
+  url: workerUrl,        
+  objectKey: result.objectKey, 
   title: title,
   description: description,
   uploadDate: new Date().toISOString(),

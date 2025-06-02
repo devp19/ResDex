@@ -244,7 +244,7 @@ const confirmRemove = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         userId: currentUser.uid,
-        objectKey: pdfToRemove.objectKey,  // Save this when you upload!
+        objectKey: pdfToRemove.objectKey, 
       }),
     });
 
@@ -278,7 +278,6 @@ const fetchPDFs = useCallback(async (userId) => {
     const userData = userDoc.data();
 
     if (userData && userData.pdfs && userData.pdfs.length > 0) {
-      // Directly use saved PDFs without fetch checking
       setPdfs(userData.pdfs);
     } else {
       setPdfs([]);
@@ -386,7 +385,7 @@ const fetchPDFs = useCallback(async (userId) => {
   }, [username]);
 
   const updateAbout = useCallback(async (newAboutSection) => {
-    if (!profileUser) return; // make sure profile exists otherwise, its screwed up
+    if (!profileUser) return; // make sure profile exists otherwise it screws up idk y even tho it exists
 
     setAbout(newAboutSection);
     const updatedUser = { ...profileUser, about: newAboutSection };
@@ -403,7 +402,7 @@ const fetchPDFs = useCallback(async (userId) => {
 }, [username, profileUser]);
 
   const updateOrganization = useCallback(async (newOrganizationSection) => {
-    if (!profileUser) return; // make sure profile exists otherwise, its screwed up
+    if (!profileUser) return;
 
     setOrganization(newOrganizationSection);
     const updatedUser = { ...profileUser, organization: newOrganizationSection };
