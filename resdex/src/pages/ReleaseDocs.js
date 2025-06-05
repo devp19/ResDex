@@ -8,7 +8,7 @@ const ReleaseDocs = () => {
                 <div className='row d-flex justify-content-center pt-4'>
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 border'>
                         <div className='row pt-4' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md'> Version 1.01  </p> <button className=' col-md custom-read'> Read ↗︎</button>
+                            <p className='col-md'> Version 1.01 tirth  </p> <button className=' col-md custom-read'> Read ↗︎</button>
                         </div>
                         <div className='row d-flex justify-content-center'>
                             <img src={ MainPage } alt='temp' style={{width: '200px', marginTop:'60px'}}></img>
