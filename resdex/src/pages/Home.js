@@ -42,9 +42,9 @@ const Home = () => {
 
   return (
     <div>
-       <Alert key='secondary' variant='secondary' dismissible>
+      {/* <Alert key='secondary' variant='secondary' dismissible>
          Note: ResDex is still under-development! Currently, ResDex is optimized for larger-screens! Thanks for visiting early!
-        </Alert>
+        </Alert> */}
 
       <div className='center-container fade-in'>
 
@@ -60,19 +60,20 @@ const Home = () => {
             <p className='akros title primary' style={{ marginTop: '-40px' }}><span className='primary title monarque'>–made </span>easy</p>
           </div>
 
-          <div className='center pt-4 fade-in'>
+          
+          {/* <div className='center fade-in'>
+            <p className='monarque primary secondary'>Learn More</p>
+          </div> */}
+
+          <div className='row d-flex justify-content-center mt-4'>
+        <div className='col-md-4 box'>
+        <p className='primary small text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
+        </div>
+        <div className='center pt-4 fade-in' style={{marginTop: '20px'}}>
             <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
               <path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/>
             </svg>
           </div>
-          <div className='center fade-in'>
-            <p className='monarque primary secondary'>"For students, by students"</p>
-          </div>
-
-          <div className='row d-flex justify-content-center minus'>
-        <div className='col-md-6 box'>
-        <p className='primary small text-center'>Share research, gain insightful feedback and connect with industry professionals all in one place.</p>
-        </div>
         </div>
         </div>
       </div>
