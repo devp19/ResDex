@@ -84,20 +84,20 @@ const Home = () => {
         <div className='row justify-content-center top'>
         <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content'>
-                <h3 className='monarque primary'> CREDENTIALS </h3>
+                <h3 className='akros primary'> CREDENTIALS </h3>
                 <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
               </div>
             </div>
             <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='monarque primary'> CONNECT </h3>
-                <p className='primary mt-4'>ResDex connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
+              <h3 className='akros primary'> CONNECT </h3>
+                <p className='primary mt-4'>Connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
               </div>
             </div>
             <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='monarque primary'> PEER REVIEW </h3>
-                <p className='primary mt-4'>ResDex enables constructive peer review, helping students refine their research and enhance their academic skills.</p>
+              <h3 className='akros primary'> PEER REVIEW </h3>
+                <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
               </div>
             </div>        </div>
       </div>
@@ -119,7 +119,7 @@ const Home = () => {
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
-      <p className='primary center top monarque' style={{ fontSize: '30px', marginBottom: '30px' }}>Testimonials</p>
+      <p className='primary center top akros' style={{ fontSize: '30px', marginBottom: '30px' }}>Testimonials</p>
 
        <div className='row d-flex justify-content-center'>
      
