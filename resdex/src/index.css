@@ -34,6 +34,10 @@ a {
   color: #1a1a1a;
 }
 
+.border-keep {
+  outline: 1px solid #1a1a1a;
+}
+
 .display {
   margin-right: 50px;
   margin-left: 50px;
