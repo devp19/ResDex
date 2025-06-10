@@ -6,7 +6,6 @@ ___
 
 *“Research made easy. A platform tailored for students by students.”*
 
-Platform Launching Soon | [Visit ResDex](https://resdex.vercel.app)
 ___ 
 
 
