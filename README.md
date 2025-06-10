@@ -9,6 +9,13 @@ ___
 Platform Launching Soon | [Visit ResDex](https://resdex.vercel.app)
 ___ 
 
+
+https://github.com/user-attachments/assets/0f32af24-bfa7-494b-99e5-dadbe9696ff6
+
+
+
+
+
 ### About
 ResDex is a student-friendly, accessible research paper “publishing” platform that gives students the opportunity to stand out among millions, review and edit papers, and connect with PHD level researchers. Designed to foster a collaborative academic community, ResDex allows users to showcase their research, achievements, and certifications in a dynamic online portfolio. 
 
