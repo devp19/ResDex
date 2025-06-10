@@ -1,4 +1,4 @@
-# ResDex - Research Made Easy.
+# ResDex
 
 <!-- ![ResDex Banner](https://github.com/user-attachments/assets/8a7f5869-7c6a-4e1d-a8a4-f40965d0191a) -->
 
