@@ -1,5 +1,7 @@
 import React from 'react'
 import MainPage from '../images/indexinv.png'
+import { Link } from 'react-router-dom';
+
 const ReleaseDocs = () => {
     return(
         <div>
@@ -10,6 +12,8 @@ const ReleaseDocs = () => {
                 <h2 className='pt-4 mt-4 primary'> Version 2 | Releases</h2>
               
                 <div className='row d-flex justify-content-center pt-4'>
+                    
+
                     
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
@@ -29,7 +33,7 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                        <button className=' col-md custom-view'> Read ↗︎</button>
+                           <Link to="/releasedocs/v200" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
                         June 5th, 2025 | Author: Dev Patel
                         </div>
@@ -43,9 +47,9 @@ const ReleaseDocs = () => {
                 <div className='horizontal-line'></div>
 
             <h2 className='pt-4 mt-4 primary'> Version 1 | Releases</h2>
-              
+               
                 <div className='row d-flex justify-content-center pt-4'>
-                    
+                     
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
                             <p className='col-md monarque primary'> <strong className='primary'>V1.03</strong> | Web-Interactivity</p>
@@ -64,7 +68,7 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                        <button className=' col-md custom-view'> Read ↗︎</button>
+                           <Link to="/releasedocs/v103" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
                         November 5th, 2024 | Author: Dev Patel
                         </div>
@@ -91,11 +95,15 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                        <button className=' col-md custom-view'> Read ↗︎</button>
+                           <Link to="/releasedocs/v102" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
                         October 2nd, 2024 | Author: Dev Patel
                         </div>
                     </div>
+
+
+
+
 
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
@@ -115,7 +123,7 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                        <button className=' col-md custom-view'> Read ↗︎</button>
+                           <Link to="/releasedocs/v101" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
                         September 10th, 2024 | Author: Dev Patel
                         </div>
@@ -140,7 +148,7 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                        <button className=' col-md custom-view'> Read ↗︎</button>
+                           <Link to="/releasedocs/v100" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
                         August 23rd, 2024 | Author: Dev Patel
                         </div>

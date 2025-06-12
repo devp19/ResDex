@@ -14,6 +14,7 @@ import Create from './pages/Create';
 import Recovery from './pages/recovery';
 import Success from './pages/Success';
 import ReleaseDocs from './pages/ReleaseDocs';
+import ReleaseInfo from './pages/ReleaseInfo';
 import V101 from './Releases/V101';
 import Notifications from './pages/Notifications';
 
@@ -82,7 +83,7 @@ function App() {
             <Route path="/create" element={<Create />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/releasedocs" element={<ReleaseDocs />} />
-            <Route path="/releasedocs/v101" element={<V101 />} />
+            <Route path="/releasedocs/:versionId" element={<ReleaseInfo />} />
             <Route path="/profile/:username" element={<Profile />} />
           </Routes>
           <Footer />
