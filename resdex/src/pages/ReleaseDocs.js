@@ -114,15 +114,15 @@ const ReleaseDocs = () => {
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.03</strong> | Web-Interactivity</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.03</strong> | Notifications & Profile Updates</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.03 introduced user authentication, file upload functionality, and initial integration with Cloudflare R2 for storage.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.03 introduced a complete notification system, overhauled the follow feature into mutual connections, and enhanced profile layout and search functionality.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Authentication</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Upload</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Cloudflare R2</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Notification System</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Connection Logic Tweaks</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Profile & Search UI Updates</p></div>
 
                           </div>
                          
@@ -132,7 +132,7 @@ const ReleaseDocs = () => {
                            
                            <Link to="/releasedocs/v103" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        November 5th, 2024 | Author: Dev Patel
+                        December 17th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 

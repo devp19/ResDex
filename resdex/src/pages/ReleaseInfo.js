@@ -28,12 +28,40 @@ const releaseNotes = {
     tags: ['PDF Performance', 'Role-Based Access', 'Audit Logging'],
   },
   v103: {
-    title: 'V1.03 | Web-Interactivity',
-    date: 'November 5th, 2024',
-    author: 'Dev Patel',
-    description:
-      'V1.03 introduced user authentication, file upload functionality, and initial integration with Cloudflare R2 for storage.',
-    tags: ['Authentication', 'Upload', 'Cloudflare R2'],
+    title: 'V1.03 | Notifications & Profile Updates',
+    date: 'December 17th, 2024',
+    author: 'Tirth Patel',
+    description:`
+      
+**Version 1.03** focused on enhancing user connectivity, real-time interactions, and profile customization, laying the groundwork for a more social and collaborative experience across the platform.
+
+A major highlight of this release was the implementation of a **full notification system**, including both **frontend and backend support**. Users now receive real-time **follow request alerts**, complete with **accept/decline logic**, displayed within a dedicated **Notifications page**. Backend logic was optimized to eliminate duplicate alerts and improve response accuracy.
+
+The **follow system was restructured into a mutual "connection" model**, where an accepted follow request automatically establishes a two-way connection---mirroring professional networking platforms. This change simplifies future collaboration features and improves clarity for users.
+
+Profiles received a **significant UI/UX update**, including:
+
+-   A redesigned profile layout for better content structure
+
+-   A new **contributions counter**
+
+-   Expanded **interests/topics** display
+
+-   A reworked **Edit Profile modal** for smoother updates
+
+**Search functionality** was also improved, featuring enhanced result grouping and **user organization logic** inspired by institutional feedback, such as from McMaster's research faculty.
+
+Additional fixes and refinements included:
+
+-   Resolution of mobile layout and padding bugs
+
+-   Reduced redundant API calls tied to UI refreshes
+
+-   Polished display behavior for follow notifications
+
+**V1.03** deepened the platform's social framework and improved usability across key touchpoints, paving the way for more collaborative, user-driven features in future releases.
+`,
+    tags: ['Notification System', 'Connection Logic Tweaks', 'Profile & Search UI Updates'],
   },
   v104: {
     title: 'V1.04 | UI/UX Improvements',
