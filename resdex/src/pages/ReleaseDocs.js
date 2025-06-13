@@ -17,28 +17,6 @@ const ReleaseDocs = () => {
 
 
 
-                    <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
-                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V2.01</strong> | Release Docs</p>
-                        </div>
-                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V2.01 focused on creating and maintaining Release Docs from ResDex.</p>
-                            <br></br>
-                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Release Docs</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Documentation</p></div>
-
-                          </div>
-                         
-                        </div>
-                   
-                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
-                           
-                           <Link to="/releasedocs/v201" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
-                        <br></br>
-                        June 13th, 2025 | Author: Tirth Patel
-                        </div>
-                    </div>
                     
 
 
@@ -66,7 +44,7 @@ const ReleaseDocs = () => {
                            
                            <Link to="/releasedocs/v200" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        June 5th, 2025 | Author: Dev Patel
+                        June 7th, 2025 | Author: Dev Patel
                         </div>
                     </div>
 
@@ -81,6 +59,59 @@ const ReleaseDocs = () => {
                
                 <div className='row d-flex justify-content-center pt-4'>
                      
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.05</strong> | Platform Optimization</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.05 focused on UI refinements, including navbar icon updates, storage backend migration from AWS S3 to Cloudflare R2, and repository cleanup to optimize performance and consistency.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Refinements</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Storage Migration</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Codebase Cleanup</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v105" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        April 29th, 2025 | Author: Tirth Patel
+                        </div>
+                    </div>
+
+
+
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.04</strong> | UI/UX Improvements</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.04 introduced enhanced user collaboration, improved connection logic, and refined UI transitions across contact and document creation features.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Collaboration Features</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>System & Logic Enhancements</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v104" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        January 29th, 2025 | Author: Tirth Patel
+                        </div>
+                    </div>
+
+
+
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
                             <p className='col-md monarque primary'> <strong className='primary'>V1.03</strong> | Web-Interactivity</p>

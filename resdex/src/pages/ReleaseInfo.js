@@ -35,53 +35,90 @@ const releaseNotes = {
       'V1.03 introduced user authentication, file upload functionality, and initial integration with Cloudflare R2 for storage.',
     tags: ['Authentication', 'Upload', 'Cloudflare R2'],
   },
+  v104: {
+    title: 'V1.04 | UI/UX Improvements',
+    date: 'January 29th, 2025',
+    author: 'Tirth Patel',
+    description:
+      `**V1.04** focused on enhancing user collaboration, streamlining connection logic, and polishing the overall user experience through targeted UI/UX refinements.
+
+This version introduced foundational upgrades to the collaborative research workflow. A key feature was the rollout of a **real-time collaborator selector** in the document creation component, allowing users to invite connections (now referred to as **Research Fellows**) directly into shared workspaces. The selector dynamically pulls profile data---names and profile images---from the user's connection list, making collaboration more intuitive and personal.
+
+Connection logic also underwent a strategic overhaul. The previous "Follow/Following" system was merged and redesigned to align more closely with **LinkedIn-style connections**, where both users must follow each other to become collaborators. This change sets the groundwork for more secure and reciprocal academic networking.
+
+From a design and usability perspective, **contact and upload interfaces received a visual refresh**. This included smoother transitions, fade-in animations for headers, and updated containers to create a more polished and responsive feel. Additionally, a **new PDF upload theme** was introduced to improve clarity and consistency across file interactions.
+
+Other notable improvements:
+
+-   **Renamed "Followers" to "Research Fellows"** to better reflect academic and professional context
+
+-   **Refactored form logic** in document creation to properly capture and store title, description, interests, and collaborator data
+
+-   **UI responsiveness updates** across form inputs, buttons, and dropdowns
+
+-   **Bug fixes** related to sizing inconsistencies across devices and browsers
+
+**V1.04** represents a step toward a more collaborative and user-centered platform, laying the groundwork for scalable research teamwork and deeper social functionality.
+`,
+    tags: ['Collaboration Features', 'System & Logic Enhancements'],
+  },
+  v105: {
+    title: 'V1.05 | Platform Optimization',
+    date: 'April 29th, 2025',
+    author: 'Tirth Patel',
+    description:
+      `**V1.05** emphasized interface consistency, backend infrastructure migration, and codebase optimization to enhance performance and maintainability.
+
+This version introduced a **UI refinement by reverting the Navbar from text labels back to icons**, improving visual consistency and aligning with user expectations for a cleaner navigation experience.
+
+A significant technical milestone in this release was the **migration of the storage backend from AWS S3 to Cloudflare R2**, leveraging AWS SDK compatibility for a smooth transition. This migration included:
+
+-   Addition of a new Cloudflare configuration file managing R2 credentials and endpoints securely through environment variables.
+
+-   Updates to imports in key components such as **PDFUpload.js** and **Profile.js** to replace AWS clients with the Cloudflare S3-compatible client.
+
+-   Removal of hardcoded AWS endpoints and bucket names, standardizing storage access for Cloudflare R2.
+
+This backend change improves cost efficiency, scalability, and integration with the Cloudflare ecosystem, setting the stage for future enhancements in storage management.
+
+Additionally, **deployment fixes and image asset cleanup** were carried out to reduce repository bloat by removing unused or bulky images. This cleanup streamlines development workflows and improves overall application performance.
+
+Other highlights include:
+
+-   Updated copyright information to maintain legal and branding accuracy.
+
+-   Various bug fixes and optimizations ensuring smoother deployment and resource management.
+
+**V1.05** strengthens the platform's foundation by balancing front-end polish with backend modernization, enhancing both user experience and operational efficiency.
+`,
+    tags: ['UI Refinements', 'Storage Migration', 'Codebase Cleanup'],
+  },
   v200: {
     title: 'V2.00 | S3 Porting',
-    date: 'June 5th, 2025',
+    date: 'June 7th, 2025',
     author: 'Dev Patel',
     description: `
-**V2.00** marked a pivotal shift in both technical infrastructure and team development strategy.
+**Version 2.00** focused on finalizing the Cloudflare R2 migration, enhancing backend stability, and improving user experience through targeted UI and documentation updates.
 
-This release introduced structured development workflows, enabling better task ownership, peer collaboration, and improved deployment pipelines. These changes helped reduce bottlenecks and increase velocity across feature development cycles.
+This release completed the transition from **AWS S3** to **Cloudflare R2** storage with thorough code cleanup and optimizations. By continuing to leverage the AWS S3 SDK's compatibility with R2, the team minimized code disruptions and preserved the ability to revert if necessary. Additional backend refinements addressed edge cases such as handling empty folders gracefully, preventing errors and UI inconsistencies.
 
-A major upgrade in this version was the migration from **AWS S3** to **Cloudflare R2** for object storage. The transition was driven by multiple advantages:
+On the frontend, subtle but impactful **UI/UX layout tweaks** improved the visual polish and alignment of interface elements, addressing overlooked updates from prior releases to ensure consistency and responsiveness across devices.
 
-- **Cost Efficiency**: Cloudflare R2 eliminates egress fees, offering significantly lower storage and bandwidth costs compared to AWS S3.
-- **Performance Improvements**: With global edge caching and optimized delivery, file access latency was reduced for end users, especially in North America.
-- **Simplified Access Control**: R2’s tight integration with Cloudflare’s zero-trust security tools enabled more streamlined permission management and audit logging.
-- **Improved Scalability**: R2 offered a flat storage model with increased flexibility, helping prepare ResDex for high-volume uploads and downloads.
-- **Vendor Consolidation**: By aligning with Cloudflare’s growing ecosystem, infrastructure became easier to manage and reduced operational complexity.
+Complementing these technical changes, the **release documentation component** was enhanced to provide clearer and more comprehensive information about upload functionalities and recent fixes. This update improves transparency for users and developers alike, aligning documentation closely with the evolving platform capabilities.
 
-The release reflects a long-term investment in performance, maintainability, and developer productivity as ResDex continues to expand its feature set and user base.
+Key advantages of this release include:
+
+-   **Stabilized Storage Integration**: Finalized migration to Cloudflare R2 ensures a robust, cost-effective backend with minimal code complexity.
+
+-   **Improved Error Handling**: Enhanced logic around empty folder scenarios prevents UI disruptions and improves user confidence.
+
+-   **Refined User Interface**: Focused layout adjustments enhance the platform's visual consistency and user experience.
+
+-   **Up-to-Date Documentation**: More detailed release notes and upload feature descriptions facilitate smoother onboarding and troubleshooting.
+
+**Version 2.00** represents a mature and stable iteration of the platform, reinforcing infrastructure reliability and user engagement while preparing for future enhancements and scaling opportunities.
 `,
     tags: ['Team Development', 'AWS S3', 'Cloudflare R2'],
-  },
-
-
-v201: {
-    title: 'V2.01 | Release Docs',
-    date: 'June 13th, 2025',
-    author: 'Tirth Patel',
-    description: `
-**Version 1.05** marked an important step in refining the platform's performance, visual coherence, and backend infrastructure in preparation for future scalability.
-
-This release introduced key interface and deployment improvements to streamline both user experience and engineering workflows. Navigation was refined by reverting from text labels back to icon-based tabs, creating a cleaner and more consistent visual structure across devices. Development velocity also benefited from a round of deployment optimizations, including the removal of bulky and unused image assets that had previously inflated repository size and slowed down build processes.
-
-The most significant upgrade in this version was the migration of object storage from **AWS S3** to **Cloudflare R2**, implemented using AWS SDK-compatible tooling. This transition introduced a more scalable and cost-efficient storage backend, while simplifying environment configuration and standardizing the storage layer across the codebase.
-
-Key benefits of the migration included:
-
--   **Cost Efficiency**: Cloudflare R2 removes egress charges, providing more predictable and reduced storage and transfer costs compared to AWS S3.
-
--   **Standardized Configuration**: By moving endpoint and credential data to environment variables, the deployment process became more secure and flexible.
-
--   **Developer Simplicity**: Refactoring the file-handling logic and removing hardcoded values led to a cleaner codebase and easier future maintenance.
-
--   **Long-Term Scalability**: R2's flat object model and edge performance support higher volumes of file uploads and downloads without restructuring the backend.
-
-Version 1.05 represents an incremental but foundational release, improving performance, deployment reliability, and backend maintainability---laying the groundwork for accelerated growth and new feature development in future versions.
-`,
-    tags: ['Release Docs', 'Documentation'],
   },
 
 
