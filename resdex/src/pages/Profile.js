@@ -961,15 +961,15 @@ Edit Profile
 
 
       
-<Modal show={showFollowersModal} onHide={() => setShowFollowersModal(false)} centered size="lg">
-  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
+<Modal className='box' show={showFollowersModal} onHide={() => setShowFollowersModal(false)} centered size="lg">
+  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid #2a2a2a'}} closeButton>
     <Modal.Title className='primary'>Research Fellows</Modal.Title>
   </Modal.Header>
-  <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto', background: '#e5e3df', borderBottom: '1px solid white' }}>
+  <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto', background: '#e5e3df', borderBottom: '1px solid #2a2a2a' }}>
     {followersLoading ? (
       <div>Loading...</div>
     ) : followersList.length === 0 ? (
-      <div>No connected research fellows.</div>
+      <div className='primary'>No connected research fellows.</div>
     ) : (
       followersList.map((result, index) => (
         <div
