@@ -66,6 +66,11 @@ const [followerCount, setFollowerCount] = useState(0);
 
   const [editedTags, setEditedTags] = useState([]);
 
+ const [showFollowersModal, setShowFollowersModal] = useState(false);
+const [followersList, setFollowersList] = useState([]);
+const [followersLoading, setFollowersLoading] = useState(false);
+
+
   const interestOptions = [
     { value: 'Technology', label: 'Technology' },
     { value: 'Healthcare', label: 'Healthcare' },
@@ -98,6 +103,48 @@ const [followerCount, setFollowerCount] = useState(0);
       console.error("Error updating contributions:", error);
     }
   };
+
+
+  const fetchFollowersList = async () => {
+  if (!profileUser || !profileUser.followers || profileUser.followers.length === 0) {
+    setFollowersList([]);
+    return;
+  }
+  setFollowersLoading(true);
+  try {
+    const followerDocs = await Promise.all(
+      profileUser.followers.map(uid => getDoc(doc(db, 'users', uid)))
+    );
+    const followers = followerDocs
+      .filter(docSnap => docSnap.exists())
+      .map(docSnap => {
+        const data = docSnap.data();
+        return {
+          uid: docSnap.id,
+          fullName: data.fullName || data.displayName || data.username || "Unknown",
+          username: data.username || "unknown",
+          profilePicture: data.profilePicture,
+          organization: data.organization || "",
+        };
+      });
+    setFollowersList(followers);
+  } catch (error) {
+    console.error("Error fetching followers:", error);
+    setFollowersList([]);
+  }
+  setFollowersLoading(false);
+};
+
+
+const handleShowFollowersModal = () => {
+  setShowFollowersModal(true);
+  fetchFollowersList();
+};
+
+const goToProfile = (username) => {
+  window.open(`/profile/${username}`, '_blank');
+};
+
 
 
 
@@ -713,9 +760,19 @@ Edit Profile
     <p className=' primary'>Contributions</p>
   </div>
   <div className='col-md offset-md-1'>
-    <h2 className=' primary'>{followerCount} 
+    {/* <span
+  style={{ cursor: 'pointer', color: '#007bff', textDecoration: 'underline' }}
+  onClick={handleShowFollowersModal}
+>
+  {profileUser.followers ? profileUser.followers.length : 0} Research Fellows
+</span> */}
+
+    <h2 className='primary' style={{ cursor: 'pointer'}}
+  onClick={handleShowFollowersModal}>{followerCount} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" class="bi bi-person-lines-fill" viewBox="0 0 16 16">
+  <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z"/>
+</svg>
     </h2>
-    <p className=' primary'>Research Fellows</p>
+    <p className=' primary' >Research Fellows</p>
   </div>
     </div>
   
@@ -904,6 +961,83 @@ Edit Profile
 
 
       
+<Modal show={showFollowersModal} onHide={() => setShowFollowersModal(false)} centered size="lg">
+  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
+    <Modal.Title className='primary'>Research Fellows</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto', background: '#e5e3df', borderBottom: '1px solid white' }}>
+    {followersLoading ? (
+      <div>Loading...</div>
+    ) : followersList.length === 0 ? (
+      <div>No connected research fellows.</div>
+    ) : (
+      followersList.map((result, index) => (
+        <div
+          key={index}
+          className="box"
+          style={{
+            padding: '20px',
+            borderRadius: '10px',
+            marginBottom: '20px',
+            maxWidth: '700px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            background: '#e5e3df'
+          }}
+        >
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center" style={{ marginRight: '30px' }}>
+              <img
+                src={
+                  result.profilePicture ||
+                  'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'
+                }
+                alt={`${result.fullName}'s profile`}
+                style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px' }}
+              />
+              <div>
+                <strong style={{ color: 'black' }}>{result.fullName}</strong>
+                <span>
+                  <i style={{ color: 'gray', marginLeft: '10px' }}>'{result.username}'</i>
+                </span>
+                <br />
+                <span>
+                  {result.organization && (
+                    <i style={{ color: 'gray' }}>
+                      <svg
+                        style={{ marginRight: '10px' }}
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="grey"
+                        className="bi bi-buildings"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z" />
+                        <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z" />
+                      </svg>
+                      {result.organization}
+                    </i>
+                  )}
+                </span>
+              </div>
+            </div>
+            <button className="custom-view" onClick={() => goToProfile(result.username)}>
+              View Profile ↗︎
+            </button>
+          </div>
+        </div>
+      ))
+    )}
+  </Modal.Body>
+  <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    {/* <Button className='custom-view' onClick={() => setShowFollowersModal(false)}>
+      Close
+    </Button> */}
+  </Modal.Footer>
+</Modal>
+
+
 
       
     <Modal show={showRemoveModal}  className='box' onHide={() => setShowRemoveModal(false)}>
