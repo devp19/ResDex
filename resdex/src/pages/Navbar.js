@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
+  const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -18,12 +19,15 @@ const Navbar = () => {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             setUsername(userData.username);
+            setNotificationCount(userData.notifications ? userData.notifications.length : 0);
+
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
       } else {
         setUsername('');
+        setNotificationCount();
       }
     });
     return () => unsubscribe();
@@ -79,6 +83,12 @@ const Navbar = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" class="bi bi-bell-fill" viewBox="0 0 16 16">
   <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901"/>
 </svg>
+
+{notificationCount > 0 && (
+    <span className="badge bg-danger" style={{marginLeft: '4px', fontSize: '0.75em'}}>
+      {notificationCount}
+    </span>
+  )}
 </NavLink>
           </li>
           
