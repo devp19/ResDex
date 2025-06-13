@@ -8,6 +8,14 @@ const Notifications = () => {
   const [visibleCount, setVisibleCount] = useState(5);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const isAcceptedFollowNotification = (notification) => {
+  return (
+    typeof notification.message === 'string' &&
+    notification.message.startsWith('Your follow request has been accepted by')
+  );
+};
+
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
@@ -51,6 +59,7 @@ const Notifications = () => {
       setNotifications(prevNotifications => 
         prevNotifications.filter(n => n !== notification)
       );
+      window.location.reload();
     } catch (error) {
       console.error("Error dismissing notification:", error);
     }
@@ -90,6 +99,8 @@ const Notifications = () => {
       );
   
       console.log(`You have accepted ${request.requesterName}'s follow request and are now following them.`);
+      window.location.reload();
+
     } catch (error) {
       console.error("Error accepting follow request:", error);
     }
@@ -124,6 +135,8 @@ const Notifications = () => {
       );
   
       console.log(`You have declined ${request.requesterName}'s follow request.`);
+      window.location.reload();
+
     } catch (error) {
       console.error("Error declining follow request:", error);
     }
@@ -144,18 +157,45 @@ const Notifications = () => {
               [...notifications].reverse().slice(0, visibleCount).map((notification, index) => (
                 <li className='center primary' key={index}> 
                   <div className='box primary p-4'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-dot" viewBox="0 0 16 16">
-                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-                    </svg>
+                    
                     {notification.status === 'pending' ? (
                       <>
-                        <a className='primary' target="_blank" href={`https://resdex.vercel.app/profile/${notification.requesterName}`}>{notification.requesterName}</a> sent you a follow request
-                        <a className='custom-view' style={{marginLeft: '25px', marginRight: '10px'}} onClick={() => handleAcceptRequest(notification)}>Accept</a>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-dot" viewBox="0 0 16 16">
+                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+                    </svg>
+                        <a className='primary' target="_blank" href={`https://resdex.ca/profile/${notification.requesterName}`}>{notification.fullName}</a> sent you a follow request!
+                        
+                        <br></br>
+                        <br></br>
+                        <a className='custom-view' style={{marginLeft: '15px', marginRight: '10px'}} onClick={() => handleAcceptRequest(notification)}>Accept</a>
                         <a className='custom-view m-1' onClick={() => handleDeclineRequest(notification)}>Decline</a>
+                        <br></br>
                       </>
-                    ) : (
-                      notification.message
-                    )}
+                    ) : isAcceptedFollowNotification(notification) ? (
+  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+    <span className='primary'> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-dot" viewBox="0 0 16 16">
+                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+                    </svg> {notification.message}</span>
+    <button
+      onClick={() => handleDismissNotification(notification)}
+      style={{
+        background: 'none',
+        border: 'none',
+        color: 'gray',
+        fontSize: '1.2em',
+        marginLeft: '10px',
+        cursor: 'pointer',
+        lineHeight: 1
+      }}
+      aria-label="Dismiss notification"
+      title="Dismiss"
+    >
+      &times;
+    </button>
+  </div>
+) : (
+  notification.message
+)}
                     <br></br>
                     <span style={{ fontSize: 'small', color: 'gray', marginLeft: '10px' }}>
                       {new Date(notification.timestamp).toLocaleString()}

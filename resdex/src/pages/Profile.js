@@ -77,7 +77,6 @@ const [followerCount, setFollowerCount] = useState(0);
     { value: 'Arts', label: 'Arts' }
 
   ];
-  
 
   useEffect(() => {
     if (profileUser) {
@@ -165,9 +164,12 @@ const [followerCount, setFollowerCount] = useState(0);
         setIsFollowing(false);
         setFollowerCount(prev => prev - 1);
       } else if (!requestSent) {
+const userDocSnap = await getDoc(currentUserRef);
+const firestoreUsername = userDocSnap.exists() ? userDocSnap.data().username : null;
         const followRequest = {
           requesterId: currentUser.uid,
-          requesterName: currentUser.displayName,
+          fullName: currentUser.displayName,
+          requesterName: firestoreUsername,
           timestamp: new Date().toISOString(),
           status: 'pending'
         };
