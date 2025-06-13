@@ -56,6 +56,36 @@ The release reflects a long-term investment in performance, maintainability, and
 `,
     tags: ['Team Development', 'AWS S3', 'Cloudflare R2'],
   },
+
+
+v201: {
+    title: 'V2.01 | Release Docs',
+    date: 'June 13th, 2025',
+    author: 'Tirth Patel',
+    description: `
+**Version 1.05** marked an important step in refining the platform's performance, visual coherence, and backend infrastructure in preparation for future scalability.
+
+This release introduced key interface and deployment improvements to streamline both user experience and engineering workflows. Navigation was refined by reverting from text labels back to icon-based tabs, creating a cleaner and more consistent visual structure across devices. Development velocity also benefited from a round of deployment optimizations, including the removal of bulky and unused image assets that had previously inflated repository size and slowed down build processes.
+
+The most significant upgrade in this version was the migration of object storage from **AWS S3** to **Cloudflare R2**, implemented using AWS SDK-compatible tooling. This transition introduced a more scalable and cost-efficient storage backend, while simplifying environment configuration and standardizing the storage layer across the codebase.
+
+Key benefits of the migration included:
+
+-   **Cost Efficiency**: Cloudflare R2 removes egress charges, providing more predictable and reduced storage and transfer costs compared to AWS S3.
+
+-   **Standardized Configuration**: By moving endpoint and credential data to environment variables, the deployment process became more secure and flexible.
+
+-   **Developer Simplicity**: Refactoring the file-handling logic and removing hardcoded values led to a cleaner codebase and easier future maintenance.
+
+-   **Long-Term Scalability**: R2's flat object model and edge performance support higher volumes of file uploads and downloads without restructuring the backend.
+
+Version 1.05 represents an incremental but foundational release, improving performance, deployment reliability, and backend maintainability---laying the groundwork for accelerated growth and new feature development in future versions.
+`,
+    tags: ['Release Docs', 'Documentation'],
+  },
+
+
+
 };
 
 const markdownComponents = {

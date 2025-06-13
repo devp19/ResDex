@@ -14,7 +14,38 @@ const ReleaseDocs = () => {
                 <div className='row d-flex justify-content-center pt-4'>
                     
 
+
+
+
+                    <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V2.01</strong> | Release Docs</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V2.01 focused on creating and maintaining Release Docs from ResDex.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Release Docs</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Documentation</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v201" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        June 13th, 2025 | Author: Tirth Patel
+                        </div>
+                    </div>
                     
+
+
+
+
+
+
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
                             <p className='col-md monarque primary'> <strong className='primary'>V2.00</strong> | S3 Porting</p>
@@ -134,7 +165,7 @@ const ReleaseDocs = () => {
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.01</strong> | Initial</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.00</strong> | Initial</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
                             <p className='primary' style={{fontSize: '15px'}}> V1.00 marked the initial project kickoff, establishing the core vision for ResDex and outlining the foundational architecture for future development.</p>
