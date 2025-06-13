@@ -961,7 +961,7 @@ Edit Profile
 
 
       
-<Modal className='box' show={showFollowersModal} onHide={() => setShowFollowersModal(false)} centered size="lg">
+<Modal show={showFollowersModal} onHide={() => setShowFollowersModal(false)} centered size="lg">
   <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid #2a2a2a'}} closeButton>
     <Modal.Title className='primary'>Research Fellows</Modal.Title>
   </Modal.Header>
