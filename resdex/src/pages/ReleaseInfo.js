@@ -5,121 +5,308 @@ import ReactMarkdown from 'react-markdown';
 const releaseNotes = {
   v100: {
     title: 'V1.00 | Initial',
-    date: 'August 23rd, 2024',
+    date: 'October 13th, 2024',
     author: 'Dev Patel',
-    description:
-      'V1.00 marked the initial project kickoff, establishing the core vision for ResDex and outlining the foundational architecture for future development.',
-    tags: ['General Development'],
+    description:`
+    
+**V1.00** established the foundational architecture of the ResDex platform, focusing on essential page routing, layout components, and early visual identity. This release set the groundwork for core navigation, branding, and user orientation.
+
+Development began with key scaffolding for navigation and landing experiences. The **Home**, **About**, **Features**, **Contact**, and **Team** pages were created with structured routing via React components such as home.js, navbar.js, and infosection.js.
+
+A major focus was placed on establishing a **clean, responsive layout** that performs well across devices and offers users a clear understanding of ResDex's purpose. The about.js file introduced mission-aligned text and headings, while contact.js, footer.js, and team.js helped organize essential informational and legal content into distinct sections.
+
+#### Key Features Introduced:
+
+-   **Landing Page Design**: Created a fully functional homepage that reflects ResDex's value proposition.
+
+-   **Navigation System**: Implemented a consistent Navbar with routing across major pages like About, News, Sign In, and more.
+
+-   **About Section**: Added headings and text to explain the mission, features, and audience of the platform.
+
+-   **Responsive Footer**: Developed a responsive footer component featuring copyright information and key links (Terms, GitHub, Contact).
+
+-   **Visual Consistency**: Unified fonts, colors, and layout padding for a clean, cohesive UI across all sections.
+
+-   **Flexbox Layouts**: Used modern CSS practices to ensure mobile compatibility and screen adaptability.
+
+**V1.00** was focused on shaping the user-facing identity of ResDex and delivering a structured, easy-to-navigate interface. These early architectural and design choices formed the core experience upon which all future features would be layered.
+
+
+      `,
+    tags: ['General Development', 'UI Foundation', 'Initial Launch'],
   },
   v101: {
-    title: 'V1.01 | App Configuration',
-    date: 'September 10th, 2024',
-    author: 'Dev Patel',
+    title: 'V1.01 | Signup Verification',
+    date: 'October 16th, 2024',
+    author: 'Tirth Patel',
     description:
-      'V1.01 added support for custom domain configuration, improved error handling across the app, and optimized backend API response times.',
-    tags: ['Domain', 'Backend API'],
+      `**V1.01** enhanced user authentication features and profile management, laying the foundation for secure access and personalized experiences.
+
+This update introduced a **signup verification page** and implemented **Firebase Sign-in**, connecting the sign-in button to the Firebase Auth flow. A **conditional UI** was created to hide the sign-in option when users are already logged in, improving user navigation.
+
+A new **Profile.js layout** was created to display user details, hooking into **Firebase auth.currentUser** to fetch the **display name** and **email** dynamically.
+
+Key account management functionalities were also added, including a **logout function** utilizing Firebase's **SignOut()** method, and a **password reset** feature on the **recovery.js** page. Users can now enter their email to receive a **Firebase password reset link**, complete with a validation message to guide the process.
+
+Additional improvements include:
+
+-   **Signup verification** to enhance account security.
+
+-   Seamless **Firebase Auth integration** to streamline user login and logout.
+
+-   User profile display connected directly to authentication data for real-time updates.
+
+-   Password recovery workflow to improve user account management and reduce friction.
+
+**V1.01** solidifies the platform's authentication system and basic profile features, creating a more secure and user-friendly environment.`,
+    tags: ['Authentication', 'Firebase Integration'],
   },
   v102: {
-    title: 'V1.02 | User Development',
-    date: 'October 2nd, 2024',
-    author: 'Dev Patel',
+    title: 'V1.02 | Cloud Storage',
+    date: 'October 18th, 2024',
+    author: 'Tirth Patel',
     description:
-      'V1.02 implemented role-based access controls, enhanced PDF viewing performance, and added basic audit logging for user activity.',
-    tags: ['PDF Performance', 'Role-Based Access', 'Audit Logging'],
+      `**V1.02** expanded the platform's data storage and file handling functionality while optimizing resource usage to enhance user experience and system efficiency.
+
+This update implemented **Firebase Cloud Storage** integration, enabling **authenticated users** to securely **upload and retrieve avatar images**. The profile now dynamically displays the user's profile picture through components like **firebase.js** and **Profile.js**.
+
+A key addition was the **PDF upload feature** using **Amazon S3**, with a dedicated upload component configured via the **AWS S3 SDK**. This function allows users to **select and securely upload PDF resumes**, with a placeholder system prepared for future retrieval capabilities.
+
+To further optimize performance, **local storage** was enabled to cache the **display name** and **photo URL**, minimizing the number of costly **Firebase reads**. Both the profile and home pages now utilize **localStorage** to load cached user data, improving load times and user responsiveness.
+
+Additionally, a **Firestore read limit fix** was introduced to reduce read operations and speed up repeated page loads, critical for staying within Firebase's free tier limits and reducing operational costs.
+
+Key improvements include:
+
+-   Integration with **Firebase Cloud Storage** for image uploads.
+
+-   Initial support for **PDF resume uploads** via **Amazon S3** with secure file handling.
+
+-   Use of **local storage caching** to minimize database reads and improve load speed.
+
+-   Optimization of Firestore read operations to reduce costs and enhance performance.
+
+**V1.02** represents a crucial step in enhancing both the front-end user profile features and backend storage solutions, setting a foundation for future file management and performance improvements.`,
+    tags: ['Cloud Storage', 'PDF Upload', 'Performance Optimization'],
   },
-  v103: {
-    title: 'V1.03 | Notifications & Profile Updates',
-    date: 'December 17th, 2024',
+  v110: {
+    title: 'V1.10 | Notifications & Profile Updates',
+    date: 'October 23rd, 2024',
     author: 'Tirth Patel',
     description:`
       
-**Version 1.03** focused on enhancing user connectivity, real-time interactions, and profile customization, laying the groundwork for a more social and collaborative experience across the platform.
+**V1.10** represents a **major update** focused on expanding user profiles, enabling public access to profiles, and enhancing PDF resume handling with improved security and scalability.
 
-A major highlight of this release was the implementation of a **full notification system**, including both **frontend and backend support**. Users now receive real-time **follow request alerts**, complete with **accept/decline logic**, displayed within a dedicated **Notifications page**. Backend logic was optimized to eliminate duplicate alerts and improve response accuracy.
+The release introduced the ability to **view other users' profiles** by creating a **routing system** based on **user ID or username**. User data including **display name, email, bio, and profile image** is fetched dynamically from **Firestore**. Profile links are now integrated throughout card lists and search results, improving navigation and discovery.
 
-The **follow system was restructured into a mutual "connection" model**, where an accepted follow request automatically establishes a two-way connection---mirroring professional networking platforms. This change simplifies future collaboration features and improves clarity for users.
+The **navbar was fixed and improved** to update correctly on **OAuth state changes** and remain consistent after page refreshes. This prevents blank loading states and further limits unnecessary Firestore reads. Public profile URLs follow the structure:\
+https://.../profile/{userid}.
 
-Profiles received a **significant UI/UX update**, including:
+Additionally, a scalable structure was set up to support **friend connections, resume previews, and profile editing** with smooth transitions between signed-in and signed-out user states. Improvements were made to **local storage caching** and **Firestore collection handling** to optimize performance.
 
--   A redesigned profile layout for better content structure
+On **Oct 22**, an **editable "About You" section** was added to profiles, allowing users to write a short personal description directly within **Profile.js**.
 
--   A new **contributions counter**
+Significant upgrades were made to the **PDF upload and viewing functionality**:
 
--   Expanded **interests/topics** display
+-   **PDF resumes are now sourced and fetched from AWS S3** using **pre-signed URLs**, improving file security and access control.
 
--   A reworked **Edit Profile modal** for smoother updates
+-   Enhanced **error handling** was added for missing or expired documents.
 
-**Search functionality** was also improved, featuring enhanced result grouping and **user organization logic** inspired by institutional feedback, such as from McMaster's research faculty.
+-   For the first time, **non-authorized users** can view public resumes through shared links.
 
-Additional fixes and refinements included:
+-   Security was strengthened with **download protection** and **timeout features** to prevent unauthorized access.
 
--   Resolution of mobile layout and padding bugs
+Key highlights include:
 
--   Reduced redundant API calls tied to UI refreshes
+-   Public **profile viewing** with dynamic Firestore data fetching.
 
--   Polished display behavior for follow notifications
+-   Robust **username-based routing** enabling easy profile access.
 
-**V1.03** deepened the platform's social framework and improved usability across key touchpoints, paving the way for more collaborative, user-driven features in future releases.
+-   **Navbar consistency** improvements tied to OAuth state management.
+
+-   Editable user **About You** section integrated into profiles.
+
+-   Advanced **PDF resume fetching** via AWS S3 with secure pre-signed URLs.
+
+-   **Public resume access** with download protection and expiration timeouts.
+
+**V1.10** significantly enhances social connectivity and document management on the platform, laying the groundwork for richer user interactions and improved privacy controls.
 `,
-    tags: ['Notification System', 'Connection Logic Tweaks', 'Profile & Search UI Updates'],
+    tags: ['User Profiles', 'PDF Management', 'Security Enhancements'],
   },
-  v104: {
-    title: 'V1.04 | UI/UX Improvements',
-    date: 'January 29th, 2025',
+  v111: {
+    title: 'V1.11 | Document Removal',
+    date: 'October 24th, 2024',
     author: 'Tirth Patel',
     description:
-      `**V1.04** focused on enhancing user collaboration, streamlining connection logic, and polishing the overall user experience through targeted UI/UX refinements.
+      `**V1.11** focused on enhancing document management by adding functionality to **remove documents** from **AWS S3** storage securely and efficiently.
 
-This version introduced foundational upgrades to the collaborative research workflow. A key feature was the rollout of a **real-time collaborator selector** in the document creation component, allowing users to invite connections (now referred to as **Research Fellows**) directly into shared workspaces. The selector dynamically pulls profile data---names and profile images---from the user's connection list, making collaboration more intuitive and personal.
+This update implemented an **AWS S3 key removal method** that parses document keys to accurately identify and delete files from the storage bucket. Users can now delete uploaded documents, improving control over their stored data.
 
-Connection logic also underwent a strategic overhaul. The previous "Follow/Following" system was merged and redesigned to align more closely with **LinkedIn-style connections**, where both users must follow each other to become collaborators. This change sets the groundwork for more secure and reciprocal academic networking.
+The user interface was updated to **reflect document removals in real-time**, disabling any broken links immediately to prevent access to deleted files and maintain a smooth user experience.
 
-From a design and usability perspective, **contact and upload interfaces received a visual refresh**. This included smoother transitions, fade-in animations for headers, and updated containers to create a more polished and responsive feel. Additionally, a **new PDF upload theme** was introduced to improve clarity and consistency across file interactions.
+Key highlights include:
 
-Other notable improvements:
+-   Introduction of **document deletion functionality** through AWS S3 key parsing.
 
--   **Renamed "Followers" to "Research Fellows"** to better reflect academic and professional context
+-   Real-time **UI updates** to reflect removed documents and disable broken links.
 
--   **Refactored form logic** in document creation to properly capture and store title, description, interests, and collaborator data
+-   Improved **user control** over uploaded content and cleaner file management.
 
--   **UI responsiveness updates** across form inputs, buttons, and dropdowns
-
--   **Bug fixes** related to sizing inconsistencies across devices and browsers
-
-**V1.04** represents a step toward a more collaborative and user-centered platform, laying the groundwork for scalable research teamwork and deeper social functionality.
+**V1.11** strengthens the platform's file management capabilities by enabling users to securely manage and remove their stored documents with immediate visual feedback.
 `,
-    tags: ['Collaboration Features', 'System & Logic Enhancements'],
+    tags: ['Document Management', 'UI Updates'],
   },
-  v105: {
-    title: 'V1.05 | Platform Optimization',
-    date: 'April 29th, 2025',
+  v112: {
+    title: 'V1.12 | Authentication & Upload Fixes',
+    date: 'October 29th, 2024',
     author: 'Tirth Patel',
     description:
-      `**V1.05** emphasized interface consistency, backend infrastructure migration, and codebase optimization to enhance performance and maintainability.
+      `**V1.12** focused on improving **authentication reliability**, enforcing stricter **username validation**, and implementing protective measures on file uploads to safeguard platform resources.
 
-This version introduced a **UI refinement by reverting the Navbar from text labels back to icons**, improving visual consistency and aligning with user expectations for a cleaner navigation experience.
+Key bug fixes included resolving issues where users could **sign up and instantly log in without verification**, as well as adding a **logout confirmation** step to prevent accidental logouts.
 
-A significant technical milestone in this release was the **migration of the storage backend from AWS S3 to Cloudflare R2**, leveraging AWS SDK compatibility for a smooth transition. This migration included:
+The username field now enforces a **regex pattern** that disallows special characters, ensuring cleaner and more consistent usernames, which improves **URL link clarity** and reduces errors during signup.
 
--   Addition of a new Cloudflare configuration file managing R2 credentials and endpoints securely through environment variables.
+In file handling, the **PDF upload process to the AWS S3 bucket was refined** with new limits set to prevent abuse: a **maximum of 10 uploads per day** and a **5MB size cap per file**. These constraints help mitigate **malicious activity** and keep storage usage within manageable bounds, with plans to explore compression strategies for larger files in the future.
 
--   Updates to imports in key components such as **PDFUpload.js** and **Profile.js** to replace AWS clients with the Cloudflare S3-compatible client.
+Key highlights include:
 
--   Removal of hardcoded AWS endpoints and bucket names, standardizing storage access for Cloudflare R2.
+-   Fixed sign-up/login flow bugs, including **instant login without verification**.
 
-This backend change improves cost efficiency, scalability, and integration with the Cloudflare ecosystem, setting the stage for future enhancements in storage management.
+-   Added **logout confirmation** to avoid accidental session termination.
 
-Additionally, **deployment fixes and image asset cleanup** were carried out to reduce repository bloat by removing unused or bulky images. This cleanup streamlines development workflows and improves overall application performance.
+-   Enforced stricter **username regex** preventing special characters.
 
-Other highlights include:
+-   Implemented **upload rate limiting** (10 uploads/day) and **file size limit** (5MB) for PDFs.
 
--   Updated copyright information to maintain legal and branding accuracy.
+-   Improved PDF S3 handling for better security and resource management.
 
--   Various bug fixes and optimizations ensuring smoother deployment and resource management.
-
-**V1.05** strengthens the platform's foundation by balancing front-end polish with backend modernization, enhancing both user experience and operational efficiency.
+**V1.12** enhances both user experience and backend resilience by tightening authentication workflows and protecting storage infrastructure.
 `,
-    tags: ['UI Refinements', 'Storage Migration', 'Codebase Cleanup'],
+    tags: ['Authentication Fix', 'Upload Tweaks'],
+  },
+  v120: {
+    title: 'V1.20 | Search Functionality',
+    date: 'October 31st, 2024',
+    author: 'Tirth Patel',
+    description:
+      `**V1.20** brought significant improvements to the platform's **search capabilities** and **user interface**, enhancing discoverability and content organization.
+
+A new **user search function** was implemented using **Firebase queries**, currently limited to **10 results** to reduce excessive Firestore reads and maintain performance. Note that indexing for projects is still pending and will be developed in future updates.
+
+The **Navbar underwent a design change**, switching text labels back to **icons** for a cleaner look, with the possibility of reverting based on user feedback.
+
+PDF document management was enhanced by adding **search by PDF title**, enabling users to find documents more efficiently. A **flexbox layout** was created to display multiple PDF documents in a single row, reducing excessive scrolling and improving visual organization.
+
+Key highlights include:
+
+-   Added **user search** via Firebase with a **limit of 10 listings** to optimize read costs.
+
+-   Introduced **PDF search by title** with plans to add **tag-based filtering** later.
+
+-   Redesigned Navbar to use **icons instead of text labels** for streamlined navigation.
+
+-   Implemented a **flexbox layout** to display multiple PDFs horizontally, limiting vertical scroll.
+
+**V1.20** marks a step forward in content discovery and UI refinement, setting a foundation for future search enhancements and better user engagement.
+`,
+    tags: ['Search Function', 'UI Function'],
+  },
+  v121: {
+    title: 'V1.21 | UI Cleanup & Modals',
+    date: 'November 2nd, 2024',
+    author: 'Tirth Patel',
+    description:
+      `**V1.21** emphasized **front-end polish**, **user guidance**, and **improved editing workflows**, delivering a cleaner experience and enhancing the platform's support and documentation structure.
+
+On **November 1**, the **Success page** was added to provide visual confirmation following actions like ticket or document submission---improving feedback loops and user trust. A **dedicated Contact page** was created for streamlined support, wired directly into the platform's backend. Additionally, a **Release Docs page** was introduced, showcasing upcoming features, deployment status, and repository usage.
+
+The **Team section** was visually refreshed with an updated image and added placeholders for new role slots. The **README.md** file also saw improvements, including clearer **installation steps**, **feature usage guides**, and **contribution workflows** for future developers.
+
+On **November 2**, the profile editing interface saw a major UI improvement:
+
+-   Replaced the static in-page edit layout in **Profile.js** with a **modal popup**.
+
+-   This paves the way for **editable tags**, dynamic fields, and future extensibility.
+
+**Highlights:**
+
+-   **Success Page Redirect**: Provides immediate confirmation after user actions.
+
+-   **Contact Page**: Built-in form linked to backend routing for inquiries or support.
+
+-   **Release Docs Page**: Centralized area for version notes, repo guidance, and roadmap visibility.
+
+-   **Profile Modal Editor**: Cleaner interface for profile updates with room for extensible field types.
+
+-   **README Update**: Better developer onboarding through clarified setup and contribution details.
+
+**V1.21** delivered essential workflow enhancements while refining platform presentation, preparing ResDex for smoother scaling and future modularity.
+`,
+    tags: ['UI Cleanup', 'Modals'],
+  },
+  v121: {
+    title: 'V1.30 | Profile Tags & Edit Controls',
+    date: 'November 4th, 2024',
+    author: 'Tirth Patel',
+    description:
+      `**V1.30** delivered a major update focused on refining the **profile** and **dashboard user interface**, improving usability, and optimizing backend interactions. The redesigned layout improved readability, spacing, and flow, creating a cleaner and more intuitive user experience. A new editable **Tag section** was introduced, allowing users to add, delete, and display custom profile attributes stored dynamically in Firestore.
+
+Significant **Firebase optimizations** were implemented to reduce unnecessary writes by checking if fields were changed before updating, helping control operational costs. Users gained the ability to **edit uploaded PDFs**, modifying metadata such as title, tags, and topics post-upload, supported by patched Firestore update logic that now detects changes properly before committing.
+
+The update resolved **UI dropdown visibility conflicts** on macOS and Windows by integrating a unified Select component style. To prevent accidental document deletion, a **confirmation pop-up** was added when removing uploaded files.
+
+Additional minor UI improvements included fixing the footer's **"Back to Top"** button and adjusting spacing on the contact page. The framework for document upload displays was reworked, replacing the previous flat layout and adding cache verification to avoid redundant data fetching.
+
+Key improvements included:
+
+-   Redesigned profile/dashboard UI for better readability and flow
+
+-   **Editable** tag fields dynamically managed in Firestore
+
+-   Optimized **Firestore** writes by change detection
+
+-   Editable metadata for uploaded PDFs with reliable update logic
+
+-   Unified dropdown styling for **cross-platform** consistency
+
+-   **Confirmation dialog** to prevent accidental document deletions
+
+-   Footer and contact page UI refinements
+
+-   Reworked upload display framework with cache double-check
+
+**V1.30** strengthened the platform's **user interface** and backend efficiency, enhancing **user control** and preparing the foundation for more dynamic profile features moving forward.
+`,
+    tags: ['Tags System', 'PDF Editing'],
+  },
+  v131: {
+    title: 'V1.31 | Document Tagging & Search Enhancement',
+    date: 'November 5th, 2024',
+    author: 'Tirth Patel',
+    description:
+      `**V1.31** focused on enriching document management and search capabilities to provide users with better organization and faster access to relevant content.
+
+This update introduced **document tagging during uploads**, allowing users to assign descriptive tags that improve search accuracy and categorization across the platform. A new **search by topic** parameter was implemented, enabling users to filter documents based on assigned tags or topics for more precise results.
+
+To enhance performance, the frontend caching mechanism was updated by **increasing cache refresh intervals to 5 minutes**, reducing unnecessary data fetches when users revisit pages frequently.
+
+Additionally, a critical **tag initialization fix** resolved an issue where tags were appearing as blank or empty on first load, ensuring consistent tag display and improved user experience.
+
+Key features introduced include:
+
+-   Document tagging available during **upload** to aid categorization
+
+-   **Search filtering** by assigned topic for refined document discovery
+
+-   Frontend cache refresh interval increased to **5 minutes** to minimize redundant fetches
+
+-   Fix for tags showing as blank or empty on initial load
+
+**V1.31** strengthened the platform's **document handling** and **search efficiency**, laying groundwork for more advanced organizational features and smoother user interactions.
+`,
+    tags: ['Document Tagging', 'Caching Optimzation'],
   },
   v200: {
     title: 'V2.00 | S3 Porting',
