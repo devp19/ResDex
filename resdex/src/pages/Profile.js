@@ -186,6 +186,33 @@ const goToProfile = (username) => {
       console.error("Error checking follow status:", error);
     }
   }, [currentUser, profileUser]);
+
+  const updateProfile = useCallback(async (updates) => {
+    if (!profileUser) return;
+  
+    try {
+      const userDocRef = doc(db, 'users', profileUser.uid);
+      await updateDoc(userDocRef, updates);
+      console.log("Profile updated:", updates);
+  
+      const updatedUser = { ...profileUser, ...updates };
+      setProfileUser(updatedUser);
+      saveProfileToLocalStorage(username, updatedUser);
+  
+      if (updates.about !== undefined) setAbout(updates.about);
+      if (updates.organization !== undefined) setOrganization(updates.organization);
+      if (updates.interests !== undefined) {
+        setInterests(updates.interests);
+        setSelectedInterests(
+          updates.interests.split(', ').map(i => ({ value: i, label: i }))
+        );
+      }
+  
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  }, [profileUser, username]);
+  
   
 
   useEffect(() => {
@@ -510,27 +537,28 @@ const updateInterests = useCallback(async (newInterests) => {
     setIsModalOpen(false);
   };
 
-  const handleAboutSubmit = () => {
-    if(newAbout !== about){
-      updateAbout(newAbout);
-    }
-    if(newOrganization !== organization){
-      updateOrganization(newOrganization);
-    }
+  const handleAboutSubmit = async () => {
+    const updates = {};
+    if (newAbout !== about) updates.about = newAbout;
+    if (newOrganization !== organization) updates.organization = newOrganization;
     const newInterestsString = selectedInterests.map(i => i.value).join(', ');
-    if (newInterestsString !== interests) {
-      updateInterests(selectedInterests);
-    }    setIsModalOpen(false);
+    if (newInterestsString !== interests) updates.interests = newInterestsString;
+  
+    if (Object.keys(updates).length > 0) {
+      await updateProfile(updates);
+    }
+  
+    setIsModalOpen(false);
   };
-
+  
   if (loading) {
     return <p className='primary'>Loading...</p>;
   }
-
+  
   if (!profileUser) {
     return <p>User not found.</p>;
   }
-
+  
   
 
   const isOwnProfile = currentUser && currentUser.uid === profileUser.uid;
