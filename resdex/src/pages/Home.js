@@ -97,7 +97,7 @@ const Home = () => {
           <div className='row text-center fade-in'>
             <p className='monarque primary' style={{ fontSize: '50px'}}>ResDex</p>
             <div className='row justify-content-center text-center d-flex fade-in'>
-            <div className= 'col-md-5'>
+            <div className= 'col-md-7'>
                   
 <p className='primary'style={{ fontSize: '20px', marginBottom: '75px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
             </div>
