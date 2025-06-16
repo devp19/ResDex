@@ -77,6 +77,43 @@ const Home = () => {
         </div>
         </div>
       </div>
+        <div className='horizontal-line'></div>
+
+
+
+ 
+
+
+
+  <div className='fade-in'>
+
+        <div>
+          <div className='row border- justify-content-center d-flex display fade-in' style={{marginTop: '75px'}}>
+            <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+          </div>
+          <div className='row text-center fade-in'>
+            <p className='primary'>⏐</p>
+          </div>
+          <div className='row text-center fade-in'>
+            <p className='monarque primary' style={{ fontSize: '50px'}}>ResDex</p>
+            <div className='row justify-content-center text-center d-flex fade-in'>
+            <div className= 'col-md-5'>
+                  
+<p className='primary'style={{ fontSize: '20px', marginBottom: '75px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
+            </div>
+            
+         </div>
+          </div>
+
+          
+          {/* <div className='center fade-in'>
+            <p className='monarque primary secondary'>Learn More</p>
+          </div> */}
+
+      
+        </div>
+      </div>
+
 
 
       <div className='container fade-in'>
@@ -84,19 +121,19 @@ const Home = () => {
         <div className='row justify-content-center top'>
         <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content'>
-                <h3 className='akros primary'> CREDENTIALS </h3>
+                <h3 className='kugile primary'> CREDENTIALS  </h3>
                 <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
               </div>
             </div>
             <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='akros primary'> CONNECT </h3>
+              <h3 className='kugile primary'> CONNECT </h3>
                 <p className='primary mt-4'>Connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
               </div>
             </div>
             <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='akros primary'> PEER REVIEW </h3>
+              <h3 className='kugile primary'> PEER REVIEW </h3>
                 <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
               </div>
             </div>        </div>
@@ -119,7 +156,7 @@ const Home = () => {
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
-      <p className='primary center top akros' style={{ fontSize: '30px', marginBottom: '30px' }}>Testimonials</p>
+      <p className='primary center top kugile' style={{ fontSize: '30px', marginBottom: '30px' }}>TESTIMONIALS</p>
 
        <div className='row d-flex justify-content-center'>
      

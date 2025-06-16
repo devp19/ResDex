@@ -10,11 +10,41 @@
   font-family: Monarque;
   src: url("./fonts/Monarque-Italic.woff") format("woff");
 }
-
+@font-face {
+  font-family: Baskerville;
+  src: url("./fonts/LibreBaskerville-Regular.woff") format("woff");
+}
+@font-face {
+  font-family: HelveticaBold;
+  src: url("./fonts/Helvetica-Bold.woff") format("woff");
+}
+@font-face {
+  font-family: Kugile;
+  src: url("./fonts/Kugile_Demo.woff") format("woff");
+}
 .akros {
   font-family: Akros;
   font-weight: normal;
   font-style: normal;
+}
+
+.kugile {
+  font-family: Kugile;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.baskerville {
+  font-family: Baskerville;
+  font-weight: normal;
+  font-style: normal;
+  
+}
+.helveticabold {
+  font-family: HelveticaBold;
+  font-weight: normal;
+  font-style: normal;
+  
 }
 
 a {
