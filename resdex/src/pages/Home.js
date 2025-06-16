@@ -99,7 +99,7 @@ const Home = () => {
             <div className='row justify-content-center text-center d-flex fade-in'>
             <div className= 'col-md-7'>
                   
-<p className='primary'style={{ fontSize: '20px', marginBottom: '75px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
+<p className='primary'style={{ fontSize: '20px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
             </div>
             
          </div>
@@ -117,7 +117,6 @@ const Home = () => {
 
 
       <div className='container fade-in'>
-        <div className='horizontal-line'></div>
         <div className='row justify-content-center top'>
         <div className='col-md-4 box mx-3 mb-3'>
               <div className='column-content'>
