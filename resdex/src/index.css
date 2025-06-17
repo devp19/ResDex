@@ -346,6 +346,17 @@ code {
 
 }
 
+.footeranimate {
+  display: flex;
+  transition: 0.5s;
+  justify-content: center;
+}
+
+.footeranimate:hover{
+  transform: translateY(-5px);
+  font-size: 18px;
+}
+
 
 .custom-read {
   color:black;

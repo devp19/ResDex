@@ -37,19 +37,12 @@ const Footer = () => {
             </div>
             
             <div>
-                <div className='row d-flex justify-content-center' style={{lineHeight: '40px'}}>
-                    <div className='col-md-2 text-center'>
-                        <Link className='link' to="/about"><span className='primary'>About</span></Link>
-                    </div>
-                    <div className='col-md-2 text-center'>
-                        <Link className='link' to="/team"><span className='primary'>Team</span></Link>
-                    </div>
-                    <div className='col-md-2 text-center'>
-                        <Link className='link' to="/contact"><span className='primary'>Contact</span></Link>
-                    </div>
-                    <div className='col-md-2 text-center'>
-                        <Link className='link' to="/releasedocs"><span className='primary'>Releases</span></Link>
-                    </div>
+                <div className='row d-flex justify-content-center' style={{lineHeight: '70px'}}>
+                        <Link className='link col-md-2 text-center m-2' to="/about"><span className='primary footeranimate'>About</span></Link>
+                        <Link className='link col-md-2 text-center m-2' to="/team"><span className='primary footeranimate'>Team</span></Link>
+                        <Link className='link col-md-2 text-center m-2' to="/contact"><span className='primary footeranimate'>Contact</span></Link>
+                        <Link className='link col-md-2 text-center m-2' to="/releasedocs"><span className='primary footeranimate'>Releases</span></Link>
+                    
                 </div>
             </div>
             <div className="center primary">
