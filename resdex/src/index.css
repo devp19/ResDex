@@ -1,5 +1,7 @@
 *{
   color: white;
+  scroll-behavior: smooth;
+
 }
 
 @font-face {
@@ -759,19 +761,29 @@ border-top: 1px solid white;
 }
 
 
-.fade-in {
+.fade-in2 {
   opacity: 0;
-  transform: translateY(-20px);
-  animation: fadeIn 1s ease-out forwards;
+  transform: translateY(-50px);
+  animation: fade-in2 1.5s ease-out forwards;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in2 {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+.fade-in {
+  opacity: 0;
+  transform: translateY(-50px);
+  transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 
 label {

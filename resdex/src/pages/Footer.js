@@ -8,26 +8,6 @@ const Footer = () => {
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-            setUser(currentUser);
-            if (currentUser) {
-                try {
-                    const userDocRef = doc(db, 'users', currentUser.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists()) {
-                        const userData = userDocSnap.data();
-                        setUsername(userData.username);
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                }
-            } else {
-                setUsername('');
-            }
-        });
-        return () => unsubscribe();
-    }, []);
 
     return (
         <div>

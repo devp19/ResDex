@@ -34,6 +34,8 @@ const getProfileFromLocalStorage = (username) => {
 };
 
 const Profile = () => {
+
+    
   const [isFollowing, setIsFollowing] = useState(false);
 const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -552,6 +554,7 @@ const updateInterests = useCallback(async (newInterests) => {
   };
   
   if (loading) {
+    
     return <p className='primary'>Loading...</p>;
   }
   
@@ -595,10 +598,16 @@ const updateInterests = useCallback(async (newInterests) => {
   };
   
 
+
+
+  
+
   return (
     <div>
+
+      
     
-        <div className='row d-flex justify-content-center mt-3 fade-in' 
+        <div className='row fade-in2 d-flex justify-content-center mt-3' 
                style={{marginBottom: '20px'}}>
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
@@ -7,6 +7,48 @@ import Logo from '../images/index.png';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
+
+  useEffect(() => {
+      // Animate scrolling marquee once
+      const scrollers = document.querySelectorAll(".scroller");
+      scrollers.forEach((scroller) => {
+        if (scroller.getAttribute("data-animated")) return;
+    
+        scroller.setAttribute("data-animated", true);
+        const scrollerInner = scroller.querySelector(".scroller__inner");
+        const scrollerContent = Array.from(scrollerInner.children);
+    
+        scrollerContent.forEach((item) => {
+          const duplicatedItem = item.cloneNode(true);
+          duplicatedItem.setAttribute("aria-hidden", true);
+          scrollerInner.appendChild(duplicatedItem);
+        });
+      });
+    
+      // Fade-in on scroll using IntersectionObserver
+      const fadeIns = document.querySelectorAll('.fade-in');
+    
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); // Optional: fade-in only once
+            }
+          });
+        },
+        {
+          threshold: 0.05,
+        }
+      );
+    
+      fadeIns.forEach((el) => observer.observe(el));
+    
+      return () => {
+        fadeIns.forEach((el) => observer.unobserve(el));
+      };
+    }, []);
+    
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

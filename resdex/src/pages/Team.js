@@ -1,9 +1,51 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 // import Fenil from '../images/FenilPFP.png'
 // import Dev from '../images/dev.png'
 // import Deep from '../images/DeepPfP.jpg'
 import Empty from '../images/empty-pic.webp'
 const Team = () => {
+
+  useEffect(() => {
+      // Animate scrolling marquee once
+      const scrollers = document.querySelectorAll(".scroller");
+      scrollers.forEach((scroller) => {
+        if (scroller.getAttribute("data-animated")) return;
+    
+        scroller.setAttribute("data-animated", true);
+        const scrollerInner = scroller.querySelector(".scroller__inner");
+        const scrollerContent = Array.from(scrollerInner.children);
+    
+        scrollerContent.forEach((item) => {
+          const duplicatedItem = item.cloneNode(true);
+          duplicatedItem.setAttribute("aria-hidden", true);
+          scrollerInner.appendChild(duplicatedItem);
+        });
+      });
+    
+      // Fade-in on scroll using IntersectionObserver
+      const fadeIns = document.querySelectorAll('.fade-in');
+    
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); // Optional: fade-in only once
+            }
+          });
+        },
+        {
+          threshold: 0.05,
+        }
+      );
+    
+      fadeIns.forEach((el) => observer.observe(el));
+    
+      return () => {
+        fadeIns.forEach((el) => observer.unobserve(el));
+      };
+    }, []);
+    
     return (
         <div>
             <div className='center primary monarque pt-4 fade-in' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex – Team</div>

@@ -12,33 +12,76 @@ import Empty from '../images/empty-pic.webp';
 
 const Home = () => {
 
+  // useEffect(() => {
+  //   const scrollers = document.querySelectorAll(".scroller");
+
+  //   function addAnimation() {
+  //     scrollers.forEach((scroller) => {
+  //       if (scroller.getAttribute("data-animated")) return;
+
+  //       scroller.setAttribute("data-animated", true);
+
+  //       const scrollerInner = scroller.querySelector(".scroller__inner");
+  //       const scrollerContent = Array.from(scrollerInner.children);
+
+  //       scrollerContent.forEach((item) => {
+  //         const duplicatedItem = item.cloneNode(true);
+  //         duplicatedItem.setAttribute("aria-hidden", true);
+  //         scrollerInner.appendChild(duplicatedItem);
+  //       });
+  //     });
+
+  //     // Trigger fade-in effect
+  //     document.querySelectorAll('.fade-in').forEach(element => {
+  //       element.classList.add('visible');
+  //     });
+  //   }
+
+  //   addAnimation();
+  // }, []); // Empty dependency array ensures this only runs once on mount
+
+
   useEffect(() => {
-    const scrollers = document.querySelectorAll(".scroller");
+  // Animate scrolling marquee once
+  const scrollers = document.querySelectorAll(".scroller");
+  scrollers.forEach((scroller) => {
+    if (scroller.getAttribute("data-animated")) return;
 
-    function addAnimation() {
-      scrollers.forEach((scroller) => {
-        if (scroller.getAttribute("data-animated")) return;
+    scroller.setAttribute("data-animated", true);
+    const scrollerInner = scroller.querySelector(".scroller__inner");
+    const scrollerContent = Array.from(scrollerInner.children);
 
-        scroller.setAttribute("data-animated", true);
+    scrollerContent.forEach((item) => {
+      const duplicatedItem = item.cloneNode(true);
+      duplicatedItem.setAttribute("aria-hidden", true);
+      scrollerInner.appendChild(duplicatedItem);
+    });
+  });
 
-        const scrollerInner = scroller.querySelector(".scroller__inner");
-        const scrollerContent = Array.from(scrollerInner.children);
+  // Fade-in on scroll using IntersectionObserver
+  const fadeIns = document.querySelectorAll('.fade-in');
 
-        scrollerContent.forEach((item) => {
-          const duplicatedItem = item.cloneNode(true);
-          duplicatedItem.setAttribute("aria-hidden", true);
-          scrollerInner.appendChild(duplicatedItem);
-        });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // Optional: fade-in only once
+        }
       });
-
-      // Trigger fade-in effect
-      document.querySelectorAll('.fade-in').forEach(element => {
-        element.classList.add('visible');
-      });
+    },
+    {
+      threshold: 0.05,
     }
+  );
 
-    addAnimation();
-  }, []); // Empty dependency array ensures this only runs once on mount
+  fadeIns.forEach((el) => observer.observe(el));
+
+  return () => {
+    fadeIns.forEach((el) => observer.unobserve(el));
+  };
+}, []);
+
 
   return (
     <div>
@@ -134,21 +177,21 @@ const Home = () => {
             </svg>
           </div>
           
-      <div className='container fade-in' style={{marginTop: '100px'}}>
+      <div className='container' style={{marginTop: '100px'}}>
         <div className='row justify-content-center'>
-        <div className='col-md-3 mb-3' style={{borderRight: '1px solid #2a2a2a'}}>
+        <div className='col-md-3 mb-3 fade-in' style={{borderRight: '1px solid #2a2a2a'}}>
               <div className='column-content'>
                 <h3 className='kugile primary' style={{fontSize: '24px'}}> CREDENTIALS  </h3>
                 <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
               </div>
             </div>
-            <div className='col-md-3 mb-3'>
+            <div className='col-md-3 mb-3 fade-in'>
               <div className='column-content primary'>
               <h3 className='kugile primary' style={{fontSize: '24px'}}> CONNECT </h3>
                 <p className='primary mt-4'>Connect students with professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
               </div>
             </div>
-            <div className='col-md-3 mb-3' style={{borderLeft: '1px solid #2a2a2a'}}>
+            <div className='col-md-3 mb-3 fade-in' style={{borderLeft: '1px solid #2a2a2a'}}>
               <div className='column-content primary'>
               <h3 className='kugile primary' style={{fontSize: '24px'}}> PEER REVIEW </h3>
                 <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
@@ -158,7 +201,7 @@ const Home = () => {
 
             </div>
             <div className='row justify-content-center'>
-        <div className='col-md-3 mb-3'>
+        <div className='col-md-3 mb-3 fade-in'>
               <div className='column-content'>
                 <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> ENGAGE </h3>
                 <p className='primary mt-4'>Prioritizes student success through tailored support, inclusive programming, and accessible resources designed to meet diverse academic and career goals.</p>
@@ -166,7 +209,7 @@ const Home = () => {
             </div>
             <div className='col-md-1  mb-3'style={{borderLeft: '1px solid #2a2a2a', marginRight: '-110px'}}>
             </div>
-            <div className='col-md-3 mb-3'>
+            <div className='col-md-3 mb-3 fade-in'>
               <div className='column-content primary'>
               <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> SHOWCASE </h3>
                 <p className='primary mt-4'>Empowers students to present their work through curated events, digital portfolios, and publication opportunities that highlight talent and innovation.</p>
@@ -179,11 +222,11 @@ const Home = () => {
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
-      <p className='primary center top kugile' style={{ fontSize: '30px', marginBottom: '30px' }}>TESTIMONIALS</p>
+      <p className='primary center top kugile fade-in' style={{ fontSize: '30px', marginBottom: '30px' }}>TESTIMONIALS</p>
 
        <div className='row d-flex justify-content-center'>
      
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
       <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It’s exactly what the academic community has been missing."</i></p>
       <div className='row' style={{paddingLeft: '20px'}}>
 
@@ -201,7 +244,7 @@ const Home = () => {
     </div>
       </div>
 
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
       <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
       <div className='row' style={{paddingLeft: '20px'}}>
 
@@ -219,7 +262,7 @@ const Home = () => {
     </div>
       </div>
       
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
       <p style={{padding: '20px'}}><i className='primary'>"ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity. It’s wonderful to see a platform so dedicated to supporting students and emerging researchers!"</i></p>
       <div className='row' style={{paddingLeft: '20px'}}>
 
@@ -236,7 +279,7 @@ const Home = () => {
       <p className='col-md-12 primary'>Darnold J. <br></br> High School Student</p>
     </div>
       </div>
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
+      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
       <p className='primary' style={{padding: '20px'}}><i className='primary'>"The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts and encouraging collaborative work. ResDex is fostering a new era of research accessibility and community."</i></p>
       <div className='row' style={{paddingLeft: '20px'}}>
 
