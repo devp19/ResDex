@@ -697,7 +697,7 @@ border-top: 1px solid white;
 }
 
 .scroller {
-  max-width: 600px;
+  max-width: 1000px;
 }
 
 .scroller__inner {
