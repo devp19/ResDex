@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '../images/dark-transparent.png';
 import TMU from '../images/tmu.png';
@@ -6,6 +6,7 @@ import MAC from '../images/mac.png';
 import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
+import CAPTION from '../images/captionblack.png';
 import Alert from 'react-bootstrap/Alert';
 import Empty from '../images/empty-pic.webp';
 
@@ -82,6 +83,106 @@ const Home = () => {
   };
 }, []);
 
+
+const testimonials = [
+    {
+      id: 1,
+      quote: "ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It's exactly what the academic community has been missing.",
+      author: "Joseph J.",
+      position: "Health Sciences, McMaster",
+      image: Empty
+    },
+    {
+      id: 2,
+      quote: "ResDex has been a game-changer for me as a PhD student. It's incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver.",
+      author: "Lamar B.",
+      position: "Nursing, University of Toronto",
+      image: Empty
+    },
+    {
+      id: 3,
+      quote: "ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity.",
+      author: "Darnold J.",
+      position: "High School Student",
+      image: Empty
+    },
+    {
+      id: 4,
+      quote: "The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts.",
+      author: "Catherine M.",
+      position: "Professor, McMaster",
+      image: Empty
+    }
+  ];
+
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  
+  // Auto-advance testimonials
+  useEffect(() => {
+    let interval;
+    if (isAutoPlaying) {
+      interval = setInterval(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, testimonials.length]);
+
+  const goToTestimonial = (index) => {
+    setCurrentTestimonial(index);
+    setIsAutoPlaying(false);
+    // Resume auto-play after manual selection
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToNext = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToPrev = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  // Your existing useEffect for animations
+  useEffect(() => {
+    const scrollers = document.querySelectorAll(".scroller");
+    scrollers.forEach((scroller) => {
+      if (scroller.getAttribute("data-animated")) return;
+
+      scroller.setAttribute("data-animated", true);
+      const scrollerInner = scroller.querySelector(".scroller__inner");
+      const scrollerContent = Array.from(scrollerInner.children);
+
+      scrollerContent.forEach((item) => {
+        const duplicatedItem = item.cloneNode(true);
+        duplicatedItem.setAttribute("aria-hidden", true);
+        scrollerInner.appendChild(duplicatedItem);
+      });
+    });
+
+    const fadeIns = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+
+    fadeIns.forEach((el) => observer.observe(el));
+    return () => fadeIns.forEach((el) => observer.unobserve(el));
+
+    
+  }, []);
 
   return (
     <div>
@@ -219,85 +320,71 @@ const Home = () => {
       </div>
 
     
-
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
-    <div className='container'>
-      <p className='primary center top kugile fade-in' style={{ fontSize: '30px', marginBottom: '30px' }}>TESTIMONIALS</p>
+<div className="testimonials-section">
+      <div className='container'>
+        <div className='row justify-content-center d-flex display fade-in'style={{marginBottom: '-180px' }}>
+            <img src={CAPTION} style={{ maxWidth: '250px'}} alt='captionblack'></img>
+          </div>
+        <p className='primary center top baskerville fade-in' style={{ fontSize: '30px', marginBottom: '-10px' }}>Their Voice, Your Call</p>
+        
+    
 
-       <div className='row d-flex justify-content-center'>
-     
-      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It’s exactly what the academic community has been missing."</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-            src={Empty} 
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Joseph J.<br></br> Health Sciences, McMaster</p>
-    </div>
-      </div>
-
-      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Lamar B. <br></br> Nursing, University of Toronto</p>
-    </div>
+    
+    <div className="testimonial-carousel">
+      {/* Testimonial Box with integrated buttons */}
+      <div className="testimonial-box">
+        {/* Left Button - positioned inside the box but on the left edge */}
+        <button 
+          className="carousel-button left-button" 
+          onClick={goToPrev}
+          aria-label="Previous testimonial"
+        >
+          &lt;
+        </button>
+        
+        {/* Testimonial Content */}
+        <div className="testimonial-content">
+          <h3 className="testimonial-number">{testimonials[currentTestimonial].number}</h3>
+          <blockquote className="testimonial-quote">
+            "{testimonials[currentTestimonial].quote}"
+          </blockquote>
+          <div className="testimonial-author">
+            <img 
+              src={testimonials[currentTestimonial].image} 
+              alt={testimonials[currentTestimonial].author}
+              className="author-image"
+            />
+            <div>
+              <p className="author-name">{testimonials[currentTestimonial].author}</p>
+              <p className="author-position">{testimonials[currentTestimonial].position}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Right Button - positioned inside the box but on the right edge */}
+        <button 
+          className="carousel-button right-button" 
+          onClick={goToNext}
+          aria-label="Next testimonial"
+        >
+          &gt;
+        </button>
       </div>
       
-      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
-      <p style={{padding: '20px'}}><i className='primary'>"ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity. It’s wonderful to see a platform so dedicated to supporting students and emerging researchers!"</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Darnold J. <br></br> High School Student</p>
-    </div>
-      </div>
-      <div className='col-md-4 fade-in box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts and encouraging collaborative work. ResDex is fostering a new era of research accessibility and community."</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Catherine M.<br></br> Professor, McMaster</p>
-    </div>
+      {/* Indicators */}
+      <div className="carousel-indicators">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            className={`indicator ${index === currentTestimonial ? 'active' : ''}`}
+            onClick={() => goToTestimonial(index)}
+          />
+        ))}
       </div>
     </div>
-    </div>
+  </div>
+</div>
 
 
       <div className='center-sample fade-in pt-4'>
