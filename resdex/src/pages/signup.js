@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
@@ -10,6 +10,48 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Signup = () => {
+
+  useEffect(() => {
+        // Animate scrolling marquee once
+        const scrollers = document.querySelectorAll(".scroller");
+        scrollers.forEach((scroller) => {
+          if (scroller.getAttribute("data-animated")) return;
+      
+          scroller.setAttribute("data-animated", true);
+          const scrollerInner = scroller.querySelector(".scroller__inner");
+          const scrollerContent = Array.from(scrollerInner.children);
+      
+          scrollerContent.forEach((item) => {
+            const duplicatedItem = item.cloneNode(true);
+            duplicatedItem.setAttribute("aria-hidden", true);
+            scrollerInner.appendChild(duplicatedItem);
+          });
+        });
+      
+        // Fade-in on scroll using IntersectionObserver
+        const fadeIns = document.querySelectorAll('.fade-in');
+      
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Optional: fade-in only once
+              }
+            });
+          },
+          {
+            threshold: 0.05,
+          }
+        );
+      
+        fadeIns.forEach((el) => observer.observe(el));
+      
+        return () => {
+          fadeIns.forEach((el) => observer.unobserve(el));
+        };
+      }, []);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -102,12 +144,12 @@ const Signup = () => {
 
   return (
     <div>
-      <div className='container'>
+      <div className='container fade-in top'>
     
         <div className='row d-flex justify-content-center'>
             <div className='col-md-5 box'>
             <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
-                <h3 className='center primary monarque'> ResDex – Sign Up</h3>
+                <h3 className='center primary monarque'>ResDex | Sign Up</h3>
                 <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
               </div>
               <div className='row d-flex justify-content-center'>

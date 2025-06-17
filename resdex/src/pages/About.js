@@ -5,7 +5,6 @@ import About2 from '../images/indexinv.png'
 const About = () => {
 
   useEffect(() => {
-      // Animate scrolling marquee once
       const scrollers = document.querySelectorAll(".scroller");
       scrollers.forEach((scroller) => {
         if (scroller.getAttribute("data-animated")) return;
@@ -21,7 +20,6 @@ const About = () => {
         });
       });
     
-      // Fade-in on scroll using IntersectionObserver
       const fadeIns = document.querySelectorAll('.fade-in');
     
       const observer = new IntersectionObserver(
@@ -29,7 +27,7 @@ const About = () => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add('visible');
-              observer.unobserve(entry.target); // Optional: fade-in only once
+              observer.unobserve(entry.target); 
             }
           });
         },

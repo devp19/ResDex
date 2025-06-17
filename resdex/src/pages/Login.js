@@ -48,7 +48,7 @@ const Login = () => {
         fadeIns.forEach((el) => observer.unobserve(el));
       };
     }, []);
-    
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -99,11 +99,11 @@ const Login = () => {
 
   return (
     <div>
-      <div className='container'>
+      <div className='container fade-in'>
         <div className='row d-flex justify-content-center'>
           <div className='col-md-5 box'>
             <div className='row d-flex justify-content-center' style={{ marginTop: '50px' }}>
-              <h3 className='center primary monarque'> ResDex – Sign In</h3>
+              <h3 className='center primary monarque'>ResDex | Login</h3>
               <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
             </div>
             <Form className='login-form' onSubmit={handleSubmit}>
