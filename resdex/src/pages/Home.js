@@ -114,31 +114,7 @@ const Home = () => {
         </div>
       </div>
 
-
-
-      <div className='container fade-in'>
-        <div className='row justify-content-center top'>
-        <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content'>
-                <h3 className='kugile primary'> CREDENTIALS  </h3>
-                <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
-              </div>
-            </div>
-            <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content primary'>
-              <h3 className='kugile primary'> CONNECT </h3>
-                <p className='primary mt-4'>Connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
-              </div>
-            </div>
-            <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content primary'>
-              <h3 className='kugile primary'> PEER REVIEW </h3>
-                <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
-              </div>
-            </div>        </div>
-      </div>
-
-      <div className='container fade-in top'>
+<div className='container fade-in' style={{marginTop: '50px'}}>
         {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
         <div className='row d-flex justify-content-center fade-in'>
         <div class="scroller box " data-direction="right" data-speed="slow">
@@ -152,6 +128,49 @@ const Home = () => {
       </div>        
       </div>
       </div>
+
+      <div className='container fade-in'>
+        <div className='row justify-content-center top'>
+        <div className='col-md-3 mx-3 mb-3' style={{borderRight: '1px solid #2a2a2a'}}>
+              <div className='column-content'>
+                <h3 className='kugile primary'> CREDENTIALS  </h3>
+                <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
+              </div>
+            </div>
+            <div className='col-md-3  mx-3 mb-3'>
+              <div className='column-content primary'>
+              <h3 className='kugile primary'> CONNECT </h3>
+                <p className='primary mt-4'>Connect students with professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
+              </div>
+            </div>
+            <div className='col-md-3  mx-3 mb-3' style={{borderLeft: '1px solid #2a2a2a'}}>
+              <div className='column-content primary'>
+              <h3 className='kugile primary'> PEER REVIEW </h3>
+                <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
+              </div>
+            </div>        </div>
+            <div className= 'horizontal-line' style={{marginTop: '-17px'}}>
+
+            </div>
+            <div className='row justify-content-center'>
+        <div className='col-md-3  mx-3 mb-3'>
+              <div className='column-content'>
+                <h3 className='kugile primary' style={{paddingTop: '15px'}}> ENGAGE </h3>
+                <p className='primary mt-4'>Prioritizes student success through tailored support, inclusive programming, and accessible resources designed to meet diverse academic and career goals.</p>
+              </div>
+            </div>
+            <div className='col-md-1  mb-3'style={{borderLeft: '1px solid #2a2a2a', marginRight: '-100px'}}>
+            </div>
+            <div className='col-md-3  mx-3 mb-3'>
+              <div className='column-content primary'>
+              <h3 className='kugile primary' style={{paddingTop: '15px'}}> SHOWCASE </h3>
+                <p className='primary mt-4'>Empowers students to present their work through curated events, digital portfolios, and publication opportunities that highlight talent and innovation.</p>
+              </div>
+            </div>
+                   </div>
+      </div>
+
+    
 
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
     <div className='container'>
