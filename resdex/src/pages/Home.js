@@ -88,22 +88,21 @@ const Home = () => {
   <div className='fade-in'>
 
         <div>
-          <div className='row border- justify-content-center d-flex display fade-in' style={{marginTop: '75px'}}>
+          <div className='row justify-content-center d-flex display fade-in' style={{marginTop: '75px'}}>
             <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
           </div>
           <div className='row text-center fade-in'>
             <p className='primary'>⏐</p>
           </div>
           <div className='row text-center fade-in'>
-            <p className='monarque primary' style={{ fontSize: '50px'}}>ResDex</p>
-            <div className='row justify-content-center text-center d-flex fade-in'>
-            <div className= 'col-md-7'>
+            <p className='monarque primary' style={{ fontSize: '30px'}}>ResDex</p>
+            <div className= 'col-md-7 justify-content-center mx-auto'>
                   
-<p className='primary'style={{ fontSize: '20px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
+<p className='primary'style={{ fontSize: '15px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
             </div>
             
          </div>
-          </div>
+        
 
           
           {/* <div className='center fade-in'>
@@ -114,56 +113,62 @@ const Home = () => {
         </div>
       </div>
 
-<div className='container fade-in' style={{marginTop: '50px'}}>
+<div className='container fade-in' style={{marginTop: '70px'}}>
         {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
         <div className='row d-flex justify-content-center fade-in'>
         <div class="scroller box " data-direction="right" data-speed="slow">
             <div class="scroller__inner mb-4">
-              <img style={{height: '60px', marginRight: '30px'}} src={TMU} alt="" />
-              <img style={{height: '60px',  marginRight: '30px', marginLeft: '30px'}} src={MAC} alt="" />
-              <img style={{height: '60px'}} src={OTTAWA} alt="" />
-              <img style={{height: '60px'}} src={UFT} alt="" />
-              <img style={{height: '60px'}} src={LOO} alt="" />
+              <img style={{height: '50px', marginRight: '30px'}} src={TMU} alt="" />
+              <img style={{height: '50px',  marginRight: '30px', marginLeft: '30px'}} src={MAC} alt="" />
+              <img style={{height: '50px'}} src={OTTAWA} alt="" />
+              <img style={{height: '50px'}} src={UFT} alt="" />
+              <img style={{height: '50px'}} src={LOO} alt="" />
             </div>
       </div>        
       </div>
       </div>
 
-      <div className='container fade-in'>
-        <div className='row justify-content-center top'>
-        <div className='col-md-3 mx-3 mb-3' style={{borderRight: '1px solid #2a2a2a'}}>
+<div className='center pt-4 fade-in' style={{marginTop: '50px'}}>
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+              <path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/>
+            </svg>
+          </div>
+          
+      <div className='container fade-in' style={{marginTop: '100px'}}>
+        <div className='row justify-content-center'>
+        <div className='col-md-3 mb-3' style={{borderRight: '1px solid #2a2a2a'}}>
               <div className='column-content'>
-                <h3 className='kugile primary'> CREDENTIALS  </h3>
+                <h3 className='kugile primary' style={{fontSize: '24px'}}> CREDENTIALS  </h3>
                 <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
               </div>
             </div>
-            <div className='col-md-3  mx-3 mb-3'>
+            <div className='col-md-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='kugile primary'> CONNECT </h3>
+              <h3 className='kugile primary' style={{fontSize: '24px'}}> CONNECT </h3>
                 <p className='primary mt-4'>Connect students with professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
               </div>
             </div>
-            <div className='col-md-3  mx-3 mb-3' style={{borderLeft: '1px solid #2a2a2a'}}>
+            <div className='col-md-3 mb-3' style={{borderLeft: '1px solid #2a2a2a'}}>
               <div className='column-content primary'>
-              <h3 className='kugile primary'> PEER REVIEW </h3>
+              <h3 className='kugile primary' style={{fontSize: '24px'}}> PEER REVIEW </h3>
                 <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
               </div>
             </div>        </div>
-            <div className= 'horizontal-line' style={{marginTop: '-17px'}}>
+            <div className= 'horizontal-line d-flex' style={{marginTop: '-17px', maxWidth: '80%', alignSelf: 'center', justifySelf: 'center'}}>
 
             </div>
             <div className='row justify-content-center'>
-        <div className='col-md-3  mx-3 mb-3'>
+        <div className='col-md-3 mb-3'>
               <div className='column-content'>
-                <h3 className='kugile primary' style={{paddingTop: '15px'}}> ENGAGE </h3>
+                <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> ENGAGE </h3>
                 <p className='primary mt-4'>Prioritizes student success through tailored support, inclusive programming, and accessible resources designed to meet diverse academic and career goals.</p>
               </div>
             </div>
-            <div className='col-md-1  mb-3'style={{borderLeft: '1px solid #2a2a2a', marginRight: '-100px'}}>
+            <div className='col-md-1  mb-3'style={{borderLeft: '1px solid #2a2a2a', marginRight: '-110px'}}>
             </div>
-            <div className='col-md-3  mx-3 mb-3'>
+            <div className='col-md-3 mb-3'>
               <div className='column-content primary'>
-              <h3 className='kugile primary' style={{paddingTop: '15px'}}> SHOWCASE </h3>
+              <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> SHOWCASE </h3>
                 <p className='primary mt-4'>Empowers students to present their work through curated events, digital portfolios, and publication opportunities that highlight talent and innovation.</p>
               </div>
             </div>
