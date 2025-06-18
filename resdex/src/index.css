@@ -1064,3 +1064,52 @@ button {
 .indicator.active {
   background: #333;
 }
+
+/* Navigation tooltips */
+.nav-link, .nav-button {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  margin-bottom: 10px;
+  z-index: 100;
+  pointer-events: none;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Make sure your nav container has proper stacking */
+.nav-container {
+  position: relative;
+  z-index: 10;
+}
+.z-index-tooltip {
+  z-index: 9999;
+}
