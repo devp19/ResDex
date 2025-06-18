@@ -4,6 +4,7 @@ import { collection, getDocs, query, where, doc, getDoc, limit } from 'firebase/
 import { db } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Select, { components } from 'react-select';
+import Logo from '../images/dark-transparent.png';
 
 const DropdownIndicator = (props) => {
   return (
@@ -244,8 +245,14 @@ setResults(formattedResults);
 
   return (
     <div className="container">
-      <div className='row top'>
-        <h1 className='center primary fade-in'>Discover & Connect</h1>
+      <div className='row mt-4'>
+         <div className='row justify-content-center d-flex fade-in'>
+                          <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                        </div>
+                        <div className='row text-center fade-in'>
+                          <p className='primary'>⏐</p>
+                        </div>
+        <h1 className='center primary monarque fade-in'>Explore ResDex</h1>
         <br />
         <div className='d-flex justify-content-center input fade-in'>
           <div className="input-group search-input-group box d-flex" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px', marginBottom: '100px', padding: '20px'}}>

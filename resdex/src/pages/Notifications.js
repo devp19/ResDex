@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebaseConfig';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
+import Logo from '../images/dark-transparent.png';
+
 
 const Notifications = () => {
 
@@ -191,7 +193,13 @@ const Notifications = () => {
 
   return (
     <div className='mt-4 fade-in'>
-      <h1 className='primary text-center'>Notifications</h1>
+      <div className='row justify-content-center d-flex display fade-in'>
+                  <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                </div>
+                <div className='row text-center fade-in'>
+                  <p className='primary'>⏐</p>
+                </div>
+      <h1 className='primary monarque text-center'>Notifications</h1>
       <div className='row d-flex justify-content-center' style={{ marginRight: '20px', marginTop: '30px' }}>
         <div className='col-md-7 d-flex justify-content-center'>  
           <ul className='mt-4'>
