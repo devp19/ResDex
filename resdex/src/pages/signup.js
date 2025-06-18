@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import Logo from '../images/index.png';
-import { collection, addDoc, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion, getDoc} from 'firebase/firestore';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 const Signup = () => {
 
   useEffect(() => {
-        // Animate scrolling marquee once
         const scrollers = document.querySelectorAll(".scroller");
         scrollers.forEach((scroller) => {
           if (scroller.getAttribute("data-animated")) return;
@@ -28,7 +27,6 @@ const Signup = () => {
           });
         });
       
-        // Fade-in on scroll using IntersectionObserver
         const fadeIns = document.querySelectorAll('.fade-in');
       
         const observer = new IntersectionObserver(
@@ -36,7 +34,7 @@ const Signup = () => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Optional: fade-in only once
+                observer.unobserve(entry.target);
               }
             });
           },
@@ -62,22 +60,21 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSignup = async (e) => {
+ const handleSignup = async (e) => {
     e.preventDefault();
 
-  const username = displayName.toLowerCase().replace(/\s+/g, '');
-  const usernameRegex = /^[a-zA-Z0-9]+$/;
+    const username = displayName.toLowerCase().replace(/\s+/g, '');
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
 
-  if (username.length < 3) {
-    setError('Username must be at least 3 characters long');
-    return;
-  }
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return;
+    }
 
-  if (!usernameRegex.test(username)) {
-    setError('Username can only contain letters and numbers, with no spaces or special characters.');
-    return;
-  }
-
+    if (!usernameRegex.test(username)) {
+      setError('Username can only contain letters and numbers, with no spaces or special characters.');
+      return;
+    }
 
     if (password !== password2) {
       setError('Passwords do not match');
@@ -105,7 +102,6 @@ const Signup = () => {
       console.log("Updating user profile...");
       await updateProfile(auth.currentUser, { displayName: fullName });
 
-      // Write to Firestore
       console.log("Adding username to 'usernames' collection...");
       await setDoc(doc(db, 'usernames', username), {
         username: username,
@@ -123,6 +119,28 @@ const Signup = () => {
         contributions: 0,
       });
 
+      console.log("Adding user to 'searchIndex' collection array...");
+      const searchIndexRef = doc(db, 'searchIndex', 'usersList'); 
+
+      const searchIndexDoc = await getDoc(searchIndexRef);
+      if (!searchIndexDoc.exists()) {
+        await setDoc(searchIndexRef, {
+          users: [{
+            uid: user.uid,
+            username: username,
+            fullName: fullName,
+          }]
+        });
+      } else {
+        await updateDoc(searchIndexRef, {
+          users: arrayUnion({
+            userId: user.uid,
+            username: username,
+            fullName: fullName,
+          })
+        });
+      }
+
       console.log("Firestore write operations completed successfully");
       
       setSuccess('Verification email sent! Please check your inbox to verify your email address.');
@@ -135,6 +153,8 @@ const Signup = () => {
       setError(authError.message);
     }
   };
+
+
 
   const handlePassword2Change = (e) => {
     const value = e.target.value;

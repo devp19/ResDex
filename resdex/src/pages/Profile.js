@@ -333,6 +333,18 @@ const confirmRemove = async () => {
     const updatedPdfs = pdfs.filter(pdf => pdf.objectKey !== pdfToRemove.objectKey);
     await updateDoc(doc(db, 'users', currentUser.uid), { pdfs: updatedPdfs });
 
+
+     const searchIndexDocRef = doc(db, 'searchIndex', 'papersList');
+    const searchIndexDoc = await getDoc(searchIndexDocRef);
+
+    if (searchIndexDoc.exists()) {
+      const papersList = searchIndexDoc.data().papers || [];
+      const updatedPapersList = papersList.filter(paper => paper.objectKey !== pdfToRemove.objectKey);
+
+      await updateDoc(searchIndexDocRef, { papers: updatedPapersList });
+    }
+
+    
     setPdfs(updatedPdfs);
     if (currentPdfIndex >= updatedPdfs.length) {
       setCurrentPdfIndex(Math.max(0, updatedPdfs.length - 1));

@@ -10,6 +10,10 @@ import CAPTION from '../images/captionblack.png';
 import Alert from 'react-bootstrap/Alert';
 import Empty from '../images/empty-pic.webp';
 
+// import { db } from '../firebaseConfig';
+// import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
+
+
 
 const Home = () => {
 
@@ -43,7 +47,6 @@ const Home = () => {
 
 
   useEffect(() => {
-  // Animate scrolling marquee once
   const scrollers = document.querySelectorAll(".scroller");
   scrollers.forEach((scroller) => {
     if (scroller.getAttribute("data-animated")) return;
@@ -59,7 +62,6 @@ const Home = () => {
     });
   });
 
-  // Fade-in on scroll using IntersectionObserver
   const fadeIns = document.querySelectorAll('.fade-in');
 
   const observer = new IntersectionObserver(
@@ -67,7 +69,7 @@ const Home = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          observer.unobserve(entry.target); // Optional: fade-in only once
+          observer.unobserve(entry.target);
         }
       });
     },
@@ -118,7 +120,6 @@ const testimonials = [
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   
-  // Auto-advance testimonials
   useEffect(() => {
     let interval;
     if (isAutoPlaying) {
@@ -132,7 +133,6 @@ const testimonials = [
   const goToTestimonial = (index) => {
     setCurrentTestimonial(index);
     setIsAutoPlaying(false);
-    // Resume auto-play after manual selection
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
@@ -148,7 +148,6 @@ const testimonials = [
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
-  // Your existing useEffect for animations
   useEffect(() => {
     const scrollers = document.querySelectorAll(".scroller");
     scrollers.forEach((scroller) => {
@@ -332,18 +331,15 @@ const testimonials = [
 
     
     <div className="testimonial-carousel">
-      {/* Testimonial Box with integrated buttons */}
       <div className="testimonial-box">
-        {/* Left Button - positioned inside the box but on the left edge */}
         <button 
           className="carousel-button left-button" 
           onClick={goToPrev}
           aria-label="Previous testimonial"
         >
-          &lt;
+          <p className='primary kugile mt-3'>&lt;</p>
         </button>
         
-        {/* Testimonial Content */}
         <div className="testimonial-content">
           <h3 className="testimonial-number">{testimonials[currentTestimonial].number}</h3>
           <blockquote className="testimonial-quote">
@@ -362,17 +358,15 @@ const testimonials = [
           </div>
         </div>
         
-        {/* Right Button - positioned inside the box but on the right edge */}
         <button 
           className="carousel-button right-button" 
           onClick={goToNext}
           aria-label="Next testimonial"
         >
-          &gt;
+          <p className='primary kugile mt-3'>&gt;</p>
         </button>
       </div>
       
-      {/* Indicators */}
       <div className="carousel-indicators">
         {testimonials.map((_, index) => (
           <button
