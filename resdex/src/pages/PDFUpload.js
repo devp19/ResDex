@@ -157,7 +157,7 @@ const handleUpload = async () => {
 
     const workerUrl = result.url.replace(
       'https://pub-b9219a60c2ea4807b8bb38a7c82cf268.r2.dev',
-      'https://resdex-r2-proxy.devptl841806.workers.dev'
+      'https://view.resdex.ca'
     );
 
     const pdfData = {

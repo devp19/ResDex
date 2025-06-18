@@ -62,7 +62,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     const workerUrl = result.Location.replace(
   'https://resdex.9941bc70add85a39ce1bc8141c669eca.r2.cloudflarestorage.com',
-  'https://resdex-r2-proxy.devptl841806.workers.dev'
+  'https://view.resdex.ca'
 );
 
 res.json({
