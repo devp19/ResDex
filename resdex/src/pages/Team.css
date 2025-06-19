@@ -26,7 +26,7 @@
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.5s ease;
+  transition: max-height 0.8s ease-in-out, opacity 1s ease-in-out;
   margin-top: 10px;
   font-size: 14px;
   line-height: 1.5;

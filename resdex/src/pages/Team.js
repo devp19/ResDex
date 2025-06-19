@@ -50,7 +50,7 @@ const Team = () => {
       members: [
         {
           name: "Dev Patel",
-          position: ["Co-Founder &", "Full-Stack Developer"],
+          position: ["Co-Founder &", "Founding Engineer"],
           bio: "Dev is a passionate full-stack developer with expertise in JavaScript, React, and Node.js. He's been building web applications for over 5 years and leads our technical vision.",
           linkedin: "https://www.linkedin.com/in/devp19/",
           github: "https://github.com/devp19",
