@@ -72,6 +72,13 @@ const [followerCount, setFollowerCount] = useState(0);
 const [followersList, setFollowersList] = useState([]);
 const [followersLoading, setFollowersLoading] = useState(false);
 
+const [showCopiedToast, setShowCopiedToast] = useState(false);
+
+const [showShareModal, setShowShareModal] = useState(false);
+
+const handleShareModalOpen = () => {
+  setShowShareModal(true);
+};
 
   const interestOptions = [
     { value: 'Technology', label: 'Technology' },
@@ -269,7 +276,15 @@ const firestoreUsername = userDocSnap.exists() ? userDocSnap.data().username : n
   
   
   
-  
+ const handleShareProfile = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    setShowCopiedToast(true);
+    setTimeout(() => setShowCopiedToast(false), 3000);
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+}; 
   
   
   
@@ -760,7 +775,43 @@ Edit Profile
   )}
 </div>
 
-  
+
+<div className='row d-flex justify-content-center'>
+            <div className='col'>
+
+            <div className='col-md' style={{position:'relative', textAlign: 'left'}}>                    
+                  {isOwnProfile && (
+                      <button
+  className="custom-view"
+  onClick={handleShareModalOpen}
+  style={{ padding: '10px 20px', borderRadius: '100px' }}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="white"
+    className="bi bi-share-fill"
+    viewBox="0 0 16 16"
+    style={{ marginRight: "8px" }}
+  >
+    <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
+  </svg>
+  Share Profile
+</button>
+                    )
+                    }
+              </div>
+              </div>
+
+        
+          
+          </div>
+
+
+
+
+ 
 
             </div>
            
@@ -833,6 +884,8 @@ Edit Profile
   </div>
   </div>
   
+
+
 
   <div className='mt-5'>
 
@@ -941,6 +994,23 @@ Edit Profile
           />
           </div>
           <br></br>
+
+
+<div className='col-md' style={{position:'relative', textAlign: 'right'}}>                    
+  {isOwnProfile && (
+    <>
+      <button className='custom-edit' onClick={handleModalOpen}> 
+        <svg style={{marginRight: '14px'}} xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="bi bi-pencil-square" fill="white" viewBox="0 0 16 16">
+          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+        </svg>
+        Edit Profile
+      </button>
+    </>
+  )}
+</div>
+
+          
         
 <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
           <p><strong className='primary'>Organization</strong></p>
@@ -1087,6 +1157,20 @@ Edit Profile
 </Modal>
 
 
+{showCopiedToast && (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    backgroundColor: '#2a2a2a',
+    color: 'white',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    zIndex: 9999
+  }}>
+    Profile link copied to clipboard!
+  </div>
+)}
 
       
     <Modal show={showRemoveModal}  className='box' onHide={() => setShowRemoveModal(false)}>
@@ -1138,6 +1222,43 @@ Edit Profile
     </div>
   </Modal.Footer>
 </Modal>
+
+
+{/* Share Profile Modal */}
+<Modal show={showShareModal} onHide={() => setShowShareModal(false)} centered>
+  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
+    <Modal.Title className='primary'>Share Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    <div className="text-center">
+      <p className='primary'>Share this profile with others</p>
+      <div className="input-group mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={window.location.href}
+          readOnly
+        />
+        <button
+          className="btn custom-view"
+          onClick={handleShareProfile}
+        >
+          Copy Link
+        </button>
+      </div>
+      
+      <div className="d-flex justify-content-center gap-3 mt-3">
+        
+      </div>
+    </div>
+  </Modal.Body>
+  <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    <button className='custom-view' onClick={() => setShowShareModal(false)}>
+      Close
+    </button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 

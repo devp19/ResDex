@@ -10,6 +10,7 @@ import CAPTION from '../images/captionblack.png';
 import Alert from 'react-bootstrap/Alert';
 import Empty from '../images/empty-pic.webp';
 
+
 // import { db } from '../firebaseConfig';
 // import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 
