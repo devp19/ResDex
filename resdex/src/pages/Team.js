@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import Dev from '../images/dev.jpg'
 import Empty from '../images/empty-pic.webp';
 import './Team.css';
+import Logo from '../images/dark-transparent.png';
+
 
 const Team = () => {
   useEffect(() => {
@@ -125,7 +126,13 @@ const Team = () => {
 
   return (
     <div className="team-page">
-      <div className='center primary monarque pt-4 fade-in' style={{ fontSize: "50px", marginTop: "30px" }}>ResDex | Team</div>
+      <div className='row justify-content-center d-flex display fade-in mt-4'>
+                        <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                      </div>
+                      <div className='row text-center fade-in'>
+                        <p className='primary'>⏐</p>
+                      </div>
+      <div className='center primary monarque fade-in' style={{ fontSize: "50px" }}>Team ResDex</div>
       <p className='center primary fade-in' style={{fontSize: '15px', marginTop: '-50px'}}>Meet the minds behind ResDex!</p>
       
       {teamMembers.map((team, index) => (
