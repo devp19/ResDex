@@ -240,10 +240,10 @@ const testimonials = [
             <p className='primary'>⏐</p>
           </div>
           <div className='row text-center fade-in'>
-            <p className='monarque primary' style={{ fontSize: '30px'}}>ResDex</p>
+            <p className='monarque primary' style={{ fontSize: '55px'}}>ResDex</p>
             <div className= 'col-md-7 justify-content-center mx-auto'>
                   
-<p className='primary'style={{ fontSize: '15px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
+<p className='primary'style={{ fontSize: '20px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
             </div>
             
          </div>
@@ -257,6 +257,7 @@ const testimonials = [
       
         </div>
       </div>
+
 
 <div className='container fade-in' style={{marginTop: '70px'}}>
         {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
@@ -321,6 +322,10 @@ const testimonials = [
       </div>
 
     
+
+
+
+
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
 <div className="testimonials-section">
       <div className='container'>
