@@ -10,6 +10,7 @@ import { s3 } from '../cloudflareConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 import blank from '../images/empty-pic.webp';
+import { canadianUniversities } from '../Orgs/canadianUniversities';
 
 import { useNavigate } from 'react-router-dom';
 import Logo from '../images/dark-transparent.png';
@@ -1013,15 +1014,44 @@ Edit Profile
           
         
 <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
-         <p className='primary'>Organization</p>
-          <textarea
-          spellcheck="false"
-            maxLength="40"
-            value={newOrganization}
-            onChange={(e) => setNewOrganization(e.target.value)}
-            rows="1"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', border: '1px solid white', resize: "none", padding:'10px' }}
-          />
+<p className='primary'>Organization (University)</p>
+<Select
+  isClearable
+  isSearchable
+  value={newOrganization ? { label: newOrganization, value: newOrganization } : null}
+  onChange={(selectedOption) =>
+    setNewOrganization(selectedOption ? selectedOption.value : '')
+  }
+  options={[
+    ...canadianUniversities.map((uni) => ({
+      label: uni,
+      value: uni
+    })),
+  ]}
+  placeholder="Select or type your university"
+  styles={{
+    control: (provided) => ({
+      ...provided,
+      color: 'black',
+      borderRadius: '5px',
+      padding: '2px',
+      minHeight: '40px'
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      color: state.isSelected ? 'black' : 'black',
+      backgroundColor: state.isSelected ? 'rgba(189,197,209,.3)' : 'white',
+      '&:hover': {
+        backgroundColor: 'rgba(189,197,209,.3)'
+      }
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: 'black'
+    })
+  }}
+/>
+
           </div>
 
 
