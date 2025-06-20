@@ -10,6 +10,8 @@ import { s3 } from '../cloudflareConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 import blank from '../images/empty-pic.webp';
+
+import { useNavigate } from 'react-router-dom';
 import Logo from '../images/dark-transparent.png';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -151,9 +153,16 @@ const handleShowFollowersModal = () => {
   fetchFollowersList();
 };
 
+
+const navigate = useNavigate(); // (add this inside your component, e.g., near `useEffect`)
+
 const goToProfile = (username) => {
-  window.open(`/profile/${username}`, '_blank');
+  setShowFollowersModal(false); // close the modal first
+  setTimeout(() => {
+    navigate(`/profile/${username}`);
+  }, 200); // slight delay to ensure modal animates out
 };
+
 
 
 
