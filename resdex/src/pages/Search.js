@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { collection, getDocs, query, limit } from "firebase/firestore";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { collection, getDocs, query, where, doc, getDoc, limit } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Select, { components } from 'react-select';
+import Logo from '../images/dark-transparent.png';
 
 const DropdownIndicator = (props) => {
   return (
@@ -15,11 +17,53 @@ const DropdownIndicator = (props) => {
 };
 
 const Search = () => {
+
+  useEffect(() => {
+      const scrollers = document.querySelectorAll(".scroller");
+      scrollers.forEach((scroller) => {
+        if (scroller.getAttribute("data-animated")) return;
+    
+        scroller.setAttribute("data-animated", true);
+        const scrollerInner = scroller.querySelector(".scroller__inner");
+        const scrollerContent = Array.from(scrollerInner.children);
+    
+        scrollerContent.forEach((item) => {
+          const duplicatedItem = item.cloneNode(true);
+          duplicatedItem.setAttribute("aria-hidden", true);
+          scrollerInner.appendChild(duplicatedItem);
+        });
+      });
+    
+      const fadeIns = document.querySelectorAll('.fade-in');
+    
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.05,
+        }
+      );
+    
+      fadeIns.forEach((el) => observer.observe(el));
+    
+      return () => {
+        fadeIns.forEach((el) => observer.unobserve(el));
+      };
+    }, []);
+    
   const [searchType, setSearchType] = useState({ value: "users", label: "Users" });
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const navigate = useNavigate();
+
+    
 
   const searchOptions = [
     { value: "users", label: "Users" },
@@ -42,35 +86,123 @@ const Search = () => {
     setDebounceTimeout(newTimeout);
   };
 
-  const handleSearch = async (term) => {
-    if (term.trim() !== "") {
-      const processedTerm = term.toLowerCase();
-      const usersCollection = collection(db, "users");
-      const q = query(usersCollection, limit(10));
-      const querySnapshot = await getDocs(q);
-      const allUsers = querySnapshot.docs.map(doc => doc.data());
-      let filteredResults;
-      if (searchType.value === "users") {
-        filteredResults = allUsers.filter(user => 
-          user.username.toLowerCase().includes(processedTerm) || 
-          user.fullName.toLowerCase().includes(processedTerm)
-        );
-      } else if (searchType.value === "papers") {
-        filteredResults = allUsers.flatMap(user => 
-          (user.pdfs || [])
-            .filter(pdf => 
-              pdf.title.toLowerCase().includes(processedTerm) || 
-              pdf.description.toLowerCase().includes(processedTerm) ||
-              (pdf.topics && pdf.topics.some(topic => topic.toLowerCase().includes(processedTerm)))
-            )
-            .map(pdf => ({ ...user, matchedPdf: pdf }))
-        );
+ const handleSearch = async (term) => {
+  if (term.trim() !== "") {
+    const processedTerm = term.toLowerCase();
+    let filteredResults = [];
+
+    if (searchType.value === "users" && processedTerm.length >= 3) {
+      try {
+        const searchIndexDocRef = doc(db, 'searchIndex', 'usersList');
+        const searchIndexDoc = await getDoc(searchIndexDocRef);
+        if (searchIndexDoc.exists()) {
+          const usersList = searchIndexDoc.data().users || [];
+
+          filteredResults = usersList.filter(user =>
+            user.username.toLowerCase().includes(processedTerm) ||
+            user.fullName.toLowerCase().includes(processedTerm)
+          );
+
+          const updatedResults = [];
+
+          for (let user of filteredResults) {
+            const userDocRef = doc(db, "users", user.userId);
+            const docSnapshot = await getDoc(userDocRef);
+
+            if (docSnapshot.exists()) {
+              const userData = docSnapshot.data();
+              const organization = userData.organization;
+              const profilePicture = userData.profilePicture || null;
+              updatedResults.push({
+                ...user,
+                organization: organization,
+                profilePicture: profilePicture,
+              });
+            }
+          }
+
+          setResults(updatedResults);  
+        } else {
+          console.warn("No users found in searchIndex.");
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Error fetching from searchIndex:", error);
+        setResults([]);
       }
-      setResults(filteredResults);
-    } else {
-      setResults([]);
+    } else if (searchType.value === "papers" && processedTerm.length >= 3) {
+      try {
+        const searchIndexDocRef = doc(db, 'searchIndex', 'papersList');
+        const searchIndexDoc = await getDoc(searchIndexDocRef);
+
+        if (searchIndexDoc.exists()) {
+          const papersList = searchIndexDoc.data().papers || [];
+          filteredResults = papersList.filter(pdf =>
+            pdf.title.toLowerCase().includes(processedTerm) ||
+            pdf.description.toLowerCase().includes(processedTerm) ||
+            (pdf.topics && pdf.topics.some(topic => topic.toLowerCase().includes(processedTerm)))
+          );
+          
+          // const formattedResults = filteredResults.map(pdf => ({
+          //   ...pdf,
+          //   matchedPdf: {
+          //     title: pdf.title,
+          //     description: pdf.description,
+          //     topics: pdf.topics,
+          //     url: pdf.url // assuming this is available
+          //   }
+          // }));
+
+
+          // // setResults(formattedResults);
+
+
+
+  const formattedResults = []
+
+for (let pdf of filteredResults) {
+  
+  const userDocRef = doc(db, "users", pdf.userUID); 
+  const docSnapshot = await getDoc(userDocRef);
+  if (docSnapshot.exists()) {
+    const userData = docSnapshot.data();
+    const organization = userData.organization || "N/A"; 
+    const profilePicture = userData.profilePicture || null;
+    const fullName = userData.fullName || "Anonymous";  
+    const username = userData.username || "Anonymous"; 
+
+    formattedResults.push({
+      ...pdf,
+      matchedPdf: {
+        title: pdf.title,
+        description: pdf.description,
+        topics: pdf.topics,
+        url: pdf.url,
+      },
+      fullName: fullName,
+      organization: organization, 
+      profilePicture: profilePicture,
+      username: username,  
+    });
+  }
+}
+
+setResults(formattedResults);
+        } else {
+          console.warn("No papers found in searchIndex.");
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Error fetching papers from searchIndex:", error);
+        setResults([]);
+      }
     }
-  };
+  } else {
+    setResults([]);
+  }
+};
+
+
 
   const goToProfile = (username) => {
     navigate(`/profile/${username}`);
@@ -113,8 +245,14 @@ const Search = () => {
 
   return (
     <div className="container">
-      <div className='row top'>
-        <h1 className='center primary fade-in'>Discover & Connect</h1>
+      <div className='row mt-4'>
+         <div className='row justify-content-center d-flex fade-in'>
+                          <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                        </div>
+                        <div className='row text-center fade-in'>
+                          <p className='primary'>⏐</p>
+                        </div>
+        <h1 className='center primary monarque fade-in'>Explore ResDex</h1>
         <br />
         <div className='d-flex justify-content-center input fade-in'>
           <div className="input-group search-input-group box d-flex" style={{maxWidth: '600px', outline: '1px solid white', borderRadius: '6px', marginBottom: '100px', padding: '20px'}}>
@@ -163,7 +301,7 @@ const Search = () => {
         viewBox="0 0 16 16"
       >
         <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z" />
-        <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z" />
+        <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1H8zm2 0h1v1H8zM8 5h1v1H8zm2 0h1v1H8zm2 0h1v1H8zm0-2h1v1H8z" />
       </svg>
       {result.organization}
     </i>
@@ -197,7 +335,7 @@ const Search = () => {
               ))}
             </div>
           ) : (
-            searchTerm.trim() !== "" && <p className='primary'>No results found</p>
+            searchTerm.trim() !== "" && <p className='primary'>No results found. Please enter 3 or more characters.</p>
           )}
         </div>
       </div>

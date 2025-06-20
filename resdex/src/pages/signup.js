@@ -1,15 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import Logo from '../images/index.png';
-import { collection, addDoc, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion, getDoc} from 'firebase/firestore';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 
 
 const Signup = () => {
+
+  useEffect(() => {
+        const scrollers = document.querySelectorAll(".scroller");
+        scrollers.forEach((scroller) => {
+          if (scroller.getAttribute("data-animated")) return;
+      
+          scroller.setAttribute("data-animated", true);
+          const scrollerInner = scroller.querySelector(".scroller__inner");
+          const scrollerContent = Array.from(scrollerInner.children);
+      
+          scrollerContent.forEach((item) => {
+            const duplicatedItem = item.cloneNode(true);
+            duplicatedItem.setAttribute("aria-hidden", true);
+            scrollerInner.appendChild(duplicatedItem);
+          });
+        });
+      
+        const fadeIns = document.querySelectorAll('.fade-in');
+      
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.05,
+          }
+        );
+      
+        fadeIns.forEach((el) => observer.observe(el));
+      
+        return () => {
+          fadeIns.forEach((el) => observer.unobserve(el));
+        };
+      }, []);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,22 +60,21 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSignup = async (e) => {
+ const handleSignup = async (e) => {
     e.preventDefault();
 
-  const username = displayName.toLowerCase().replace(/\s+/g, '');
-  const usernameRegex = /^[a-zA-Z0-9]+$/;
+    const username = displayName.toLowerCase().replace(/\s+/g, '');
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
 
-  if (username.length < 3) {
-    setError('Username must be at least 3 characters long');
-    return;
-  }
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return;
+    }
 
-  if (!usernameRegex.test(username)) {
-    setError('Username can only contain letters and numbers, with no spaces or special characters.');
-    return;
-  }
-
+    if (!usernameRegex.test(username)) {
+      setError('Username can only contain letters and numbers, with no spaces or special characters.');
+      return;
+    }
 
     if (password !== password2) {
       setError('Passwords do not match');
@@ -63,7 +102,6 @@ const Signup = () => {
       console.log("Updating user profile...");
       await updateProfile(auth.currentUser, { displayName: fullName });
 
-      // Write to Firestore
       console.log("Adding username to 'usernames' collection...");
       await setDoc(doc(db, 'usernames', username), {
         username: username,
@@ -81,6 +119,28 @@ const Signup = () => {
         contributions: 0,
       });
 
+      console.log("Adding user to 'searchIndex' collection array...");
+      const searchIndexRef = doc(db, 'searchIndex', 'usersList'); 
+
+      const searchIndexDoc = await getDoc(searchIndexRef);
+      if (!searchIndexDoc.exists()) {
+        await setDoc(searchIndexRef, {
+          users: [{
+            uid: user.uid,
+            username: username,
+            fullName: fullName,
+          }]
+        });
+      } else {
+        await updateDoc(searchIndexRef, {
+          users: arrayUnion({
+            userId: user.uid,
+            username: username,
+            fullName: fullName,
+          })
+        });
+      }
+
       console.log("Firestore write operations completed successfully");
       
       setSuccess('Verification email sent! Please check your inbox to verify your email address.');
@@ -94,6 +154,8 @@ const Signup = () => {
     }
   };
 
+
+
   const handlePassword2Change = (e) => {
     const value = e.target.value;
     setPassword2(value);
@@ -102,12 +164,12 @@ const Signup = () => {
 
   return (
     <div>
-      <div className='container'>
+      <div className='container fade-in top'>
     
         <div className='row d-flex justify-content-center'>
             <div className='col-md-5 box'>
             <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
-                <h3 className='center primary monarque'> ResDex – Sign Up</h3>
+                <h3 className='center primary monarque'>ResDex | Sign Up</h3>
                 <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
               </div>
               <div className='row d-flex justify-content-center'>

@@ -10,7 +10,10 @@ import { s3 } from '../cloudflareConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 import blank from '../images/empty-pic.webp';
+
 import { useNavigate } from 'react-router-dom';
+import Logo from '../images/dark-transparent.png';
+
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 
@@ -34,6 +37,8 @@ const getProfileFromLocalStorage = (username) => {
 };
 
 const Profile = () => {
+
+    
   const [isFollowing, setIsFollowing] = useState(false);
 const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -70,6 +75,13 @@ const [followerCount, setFollowerCount] = useState(0);
 const [followersList, setFollowersList] = useState([]);
 const [followersLoading, setFollowersLoading] = useState(false);
 
+const [showCopiedToast, setShowCopiedToast] = useState(false);
+
+const [showShareModal, setShowShareModal] = useState(false);
+
+const handleShareModalOpen = () => {
+  setShowShareModal(true);
+};
 
   const interestOptions = [
     { value: 'Technology', label: 'Technology' },
@@ -274,7 +286,15 @@ const firestoreUsername = userDocSnap.exists() ? userDocSnap.data().username : n
   
   
   
-  
+ const handleShareProfile = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    setShowCopiedToast(true);
+    setTimeout(() => setShowCopiedToast(false), 3000);
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+}; 
   
   
   
@@ -338,6 +358,18 @@ const confirmRemove = async () => {
     const updatedPdfs = pdfs.filter(pdf => pdf.objectKey !== pdfToRemove.objectKey);
     await updateDoc(doc(db, 'users', currentUser.uid), { pdfs: updatedPdfs });
 
+
+     const searchIndexDocRef = doc(db, 'searchIndex', 'papersList');
+    const searchIndexDoc = await getDoc(searchIndexDocRef);
+
+    if (searchIndexDoc.exists()) {
+      const papersList = searchIndexDoc.data().papers || [];
+      const updatedPapersList = papersList.filter(paper => paper.objectKey !== pdfToRemove.objectKey);
+
+      await updateDoc(searchIndexDocRef, { papers: updatedPapersList });
+    }
+
+    
     setPdfs(updatedPdfs);
     if (currentPdfIndex >= updatedPdfs.length) {
       setCurrentPdfIndex(Math.max(0, updatedPdfs.length - 1));
@@ -559,6 +591,7 @@ const updateInterests = useCallback(async (newInterests) => {
   };
   
   if (loading) {
+    
     return <p className='primary'>Loading...</p>;
   }
   
@@ -582,9 +615,8 @@ const updateInterests = useCallback(async (newInterests) => {
     multiValue: (provided) => ({
       ...provided,
       backgroundColor: '#1a1a1a',
-      padding:'10px',
-      margin: '1px',
-      borderRadius: '5px'
+      padding:'5px',
+      borderRadius: '50px'
     }),
     multiValueLabel: (provided) => ({
       ...provided,
@@ -602,10 +634,16 @@ const updateInterests = useCallback(async (newInterests) => {
   };
   
 
+
+
+  
+
   return (
     <div>
+
+      
     
-        <div className='row d-flex justify-content-center mt-3 fade-in' 
+        <div className='row fade-in2 d-flex justify-content-center mt-3' 
                style={{marginBottom: '20px'}}>
 
 
@@ -746,7 +784,43 @@ Edit Profile
   )}
 </div>
 
-  
+
+<div className='row d-flex justify-content-center'>
+            <div className='col'>
+
+            <div className='col-md' style={{position:'relative', textAlign: 'left'}}>                    
+                  {isOwnProfile && (
+                      <button
+  className="custom-view"
+  onClick={handleShareModalOpen}
+  style={{ padding: '10px 20px', borderRadius: '100px' }}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="white"
+    className="bi bi-share-fill"
+    viewBox="0 0 16 16"
+    style={{ marginRight: "8px" }}
+  >
+    <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
+  </svg>
+  Share Profile
+</button>
+                    )
+                    }
+              </div>
+              </div>
+
+        
+          
+          </div>
+
+
+
+
+ 
 
             </div>
            
@@ -819,6 +893,8 @@ Edit Profile
   </div>
   </div>
   
+
+
 
   <div className='mt-5'>
 
@@ -912,37 +988,45 @@ Edit Profile
 
       <Modal show={isModalOpen} onHide={handleModalClose} className='box'>
         <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
-          <Modal.Title className='primary'>Edit Profile</Modal.Title>
+          <Modal.Title className='primary'>
+             <div className='row justify-content-left'>
+                              <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                            </div>
+                            <div className='row'>
+                            </div>
+                            Edit Profile</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
           <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
-           <p><strong className='primary'>About</strong></p>
+          <p className='primary'>About</p>
           <textarea
           spellcheck="false"
             maxLength="300"
             value={newAbout}
             onChange={(e) => setNewAbout(e.target.value)}
             rows="6"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'10px' }}
           />
           </div>
           <br></br>
+
+          
         
 <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
-          <p><strong className='primary'>Organization</strong></p>
+         <p className='primary'>Organization</p>
           <textarea
           spellcheck="false"
             maxLength="40"
             value={newOrganization}
             onChange={(e) => setNewOrganization(e.target.value)}
             rows="1"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
+            style={{ width: '100%', color: 'black', borderRadius: '5px', border: '1px solid white', resize: "none", padding:'10px' }}
           />
           </div>
 
 
 <br></br>
-<p><strong className='primary'>Interests</strong></p>
+<p className='primary'>Interests</p>
 <Select
      isMulti
      name="interests"
@@ -1073,6 +1157,20 @@ Edit Profile
 </Modal>
 
 
+{showCopiedToast && (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    backgroundColor: '#2a2a2a',
+    color: 'white',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    zIndex: 9999
+  }}>
+    Profile link copied to clipboard!
+  </div>
+)}
 
       
     <Modal show={showRemoveModal}  className='box' onHide={() => setShowRemoveModal(false)}>
@@ -1124,6 +1222,43 @@ Edit Profile
     </div>
   </Modal.Footer>
 </Modal>
+
+
+{/* Share Profile Modal */}
+<Modal show={showShareModal} onHide={() => setShowShareModal(false)} centered>
+  <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
+    <Modal.Title className='primary'>Share Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    <div className="text-center">
+      <p className='primary'>Share this profile with others</p>
+      <div className="input-group mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={window.location.href}
+          readOnly
+        />
+        <button
+          className="btn custom-view"
+          onClick={handleShareProfile}
+        >
+          Copy Link
+        </button>
+      </div>
+      
+      <div className="d-flex justify-content-center gap-3 mt-3">
+        
+      </div>
+    </div>
+  </Modal.Body>
+  <Modal.Footer style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
+    <button className='custom-view' onClick={() => setShowShareModal(false)}>
+      Close
+    </button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 

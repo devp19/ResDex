@@ -1,8 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebaseConfig';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
+import Logo from '../images/dark-transparent.png';
+
 
 const Notifications = () => {
+
+  useEffect(() => {
+      // Animate scrolling marquee once
+      const scrollers = document.querySelectorAll(".scroller");
+      scrollers.forEach((scroller) => {
+        if (scroller.getAttribute("data-animated")) return;
+    
+        scroller.setAttribute("data-animated", true);
+        const scrollerInner = scroller.querySelector(".scroller__inner");
+        const scrollerContent = Array.from(scrollerInner.children);
+    
+        scrollerContent.forEach((item) => {
+          const duplicatedItem = item.cloneNode(true);
+          duplicatedItem.setAttribute("aria-hidden", true);
+          scrollerInner.appendChild(duplicatedItem);
+        });
+      });
+    
+      // Fade-in on scroll using IntersectionObserver
+      const fadeIns = document.querySelectorAll('.fade-in');
+    
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); // Optional: fade-in only once
+            }
+          });
+        },
+        {
+          threshold: 0.05,
+        }
+      );
+    
+      fadeIns.forEach((el) => observer.observe(el));
+    
+      return () => {
+        fadeIns.forEach((el) => observer.unobserve(el));
+      };
+    }, []);
+    
   const [notifications, setNotifications] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [visibleCount, setVisibleCount] = useState(5);
@@ -149,7 +193,13 @@ const Notifications = () => {
 
   return (
     <div className='mt-4 fade-in'>
-      <h1 className='primary text-center'>Notifications</h1>
+      <div className='row justify-content-center d-flex display fade-in'>
+                  <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                </div>
+                <div className='row text-center fade-in'>
+                  <p className='primary'>⏐</p>
+                </div>
+      <h1 className='primary monarque text-center'>Notifications</h1>
       <div className='row d-flex justify-content-center' style={{ marginRight: '20px', marginTop: '30px' }}>
         <div className='col-md-7 d-flex justify-content-center'>  
           <ul className='mt-4'>

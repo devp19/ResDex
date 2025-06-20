@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '../images/dark-transparent.png';
 import TMU from '../images/tmu.png';
@@ -6,39 +6,184 @@ import MAC from '../images/mac.png';
 import OTTAWA from '../images/ottawa.png';
 import UFT from '../images/uft.png';
 import LOO from '../images/loo.png';
+import CAPTION from '../images/captionblack.png';
 import Alert from 'react-bootstrap/Alert';
 import Empty from '../images/empty-pic.webp';
 
 
+// import { db } from '../firebaseConfig';
+// import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
+
+
+
 const Home = () => {
+
+  // useEffect(() => {
+  //   const scrollers = document.querySelectorAll(".scroller");
+
+  //   function addAnimation() {
+  //     scrollers.forEach((scroller) => {
+  //       if (scroller.getAttribute("data-animated")) return;
+
+  //       scroller.setAttribute("data-animated", true);
+
+  //       const scrollerInner = scroller.querySelector(".scroller__inner");
+  //       const scrollerContent = Array.from(scrollerInner.children);
+
+  //       scrollerContent.forEach((item) => {
+  //         const duplicatedItem = item.cloneNode(true);
+  //         duplicatedItem.setAttribute("aria-hidden", true);
+  //         scrollerInner.appendChild(duplicatedItem);
+  //       });
+  //     });
+
+  //     // Trigger fade-in effect
+  //     document.querySelectorAll('.fade-in').forEach(element => {
+  //       element.classList.add('visible');
+  //     });
+  //   }
+
+  //   addAnimation();
+  // }, []); // Empty dependency array ensures this only runs once on mount
+
+
+  useEffect(() => {
+  const scrollers = document.querySelectorAll(".scroller");
+  scrollers.forEach((scroller) => {
+    if (scroller.getAttribute("data-animated")) return;
+
+    scroller.setAttribute("data-animated", true);
+    const scrollerInner = scroller.querySelector(".scroller__inner");
+    const scrollerContent = Array.from(scrollerInner.children);
+
+    scrollerContent.forEach((item) => {
+      const duplicatedItem = item.cloneNode(true);
+      duplicatedItem.setAttribute("aria-hidden", true);
+      scrollerInner.appendChild(duplicatedItem);
+    });
+  });
+
+  const fadeIns = document.querySelectorAll('.fade-in');
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.05,
+    }
+  );
+
+  fadeIns.forEach((el) => observer.observe(el));
+
+  return () => {
+    fadeIns.forEach((el) => observer.unobserve(el));
+  };
+}, []);
+
+
+
+const testimonials = [
+    {
+      id: 1,
+      quote: "ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It's exactly what the academic community has been missing.",
+      author: "Joseph J.",
+      position: "Health Sciences, McMaster",
+      image: Empty
+    },
+    {
+      id: 2,
+      quote: "ResDex has been a game-changer for me as a PhD student. It's incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver.",
+      author: "Lamar B.",
+      position: "Nursing, University of Toronto",
+      image: Empty
+    },
+    {
+      id: 3,
+      quote: "ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity.",
+      author: "Darnold J.",
+      position: "High School Student",
+      image: Empty
+    },
+    {
+      id: 4,
+      quote: "The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts.",
+      author: "Catherine M.",
+      position: "Professor, McMaster",
+      image: Empty
+    }
+  ];
+
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  
+  useEffect(() => {
+    let interval;
+    if (isAutoPlaying) {
+      interval = setInterval(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, testimonials.length]);
+
+  const goToTestimonial = (index) => {
+    setCurrentTestimonial(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToNext = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToPrev = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
 
   useEffect(() => {
     const scrollers = document.querySelectorAll(".scroller");
+    scrollers.forEach((scroller) => {
+      if (scroller.getAttribute("data-animated")) return;
 
-    function addAnimation() {
-      scrollers.forEach((scroller) => {
-        if (scroller.getAttribute("data-animated")) return;
+      scroller.setAttribute("data-animated", true);
+      const scrollerInner = scroller.querySelector(".scroller__inner");
+      const scrollerContent = Array.from(scrollerInner.children);
 
-        scroller.setAttribute("data-animated", true);
+      scrollerContent.forEach((item) => {
+        const duplicatedItem = item.cloneNode(true);
+        duplicatedItem.setAttribute("aria-hidden", true);
+        scrollerInner.appendChild(duplicatedItem);
+      });
+    });
 
-        const scrollerInner = scroller.querySelector(".scroller__inner");
-        const scrollerContent = Array.from(scrollerInner.children);
-
-        scrollerContent.forEach((item) => {
-          const duplicatedItem = item.cloneNode(true);
-          duplicatedItem.setAttribute("aria-hidden", true);
-          scrollerInner.appendChild(duplicatedItem);
+    const fadeIns = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
         });
-      });
+      },
+      { threshold: 0.05 }
+    );
 
-      // Trigger fade-in effect
-      document.querySelectorAll('.fade-in').forEach(element => {
-        element.classList.add('visible');
-      });
-    }
+    fadeIns.forEach((el) => observer.observe(el));
+    return () => fadeIns.forEach((el) => observer.unobserve(el));
 
-    addAnimation();
-  }, []); // Empty dependency array ensures this only runs once on mount
+    
+  }, []);
 
   return (
     <div>
@@ -77,124 +222,170 @@ const Home = () => {
         </div>
         </div>
       </div>
-
-
-      <div className='container fade-in'>
         <div className='horizontal-line'></div>
-        <div className='row justify-content-center top'>
-        <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content'>
-                <h3 className='akros primary'> CREDENTIALS </h3>
-                <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
-              </div>
+
+
+
+ 
+
+
+
+  <div className='fade-in'>
+
+        <div>
+          <div className='row justify-content-center d-flex display fade-in' style={{marginTop: '75px'}}>
+            <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+          </div>
+          <div className='row text-center fade-in'>
+            <p className='primary'>⏐</p>
+          </div>
+          <div className='row text-center fade-in'>
+            <p className='monarque primary' style={{ fontSize: '55px'}}>ResDex</p>
+            <div className= 'col-md-7 justify-content-center mx-auto'>
+                  
+<p className='primary'style={{ fontSize: '20px', marginBottom: '25px' }}>As students, we understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.</p>
             </div>
-            <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content primary'>
-              <h3 className='akros primary'> CONNECT </h3>
-                <p className='primary mt-4'>Connects students with PhD professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
-              </div>
-            </div>
-            <div className='col-md-4 box mx-3 mb-3'>
-              <div className='column-content primary'>
-              <h3 className='akros primary'> PEER REVIEW </h3>
-                <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
-              </div>
-            </div>        </div>
+            
+         </div>
+        
+
+          
+          {/* <div className='center fade-in'>
+            <p className='monarque primary secondary'>Learn More</p>
+          </div> */}
+
+      
+        </div>
       </div>
 
-      <div className='container fade-in top'>
+
+<div className='container fade-in' style={{marginTop: '70px'}}>
         {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
         <div className='row d-flex justify-content-center fade-in'>
         <div class="scroller box " data-direction="right" data-speed="slow">
             <div class="scroller__inner mb-4">
-              <img style={{height: '60px', marginRight: '30px'}} src={TMU} alt="" />
-              <img style={{height: '60px',  marginRight: '30px', marginLeft: '30px'}} src={MAC} alt="" />
-              <img style={{height: '60px'}} src={OTTAWA} alt="" />
-              <img style={{height: '60px'}} src={UFT} alt="" />
-              <img style={{height: '60px'}} src={LOO} alt="" />
+              <img style={{height: '50px', marginRight: '30px'}} src={TMU} alt="" />
+              <img style={{height: '50px',  marginRight: '30px', marginLeft: '30px'}} src={MAC} alt="" />
+              <img style={{height: '50px'}} src={OTTAWA} alt="" />
+              <img style={{height: '50px'}} src={UFT} alt="" />
+              <img style={{height: '50px'}} src={LOO} alt="" />
             </div>
       </div>        
       </div>
       </div>
 
+<div className='center pt-4 fade-in' style={{marginTop: '50px'}}>
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd">
+              <path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/>
+            </svg>
+          </div>
+          
+      <div className='container' style={{marginTop: '100px'}}>
+        <div className='row justify-content-center'>
+        <div className='col-md-3 mb-3 fade-in' style={{borderRight: '1px solid #2a2a2a'}}>
+              <div className='column-content'>
+                <h3 className='kugile primary' style={{fontSize: '24px'}}> CREDENTIALS  </h3>
+                <p className='primary mt-4'>Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.</p>
+              </div>
+            </div>
+            <div className='col-md-3 mb-3 fade-in'>
+              <div className='column-content primary'>
+              <h3 className='kugile primary' style={{fontSize: '24px'}}> CONNECT </h3>
+                <p className='primary mt-4'>Connect students with professionals, enhancing visibility and promoting equitable opportunities for underrepresented groups.</p>
+              </div>
+            </div>
+            <div className='col-md-3 mb-3 fade-in' style={{borderLeft: '1px solid #2a2a2a'}}>
+              <div className='column-content primary'>
+              <h3 className='kugile primary' style={{fontSize: '24px'}}> PEER REVIEW </h3>
+                <p className='primary mt-4'> Constructive peer review capabilities, helping students refine their research and enhance their academic skills.</p>
+              </div>
+            </div>        </div>
+            <div className= 'horizontal-line d-flex' style={{marginTop: '-17px', maxWidth: '80%', alignSelf: 'center', justifySelf: 'center'}}>
+
+            </div>
+            <div className='row justify-content-center'>
+        <div className='col-md-3 mb-3 fade-in'>
+              <div className='column-content'>
+                <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> ENGAGE </h3>
+                <p className='primary mt-4'>Prioritizes student success through tailored support, inclusive programming, and accessible resources designed to meet diverse academic and career goals.</p>
+              </div>
+            </div>
+            <div className='col-md-1  mb-3'style={{borderLeft: '1px solid #2a2a2a', marginRight: '-110px'}}>
+            </div>
+            <div className='col-md-3 mb-3 fade-in'>
+              <div className='column-content primary'>
+              <h3 className='kugile primary' style={{paddingTop: '15px', fontSize: '24px'}}> SHOWCASE </h3>
+                <p className='primary mt-4'>Empowers students to present their work through curated events, digital portfolios, and publication opportunities that highlight talent and innovation.</p>
+              </div>
+            </div>
+                   </div>
+      </div>
+
+    
+
+
+
+
 <div className='horizontal-line' style={{marginTop: '90px'}}></div>
-    <div className='container'>
-      <p className='primary center top akros' style={{ fontSize: '30px', marginBottom: '30px' }}>Testimonials</p>
+<div className="testimonials-section">
+      <div className='container'>
+        <div className='row justify-content-center d-flex display fade-in'style={{marginBottom: '-180px' }}>
+            <img src={CAPTION} style={{ maxWidth: '250px'}} alt='captionblack'></img>
+          </div>
+        <p className='primary center top baskerville fade-in' style={{ fontSize: '30px', marginBottom: '-10px' }}>Their Voice, Your Call</p>
+        
+    
 
-       <div className='row d-flex justify-content-center'>
-     
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has streamlined the entire research process for students like me. From publication to networking, everything is in one place, making collaboration with other students and experienced researchers so much easier. It’s exactly what the academic community has been missing."</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-            src={Empty} 
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Joseph J.<br></br> Health Sciences, McMaster</p>
-    </div>
-      </div>
-
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"ResDex has been a game-changer for me as a PhD student. It’s incredibly intuitive to navigate, and the platform has made networking with other researchers effortless. Having everything from publication to peer review streamlined in one place is a massive time-saver. Highly recommended for students and researchers alike!"</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Lamar B. <br></br> Nursing, University of Toronto</p>
-    </div>
+    
+    <div className="testimonial-carousel">
+      <div className="testimonial-box">
+        <button 
+          className="carousel-button left-button" 
+          onClick={goToPrev}
+          aria-label="Previous testimonial"
+        >
+          <p className='primary kugile mt-3'>&lt;</p>
+        </button>
+        
+        <div className="testimonial-content">
+          <h3 className="testimonial-number">{testimonials[currentTestimonial].number}</h3>
+          <blockquote className="testimonial-quote">
+            "{testimonials[currentTestimonial].quote}"
+          </blockquote>
+          <div className="testimonial-author">
+            <img 
+              src={testimonials[currentTestimonial].image} 
+              alt={testimonials[currentTestimonial].author}
+              className="author-image"
+            />
+            <div>
+              <p className="author-name">{testimonials[currentTestimonial].author}</p>
+              <p className="author-position">{testimonials[currentTestimonial].position}</p>
+            </div>
+          </div>
+        </div>
+        
+        <button 
+          className="carousel-button right-button" 
+          onClick={goToNext}
+          aria-label="Next testimonial"
+        >
+          <p className='primary kugile mt-3'>&gt;</p>
+        </button>
       </div>
       
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
-      <p style={{padding: '20px'}}><i className='primary'>"ResDex has transformed the way I approach research publications. The ease of managing and reviewing work, coupled with a student-friendly interface, has boosted my productivity. It’s wonderful to see a platform so dedicated to supporting students and emerging researchers!"</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Darnold J. <br></br> High School Student</p>
-    </div>
-      </div>
-      <div className='col-md-4 box mb-3 testimonial' style={{margin: '20px'}}>
-      <p className='primary' style={{padding: '20px'}}><i className='primary'>"The innovative features on ResDex are exactly what the research community needed. As a professor, I can see the tremendous potential this platform holds for connecting students with experts and encouraging collaborative work. ResDex is fostering a new era of research accessibility and community."</i></p>
-      <div className='row' style={{paddingLeft: '20px'}}>
-
-      <div className='col-md-4'>
-      <div className="profile-pic-2">
-        <img 
-             src={Empty}  
-            alt="Profile of Dev Patel" 
-            className="profile-img-2"
-        />
-    </div>
-      </div>
-
-      <p className='col-md-12 primary'>Catherine M.<br></br> Professor, McMaster</p>
-    </div>
+      <div className="carousel-indicators">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            className={`indicator ${index === currentTestimonial ? 'active' : ''}`}
+            onClick={() => goToTestimonial(index)}
+          />
+        ))}
       </div>
     </div>
-    </div>
+  </div>
+</div>
 
 
       <div className='center-sample fade-in pt-4'>

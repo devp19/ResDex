@@ -58,19 +58,18 @@ const ReleaseDocs = () => {
             <h2 className='pt-4 mt-4 primary'> Version 1 | Releases</h2>
                
                 <div className='row d-flex justify-content-center pt-4'>
-                     
+
 
 <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.05</strong> | Platform Optimization</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.31</strong> | Document Tagging & Search Enhancement</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.05 focused on UI refinements, including navbar icon updates, storage backend migration from AWS S3 to Cloudflare R2, and repository cleanup to optimize performance and consistency.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.31 introduced document tagging during upload, enhanced search functionality by topic filtering, and improved frontend caching for better performance.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Refinements</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Storage Migration</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Codebase Cleanup</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Document Tagging</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Caching Optimzation</p></div>
 
                           </div>
                          
@@ -78,9 +77,103 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                           <Link to="/releasedocs/v105" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                           <Link to="/releasedocs/v131" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        April 29th, 2025 | Author: Tirth Patel
+                        November 5th, 2024 | Author: Tirth Patel
+                        </div>
+                    </div>   
+
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.30</strong> | Profile Tags & Edit Controls</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.30 introduced editable user tags, PDF metadata editing, and major UI layout improvements for profiles and dashboards.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Tags System</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>PDF Editing</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v121" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        November 4th, 2024 | Author: Tirth Patel
+                        </div>
+                    </div>                     
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.21</strong> | UI Cleanup & Modals</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.21 focused on interface refinements, modal-driven profile editing, and the introduction of key informational pages including Release Docs and Contact.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Cleanup</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Modals</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v121" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        November 2nd, 2024 | Author: Tirth Patel
+                        </div>
+                    </div>
+
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.20</strong> | Search Functionality</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.20 introduced user search functionality and PDF document searching by title, along with UI adjustments to improve navigation and content display.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Search Function</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Updates</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v120" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        October 31st, 2024 | Author: Tirth Patel
+                        </div>
+                    </div>
+
+<div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
+                        <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.12</strong> | Authentication & Upload Fixes</p>
+                        </div>
+                        <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.12 addressed authentication flow bugs, tightened username validation, and introduced upload limits to enhance platform security and stability.</p>
+                            <br></br>
+                          <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Authentication Fix</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Upload Tweaks</p></div>
+
+                          </div>
+                         
+                        </div>
+                   
+                        <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
+                           
+                           <Link to="/releasedocs/v112" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                        <br></br>
+                        October 29th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 
@@ -89,14 +182,14 @@ const ReleaseDocs = () => {
 
 <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.04</strong> | UI/UX Improvements</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.11</strong> | Document Removal</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.04 introduced enhanced user collaboration, improved connection logic, and refined UI transitions across contact and document creation features.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.11 introduced the ability to securely remove uploaded documents from AWS S3 with real-time UI updates reflecting the changes.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Collaboration Features</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>System & Logic Enhancements</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Document Management</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Updates</p></div>
 
                           </div>
                          
@@ -104,9 +197,9 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                           <Link to="/releasedocs/v104" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                           <Link to="/releasedocs/v111" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        January 29th, 2025 | Author: Tirth Patel
+                        October 24th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 
@@ -114,15 +207,15 @@ const ReleaseDocs = () => {
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.03</strong> | Notifications & Profile Updates</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.10</strong> | Profile Expansion</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.03 introduced a complete notification system, overhauled the follow feature into mutual connections, and enhanced profile layout and search functionality.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.10 introduced public profile viewing, enhanced profile editing features, and major improvements to PDF resume uploading and secure viewing via AWS S3.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Notification System</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Connection Logic Tweaks</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Profile & Search UI Updates</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>User Profiles</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>PDF Management</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Security Enhancements</p></div>
 
                           </div>
                          
@@ -130,9 +223,9 @@ const ReleaseDocs = () => {
                    
                         <div className='row primary' style={{marginLeft: '10px', marginRight: '10px', marginTop:'30px', paddingBottom:'10px', fontSize: '12px'}}>
                            
-                           <Link to="/releasedocs/v103" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
+                           <Link to="/releasedocs/v110" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        December 17th, 2024 | Author: Tirth Patel
+                        October 23th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 
@@ -141,15 +234,15 @@ const ReleaseDocs = () => {
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.02</strong> | User Development</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.02</strong> | Cloud Storage</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.02 implemented role-based access controls, enhanced PDF viewing performance, and added basic audit logging for user activity.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.02 introduced cloud storage capabilities, avatar image uploads, PDF resume handling with Amazon S3, and optimized data caching to improve performance and reduce costs.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>PDF Performance</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Role-Based Access</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Audit Logging</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Cloud Storage</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>PDF Upload</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Performance Optimization</p></div>
 
                           </div>
                          
@@ -159,7 +252,7 @@ const ReleaseDocs = () => {
                            
                            <Link to="/releasedocs/v102" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        October 2nd, 2024 | Author: Dev Patel
+                        October 18th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 
@@ -170,14 +263,14 @@ const ReleaseDocs = () => {
 
                     <div style={{borderRadius: '10px', margin: '10px'}} className='col-md-3 box border'>
                         <div className='row' style={{marginLeft: '10px', marginRight: '10px', fontSize: '30px'}}>
-                            <p className='col-md monarque primary'> <strong className='primary'>V1.01</strong> | App Configuration</p>
+                            <p className='col-md monarque primary'> <strong className='primary'>V1.01</strong> | Signup Verification</p>
                         </div>
                         <div className='row d-flex' style={{margin: '10px', fontSize: '30px'}}>
-                            <p className='primary' style={{fontSize: '15px'}}> V1.01 added support for custom domain configuration, improved error handling across the app, and optimized backend API response times.</p>
+                            <p className='primary' style={{fontSize: '15px'}}> V1.01 introduced Firebase-based authentication, including sign-in, password reset, and profile initialization with user-specific data handling.</p>
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Domain</p></div>
-                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Backend API</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Authentication</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Firebase Integration</p></div>
 
                           </div>
                          
@@ -187,7 +280,7 @@ const ReleaseDocs = () => {
                            
                            <Link to="/releasedocs/v101" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        September 10th, 2024 | Author: Dev Patel
+                        October 16th, 2024 | Author: Tirth Patel
                         </div>
                     </div>
 
@@ -203,6 +296,8 @@ const ReleaseDocs = () => {
                             <br></br>
                           <div className='col-md-12 d-flex flex-wrap' style={{marginTop: '10px'}}>
                             <div style={{fontSize: '10px'}}><p className='interest-pill'>General Development</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>UI Foundation</p></div>
+                            <div style={{fontSize: '10px'}}><p className='interest-pill'>Initial Launch</p></div>
 
                           </div>
                          
@@ -212,7 +307,7 @@ const ReleaseDocs = () => {
                            
                            <Link to="/releasedocs/v100" className='col-md custom-view' style={{ textDecoration: 'none' }}>Read ↗︎</Link>
                         <br></br>
-                        August 23rd, 2024 | Author: Dev Patel
+                        October 13th, 2024 | Author: Dev Patel
                         </div>
                     </div>
 

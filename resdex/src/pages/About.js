@@ -1,8 +1,48 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import About1 from '../images/index.png'
 import About2 from '../images/indexinv.png'
 
 const About = () => {
+
+  useEffect(() => {
+      const scrollers = document.querySelectorAll(".scroller");
+      scrollers.forEach((scroller) => {
+        if (scroller.getAttribute("data-animated")) return;
+    
+        scroller.setAttribute("data-animated", true);
+        const scrollerInner = scroller.querySelector(".scroller__inner");
+        const scrollerContent = Array.from(scrollerInner.children);
+    
+        scrollerContent.forEach((item) => {
+          const duplicatedItem = item.cloneNode(true);
+          duplicatedItem.setAttribute("aria-hidden", true);
+          scrollerInner.appendChild(duplicatedItem);
+        });
+      });
+    
+      const fadeIns = document.querySelectorAll('.fade-in');
+    
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); 
+            }
+          });
+        },
+        {
+          threshold: 0.05,
+        }
+      );
+    
+      fadeIns.forEach((el) => observer.observe(el));
+    
+      return () => {
+        fadeIns.forEach((el) => observer.unobserve(el));
+      };
+    }, []);
+  
   return (
     <div style={{marginRight: '10px', marginLeft: '10px'}}>
    

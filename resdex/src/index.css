@@ -1,5 +1,7 @@
 *{
-  color: white;
+  color: rgb(255, 255, 255);
+  scroll-behavior: smooth;
+
 }
 
 @font-face {
@@ -10,11 +12,41 @@
   font-family: Monarque;
   src: url("./fonts/Monarque-Italic.woff") format("woff");
 }
-
+@font-face {
+  font-family: Baskerville;
+  src: url("./fonts/LibreBaskerville-Regular.woff") format("woff");
+}
+@font-face {
+  font-family: HelveticaBold;
+  src: url("./fonts/Helvetica-Bold.woff") format("woff");
+}
+@font-face {
+  font-family: Kugile;
+  src: url("./fonts/Kugile_Demo.woff") format("woff");
+}
 .akros {
   font-family: Akros;
   font-weight: normal;
   font-style: normal;
+}
+
+.kugile {
+  font-family: Kugile;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.baskerville {
+  font-family: Baskerville;
+  font-weight: normal;
+  font-style: normal;
+  
+}
+.helveticabold {
+  font-family: HelveticaBold;
+  font-weight: normal;
+  font-style: normal;
+  
 }
 
 a {
@@ -314,6 +346,17 @@ code {
 .custom-edit:hover {
   transform: translateY(-10px);
 
+}
+
+.footeranimate {
+  display: flex;
+  transition: 0.5s;
+  justify-content: center;
+}
+
+.footeranimate:hover{
+  transform: translateY(-5px);
+  font-size: 18px;
 }
 
 
@@ -652,6 +695,102 @@ border-top: 1px solid white;
   color: white;
 }
 
+/* NEW BEGINNING */
+
+/* Testimonial Carousel Styles */
+.testimonial-carousel {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  padding: 20px;
+}
+
+.carousel-slide {
+  animation: fadeIn 0.5s ease;
+  margin-bottom: 30px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.carousel-slide h1 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.carousel-controls button {
+  background: none;
+  border: 0px solid #2a2a2a;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  color: #2a2a2a;
+  transition: all 0.3s ease;
+}
+
+.carousel-controls button:hover {
+  background: #f0f0f0;
+}
+
+/*bubbles*/
+.indicators {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #5e5e5e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background: #2a2a2a;
+  transform: scale(1.2);
+}
+
+.indicator:hover {
+  background: #b6b6b6;
+}
+
+/* Keep your existing testimonial styles */
+.testimonial {
+  margin: 20px;
+  transition: all 0.3s ease;
+}
+
+.profile-pic-2 {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+}
+
+.profile-img-2 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* NEW END */
+
 .carousel-control-prev-icon {
   background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='primary' viewBox='0 0 16 16'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L6.707 7l4.647 4.646a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
 }
@@ -667,7 +806,7 @@ border-top: 1px solid white;
 }
 
 .scroller {
-  max-width: 600px;
+  max-width: 1000px;
 }
 
 .scroller__inner {
@@ -718,19 +857,29 @@ border-top: 1px solid white;
 }
 
 
-.fade-in {
+.fade-in2 {
   opacity: 0;
-  transform: translateY(-20px);
-  animation: fadeIn 1s ease-out forwards;
+  transform: translateY(-50px);
+  animation: fade-in2 1.5s ease-out forwards;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in2 {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+.fade-in {
+  opacity: 0;
+  transform: translateY(-50px);
+  transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 
 label {
@@ -810,3 +959,240 @@ button {
 }
 
 
+
+
+
+
+/* Testimonial Box with integrated buttons */
+
+
+/* Navigation Buttons - now positioned inside the box */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.carousel-button:hover {
+  background: #f8f9fa;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.left-button {
+  left: -50px; /* Half outside the box */
+}
+
+.right-button {
+  right: -50px; /* Half outside the box */
+}
+
+/* Testimonial Content */
+.testimonial-content {
+  padding: 0 1rem; /* Give space so text doesn't touch buttons */
+}
+
+/* Rest of your existing testimonial styles... */
+.testimonial-number {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.testimonial-quote {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #2a2a2a;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.author-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.2rem;
+}
+
+.author-position {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+/* Indicators */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 1.0rem;
+  margin-top: 2rem;
+}
+
+.indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #8a8a8a;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background: #333;
+}
+
+/* Navigation tooltips */
+.nav-link, .nav-button {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  margin-bottom: 10px;
+  z-index: 100;
+  pointer-events: none;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Make sure your nav container has proper stacking */
+.nav-container {
+  position: relative;
+  z-index: 10;
+}
+.z-index-tooltip {
+  z-index: 9999;
+}
+/* Team.css */
+.team-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  height: auto;
+  min-height: 300px;
+}
+
+.team-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.member-bio {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.team-card:hover .member-bio {
+  max-height: 200px;
+  opacity: 1;
+}
+
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: 3px solid #f0f0f0;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.profile-position {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.social-links {
+  margin-top: 15px;
+}
+
+.social-links a {
+  transition: transform 0.3s ease;
+}
+
+.social-links a:hover {
+  transform: scale(1.2);
+}
+
+
+
+
+.box .modal-content {
+  border-radius: 12px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.223);
+  border: 2px solid rgb(255, 255, 255);
+  background-color: white;
+}

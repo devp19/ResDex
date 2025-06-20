@@ -41,82 +41,167 @@ const PDFUpload = ({ user, onUploadComplete }) => {
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile || !user || !title.trim()) return;
+//   const handleUpload = async () => {
+//     if (!selectedFile || !user || !title.trim()) return;
 
-    setLoading(true);
-    setShowModal(false);
-    setErrorModal(false);
+//     setLoading(true);
+//     setShowModal(false);
+//     setErrorModal(false);
 
-    try {
-      const userDocRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDoc(userDocRef);
-      const currentPdfs = docSnapshot.exists() ? docSnapshot.data().pdfs || [] : [];
+//     try {
+//       const userDocRef = doc(db, 'users', user.uid);
+//       const docSnapshot = await getDoc(userDocRef);
+//       const currentPdfs = docSnapshot.exists() ? docSnapshot.data().pdfs || [] : [];
 
-      const today = new Date().toISOString().split('T')[0];
-      const todaysUploads = currentPdfs.filter(pdf => pdf.uploadDate.startsWith(today));
+//       const today = new Date().toISOString().split('T')[0];
+//       const todaysUploads = currentPdfs.filter(pdf => pdf.uploadDate.startsWith(today));
       
-      if (todaysUploads.length >= MAX_UPLOADS_PER_DAY) {
-        setLoading(false);
-        setErrorMessage(`You have reached the daily limit of ${MAX_UPLOADS_PER_DAY} uploads.`);
-        setErrorModal(true);
-        return;
-      }
+//       if (todaysUploads.length >= MAX_UPLOADS_PER_DAY) {
+//         setLoading(false);
+//         setErrorMessage(`You have reached the daily limit of ${MAX_UPLOADS_PER_DAY} uploads.`);
+//         setErrorModal(true);
+//         return;
+//       }
 
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('userId', user.uid);
+//       const formData = new FormData();
+//       formData.append('file', selectedFile);
+//       formData.append('userId', user.uid);
 
-      const response = await fetch('https://resdex.onrender.com/upload', {
-        method: 'POST',
-        body: formData,
-      });
+//       const response = await fetch('https://resdex.onrender.com/upload', {
+//         method: 'POST',
+//         body: formData,
+//       });
 
-      const result = await response.json();
+//       const result = await response.json();
 
-      if (!result.success) {
-        throw new Error('Upload failed');
-      }
+//       if (!result.success) {
+//         throw new Error('Upload failed');
+//       }
 
-      const workerUrl = result.url.replace(
-  'https://pub-b9219a60c2ea4807b8bb38a7c82cf268.r2.dev',
-  'https://resdex-r2-proxy.devptl841806.workers.dev'
-);
+//       const workerUrl = result.url.replace(
+//   'https://pub-b9219a60c2ea4807b8bb38a7c82cf268.r2.dev',
+//   'https://resdex-r2-proxy.devptl841806.workers.dev'
+// );
 
-const pdfData = {
-  url: workerUrl,        
-  objectKey: result.objectKey, 
-  title: title,
-  description: description,
-  uploadDate: new Date().toISOString(),
-  topics: selectedTopics.map(topic => topic.value),
+// const pdfData = {
+//   url: workerUrl,        
+//   objectKey: result.objectKey, 
+//   title: title,
+//   description: description,
+//   uploadDate: new Date().toISOString(),
+//   topics: selectedTopics.map(topic => topic.value),
+// };
+
+
+//       if (!docSnapshot.exists()) {
+//         await setDoc(userDocRef, { pdfs: [pdfData] });
+//       } else {
+//         await updateDoc(userDocRef, { pdfs: arrayUnion(pdfData) });
+//       }
+
+//       if (onUploadComplete) {
+//         onUploadComplete(user.uid);
+//       }
+
+//       setTitle('');
+//       setDescription('');
+//       setSelectedFile(null);
+//       setErrorMessage('');
+//       setSelectedTopics([]);
+//       window.location.reload();
+//     } catch (error) {
+//       console.error('Error uploading PDF: ', error);
+//       setErrorMessage('Failed to upload. Please try again.');
+//       setErrorModal(true);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+const handleUpload = async () => {
+  if (!selectedFile || !user || !title.trim()) return;
+
+  setLoading(true);
+  setShowModal(false);
+  setErrorModal(false);
+
+  try {
+    const userDocRef = doc(db, 'users', user.uid);
+    const docSnapshot = await getDoc(userDocRef);
+    const currentPdfs = docSnapshot.exists() ? docSnapshot.data().pdfs || [] : [];
+
+    const today = new Date().toISOString().split('T')[0];
+    const todaysUploads = currentPdfs.filter(pdf => pdf.uploadDate.startsWith(today));
+
+    if (todaysUploads.length >= MAX_UPLOADS_PER_DAY) {
+      setLoading(false);
+      setErrorMessage(`You have reached the daily limit of ${MAX_UPLOADS_PER_DAY} uploads.`);
+      setErrorModal(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('userId', user.uid);
+
+    const response = await fetch('https://resdex.onrender.com/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error('Upload failed');
+    }
+
+    const workerUrl = result.url.replace(
+      'https://pub-b9219a60c2ea4807b8bb38a7c82cf268.r2.dev',
+      'https://view.resdex.ca'
+    );
+
+    const pdfData = {
+      url: workerUrl,        
+      objectKey: result.objectKey, 
+      title: title,
+      description: description,
+      uploadDate: new Date().toISOString(),
+      topics: selectedTopics.map(topic => topic.value),
+      userUID: user.uid,
+    };
+
+    if (!docSnapshot.exists()) {
+      await setDoc(userDocRef, { pdfs: [pdfData] });
+    } else {
+      await updateDoc(userDocRef, { pdfs: arrayUnion(pdfData) });
+    }
+
+    const searchIndexRef = doc(db, 'searchIndex', 'papersList');
+    const searchIndexDoc = await getDoc(searchIndexRef);
+    let papers = searchIndexDoc.exists() ? searchIndexDoc.data().papers || [] : [];
+    
+    papers.push(pdfData); 
+    await setDoc(searchIndexRef, { papers });
+
+    if (onUploadComplete) {
+      onUploadComplete(user.uid);
+    }
+
+    setTitle('');
+    setDescription('');
+    setSelectedFile(null);
+    setErrorMessage('');
+    setSelectedTopics([]);
+    window.location.reload();
+  } catch (error) {
+    console.error('Error uploading PDF: ', error);
+    setErrorMessage('Failed to upload. Please try again.');
+    setErrorModal(true);
+  } finally {
+    setLoading(false);
+  }
 };
 
-
-      if (!docSnapshot.exists()) {
-        await setDoc(userDocRef, { pdfs: [pdfData] });
-      } else {
-        await updateDoc(userDocRef, { pdfs: arrayUnion(pdfData) });
-      }
-
-      if (onUploadComplete) {
-        onUploadComplete(user.uid);
-      }
-
-      setTitle('');
-      setDescription('');
-      setSelectedFile(null);
-      setErrorMessage('');
-      setSelectedTopics([]);
-      window.location.reload();
-    } catch (error) {
-      console.error('Error uploading PDF: ', error);
-      setErrorMessage('Failed to upload. Please try again.');
-      setErrorModal(true);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const styles = {
     loadingOverlay: {
