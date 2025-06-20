@@ -10,6 +10,7 @@ import { s3 } from '../cloudflareConfig';
 import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 import blank from '../images/empty-pic.webp';
+import Logo from '../images/dark-transparent.png';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -605,9 +606,8 @@ const updateInterests = useCallback(async (newInterests) => {
     multiValue: (provided) => ({
       ...provided,
       backgroundColor: '#1a1a1a',
-      padding:'10px',
-      margin: '1px',
-      borderRadius: '5px'
+      padding:'5px',
+      borderRadius: '50px'
     }),
     multiValueLabel: (provided) => ({
       ...provided,
@@ -979,18 +979,24 @@ Edit Profile
 
       <Modal show={isModalOpen} onHide={handleModalClose} className='box'>
         <Modal.Header style={{background: '#e5e3df', borderBottom: '1px solid white'}} closeButton>
-          <Modal.Title className='primary'>Edit Profile</Modal.Title>
+          <Modal.Title className='primary'>
+             <div className='row justify-content-left'>
+                              <img src={Logo} style={{ maxWidth: '70px', fill: 'black' }} alt='resdex-logo'></img>
+                            </div>
+                            <div className='row'>
+                            </div>
+                            Edit Profile</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{background: '#e5e3df', borderBottom: '1px solid white'}}>
           <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
-           <p><strong className='primary'>About</strong></p>
+          <p className='primary'>About</p>
           <textarea
           spellcheck="false"
             maxLength="300"
             value={newAbout}
             onChange={(e) => setNewAbout(e.target.value)}
             rows="6"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
+            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'10px' }}
           />
           </div>
           <br></br>
@@ -998,20 +1004,20 @@ Edit Profile
           
         
 <div style={{borderBottom: '1px solid white', paddingBottom: '20px'}}>
-          <p><strong className='primary'>Organization</strong></p>
+         <p className='primary'>Organization</p>
           <textarea
           spellcheck="false"
             maxLength="40"
             value={newOrganization}
             onChange={(e) => setNewOrganization(e.target.value)}
             rows="1"
-            style={{ width: '100%', color: 'black', borderRadius: '5px', resize: "none", padding:'20px' }}
+            style={{ width: '100%', color: 'black', borderRadius: '5px', border: '1px solid white', resize: "none", padding:'10px' }}
           />
           </div>
 
 
 <br></br>
-<p><strong className='primary'>Interests</strong></p>
+<p className='primary'>Interests</p>
 <Select
      isMulti
      name="interests"

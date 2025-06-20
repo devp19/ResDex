@@ -1186,3 +1186,13 @@ button {
 .social-links a:hover {
   transform: scale(1.2);
 }
+
+
+
+
+.box .modal-content {
+  border-radius: 12px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.223);
+  border: 2px solid rgb(255, 255, 255);
+  background-color: white;
+}
