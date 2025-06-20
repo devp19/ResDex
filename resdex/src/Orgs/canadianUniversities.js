@@ -32,7 +32,7 @@ export const canadianUniversities = [
     "Queen's University",
     "Royal Military College of Canada",
     "Royal Roads University",
-    "Ryerson University (now Toronto Metropolitan University)",
+    "Toronto Metropolitan University",
     "Saint Mary's University",
     "Simon Fraser University",
     "St. Francis Xavier University",
