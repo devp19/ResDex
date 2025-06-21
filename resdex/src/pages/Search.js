@@ -313,10 +313,26 @@ const Search = () => {
     indicatorSeparator: () => ({ display: "none" }),
   };
 
+  // Custom placeholder logic
+  let searchPlaceholder = "";
+  switch (searchType.label) {
+    case "Users":
+      searchPlaceholder = "Search for a user by name or username...";
+      break;
+    case "Papers":
+      searchPlaceholder = "Search for research papers, topics, or authors...";
+      break;
+    case "Universities":
+      searchPlaceholder = "Search by university name...";
+      break;
+    default:
+      searchPlaceholder = `Search ${searchType.label}`;
+  }
+
   return (
     <div className="container">
       <div className="row mt-4">
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: "center" }}>
           <div className="row justify-content-center d-flex fade-in">
             <img
               src={Logo}
@@ -330,7 +346,10 @@ const Search = () => {
           <h1 className="primary monarque fade-in">Explore ResDex</h1>
         </div>
         <br />
-        <div className="d-flex justify-content-center input fade-in" style={{ marginTop: '20px' }}>
+        <div
+          className="d-flex justify-content-center input fade-in"
+          style={{ marginTop: "20px" }}
+        >
           <div
             className="input-group search-input-group box d-flex"
             style={{
@@ -354,11 +373,7 @@ const Search = () => {
             <input
               type="search"
               className="form-control"
-              placeholder={
-                searchType.value === "universities"
-                  ? "Search by university name..."
-                  : `Search ${searchType.label}`
-              }
+              placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={handleSearchInputChange}
               style={{
