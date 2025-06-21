@@ -13,6 +13,7 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   const [isConnected, setIsConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [recipientOnline, setRecipientOnline] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -183,10 +184,16 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
 
     newSocket.on('userJoined', (data) => {
       console.log('👤 User joined:', data);
+      if (data.userId === recipient.uid) {
+        setRecipientOnline(true);
+      }
     });
 
     newSocket.on('userLeft', (data) => {
       console.log('👤 User left:', data);
+      if (data.userId === recipient.uid) {
+        setRecipientOnline(false);
+      }
     });
 
     newSocket.on('error', (error) => {
@@ -274,9 +281,9 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   };
 
   return (
-    <div className="fixed bottom-4 right-8 w-96 bg-white border shadow-xl rounded-lg z-50 relative" style={{
+    <div className="fixed bottom-4 right-8 w-96 bg-black border shadow-xl rounded-lg z-50 relative" style={{
       backgroundColor: '#000000', 
-      border: '1px solid #746c6c', 
+      border: '1px solid #000000', 
       maxHeight: '600px',
       minHeight: '400px',
       boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
@@ -287,7 +294,7 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
       {/* Exit Button - Top Right */}
       <button 
         onClick={onClose} 
-        className=" top-1 right-1 z-10 text-black hover:text-gray-300 transition-colors" 
+        className="absolute top-0 right-0 z-10 text-white hover:text-gray-300 transition-colors" 
         style={{fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer', padding: '8px', lineHeight: '1', fontWeight: 'normal'}}
       >
         &times;
@@ -307,11 +314,14 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             <h4 className="font-semibold text-sm text-black truncate">
               {recipient.fullName || recipient.displayName || 'User'}
             </h4>
-            <div 
-              className="w-2 h-2 rounded-full ml-2" 
+            <div
+              className="ml-2 border border-gray-300"
               style={{
-                backgroundColor: isConnected ? '#34C759' : '#8E8E93',
-                flexShrink: 0
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                backgroundColor: recipientOnline ? "#34C759" : "#8E8E93",
+                flexShrink: 0,
               }}
             />
           </div>
