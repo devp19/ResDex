@@ -179,7 +179,7 @@ const Home = () => {
       </div>
 
       <div className="container fade-in" style={{ marginTop: "70px" }}>
-        {/* <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>A student led initiative from</p> */}
+        <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>Proud Partners</p>
         <div className="row d-flex justify-content-center fade-in">
           <div
             className="scroller box "

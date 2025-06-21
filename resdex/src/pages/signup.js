@@ -140,8 +140,12 @@ const Signup = () => {
         navigate("/login");
       }, 3000);
     } catch (authError) {
-      console.error("Error during authentication:", authError);
-      setError(authError.message);
+      if (authError.code === "auth/email-already-in-use") {
+        setError("Email already in use.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+      console.error("Signup Error:", authError);
     }
   };
 
@@ -224,7 +228,8 @@ const Signup = () => {
                   <p style={{ color: "red" }}>Passwords do not match</p>
                 )}
 
-                <MessageDisplay error={error} success={success} />
+                {error && <p style={{ color: "red" }}>{error}</p>}
+                {success && <p style={{ color: "green" }}>{success}</p>}
 
                 <Button className="custom" type="submit">
                   Sign Up

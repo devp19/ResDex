@@ -87,10 +87,7 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding-top: 20px;
   perspective: 1000px;
-
 }
-
-
 
 body::-webkit-scrollbar {
   width: 5px; 
@@ -1214,4 +1211,18 @@ button {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.223);
   border: 2px solid rgb(255, 255, 255);
   background-color: white;
+}
+
+.form-field-modern .form-control {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.form-field-modern .form-control:focus {
+  background-color: #fff;
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
 }
