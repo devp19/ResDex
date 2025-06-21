@@ -875,6 +875,8 @@ const Profile = () => {
     }
   }, [isOwnProfile, isGoogleProviderLinked, profileUser]);
 
+  const canChat = isOwnProfile || (profileUser?.followers?.includes(currentUser?.uid));
+
   if (loading) {
     return <p className="primary">Loading...</p>;
   }
@@ -1224,7 +1226,8 @@ const Profile = () => {
                 className="col-md d-flex justify-content-end mt-4"
                 style={{ maxHeight: "50px" }}
               >
-                { !isOwnProfile && (
+
+                {!isOwnProfile && (
                   <>
                     <a
                       className="custom-view"
@@ -1256,8 +1259,14 @@ const Profile = () => {
                     </a>
                     <a
                       className="custom-view chat-button"
-                      onClick={handleChatClick}
-                      style={{ padding: "10px 20px", borderRadius: "100px" }}
+                      onClick={canChat ? handleChatClick : (e) => e.preventDefault()}
+                      style={{ 
+                        padding: "10px 20px", 
+                        borderRadius: "100px",
+                        cursor: canChat ? "pointer" : "not-allowed",
+                        opacity: canChat ? 1 : 0.6
+                      }}
+                      title={!canChat ? "You must be a research fellow to chat" : "Chat with this user"}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -2331,7 +2340,7 @@ const Profile = () => {
             />
           ) : (
             <button
-              onClick={() => setShowChat(true)}
+              onClick={() => canChat && setShowChat(true)}
               style={{
                 backgroundColor: "#1a1a1a",
                 color: "#ffffff",
@@ -2341,9 +2350,10 @@ const Profile = () => {
                 border: "none",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
                 fontSize: "20px",
-                cursor: "pointer",
+                cursor: canChat ? "pointer" : "not-allowed",
+                opacity: canChat ? 1 : 0.6
               }}
-              title="Open Chat"
+              title={!canChat ? "You must be a research fellow to chat" : "Open Chat"}
             >
               💬
             </button>
