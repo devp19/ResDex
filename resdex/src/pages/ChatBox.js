@@ -1,6 +1,7 @@
 // src/pages/ChatBox.js
 import { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
+import "react-image-crop/dist/ReactCrop.css";
 
 export default function ChatBox({ recipient, currentUser, onClose }) {
   const [message, setMessage] = useState('');
