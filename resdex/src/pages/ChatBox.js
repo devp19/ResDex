@@ -273,10 +273,10 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   };
 
   return (
-    <div className="fixed bottom-4 right-8 w-80 bg-white border shadow-xl rounded-lg z-50" style={{
-      backgroundColor: '#ffffff', 
-      border: '2px solid #1a1a1a', 
-      maxHeight: '600px',
+    <div className="fixed bottom-4 right-8 w-96 bg-white border shadow-xl rounded-lg z-50" style={{
+      backgroundColor: '#f2f0eb', 
+      border: '1px solid #746c6c', 
+      maxHeight: '20px',
       minHeight: '400px',
       boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
       borderRadius: '8px',
@@ -284,41 +284,30 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <div className="flex justify-between items-center p-3 border-b rounded-t-lg" style={{
-        borderColor: '#1a1a1a', 
-        backgroundColor: '#1a1a1a',
+      <div className="flex justify-between items-center p-2 border-b rounded-t-lg" style={{
+        borderColor: '#f2f0eb', 
+        backgroundColor: '#f2f0eb',
         borderTopLeftRadius: '6px',
         borderTopRightRadius: '6px',
-        flexShrink: 0
+        flexShrink: 0,
+        minHeight: '40px',
+        maxHeight: '40px'
       }}>
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-gray-300 mr-3 flex items-center justify-center overflow-hidden">
-            {recipient.profilePicture ? (
-              <img 
-                src={recipient.profilePicture} 
-                alt="Profile" 
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <span style={{color: '#1a1a1a', fontSize: '14px', fontWeight: 'bold'}}>
-                {(recipient.fullName || recipient.displayName || 'U').charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm text-white">
+        <div className="flex items-center flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
+            <h4 className="font-semibold text-sm text-black truncate">
               {recipient.fullName || recipient.displayName || 'User'}
             </h4>
-            <p className="text-xs text-white">
+            <p className="text-xs text-gray-300">
               {isConnected ? 'Online' : 'Connecting...'}
             </p>
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
           <button 
             onClick={onClose} 
             className="text-white hover:text-white transition-colors" 
-            style={{fontSize: '18px', background: 'none', border: 'none', cursor: 'pointer'}}
+            style={{fontSize: '16px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px'}}
           >
             &times;
           </button>
@@ -327,10 +316,10 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
 
       {/* Messages - Smaller with scrolling */}
       <div className="flex-1 overflow-y-auto p-3" style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e0e0e0',
-        maxHeight: '300px',
-        minHeight: '200px'
+        backgroundColor: '#f2f0eb',
+        borderBottom: '1px solid #746c6c',
+        maxHeight: '350px',
+        minHeight: '250px'
       }}>
         {error && (
           <div className="flex flex-col justify-center items-center h-full">
@@ -355,25 +344,37 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
         )}
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <p style={{color: '#666666', fontSize: '12px'}}>Loading...</p>
+            <p style={{color: '#8e8e93', fontSize: '12px'}}>Loading...</p>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex justify-center items-center h-full">
-            <p style={{color: '#666666', textAlign: 'center', fontSize: '12px'}}>
+            <p style={{color: '#8e8e93', textAlign: 'center', fontSize: '12px'}}>
               No messages yet
             </p>
           </div>
         ) : (
           <>
             {messages.map((msg) => (
-              <div key={msg.id} className={`mb-2 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
-                <div className={`inline-block p-2 rounded-lg max-w-xs ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-black' : 'bg-gray-200 text-gray-800'}`} style={{
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  fontSize: '12px',
-                  lineHeight: '1.3'
+              <div key={msg.id} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
+                <div className={`inline-block p-2 rounded-lg max-w-[10%]`} style={{
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  fontSize: '13px',
+                  lineHeight: '1.4',
+                  borderRadius: '50px',
+                  backgroundColor: msg.senderId === currentUser.uid ? '#2f2f2e' : '#e5e5ea',
                 }}>
-                  <p className="break-words" style={{color: msg.senderId === currentUser.uid ? '#ffffff' : '#333333'}}>{msg.text}</p>
-                  <p className="text-xs mt-1" style={{color: msg.senderId === currentUser.uid ? '#ffffff' : '#666666'}}>
+                  <p className="break-words" style={{
+                    color: msg.senderId === currentUser.uid ? '#e4e3dc' : '#000000',
+                    margin: '0',
+                    fontWeight: '400'
+                  }}>
+                    {msg.text}
+                  </p>
+                  <p className="text-xs mt-1 opacity-70" style={{
+                    color: msg.senderId === currentUser.uid ? '#e5e5ea' : '#6c6c70',
+                    margin: '0',
+                    textAlign: msg.senderId === currentUser.uid ? 'right' : 'left'
+                  }}>
                     {msg.timestamp ? 
                       new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
                       'Just now'
@@ -384,7 +385,7 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             ))}
             {typingUsers.length > 0 && (
               <div className="text-left mb-2">
-                <div className="inline-block p-2 rounded-lg bg-gray-100 text-gray-600 text-xs">
+                <div className="inline-block p-2 rounded-lg bg-gray-100 text-gray-600 text-xs" style={{backgroundColor: '#e5e5ea', color: '#000000'}}>
                   {typingUsers.map(user => user.username).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
                 </div>
               </div>
@@ -395,33 +396,35 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
       </div>
 
       {/* Permanent Input Box */}
-      <div className="p-3" style={{backgroundColor: '#f8f9fa', flexShrink: 0}}>
+      <div className="p-3" style={{backgroundColor: '#f2f0eb', flexShrink: 0}}>
         <div className="flex">
           <input
-            className="flex-1 border rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 border rounded-l px-3 py-2 text-sm focus:outline-none"
             placeholder="Type a message..."
             value={message}
             onChange={handleTyping}
             onKeyPress={handleKeyPress}
             disabled={sending || !isConnected}
             style={{
-              border: '1px solid #1a1a1a', 
-              borderRadius: '4px 0 0 4px',
-              backgroundColor: '#ffffff',
-              color: '#333333',
-              fontSize: '12px'
+              border: '1px solid #746c6c', 
+              borderRadius: '18px 0 0 18px',
+              backgroundColor: '#3a3a3c',
+              color: '#ffffff',
+              fontSize: '13px'
             }}
           />
           <button
-            className="text-white px-4 py-2 rounded-r text-sm font-medium transition-colors hover:opacity-90"
+            className="text-white px-4 py-2 rounded-r text-sm font-medium transition-colors"
             onClick={sendMessage}
             disabled={!message.trim() || sending || !isConnected}
             style={{
-              backgroundColor: (message.trim() && !sending && isConnected) ? '#1a1a1a' : '#cccccc',
-              borderRadius: '0 4px 4px 0',
+              backgroundColor: (message.trim() && !sending && isConnected) ? '#007aff' : '#3a3a3c',
+              borderRadius: '0 18px 18px 0',
               cursor: (message.trim() && !sending && isConnected) ? 'pointer' : 'not-allowed',
               color: '#ffffff',
-              fontSize: '12px'
+              fontSize: '13px',
+              border: '1px solid #746c6c',
+              borderLeft: 'none'
             }}
           >
             {sending ? '...' : 'Send'}
