@@ -714,6 +714,29 @@ const Profile = () => {
     });
   };
 
+  const isOwnProfile =
+    currentUser && profileUser && currentUser.uid === profileUser.uid;
+
+  const isGoogleProviderLinked = currentUser?.providerData?.some(
+    (provider) => provider.providerId === "google.com"
+  );
+
+  useEffect(() => {
+    if (
+      isOwnProfile &&
+      isGoogleProviderLinked &&
+      profileUser &&
+      !profileUser.googleAccount
+    ) {
+      const userDocRef = doc(db, "users", profileUser.uid);
+      updateDoc(userDocRef, { googleAccount: true }).then(() => {
+        setProfileUser((prev) =>
+          prev ? { ...prev, googleAccount: true } : prev
+        );
+      });
+    }
+  }, [isOwnProfile, isGoogleProviderLinked, profileUser]);
+
   if (loading) {
     return <p className="primary">Loading...</p>;
   }
@@ -721,8 +744,6 @@ const Profile = () => {
   if (!profileUser) {
     return <p>User not found.</p>;
   }
-
-  const isOwnProfile = currentUser && currentUser.uid === profileUser.uid;
 
   const customStyles = {
     option: (provided, state) => ({
@@ -775,7 +796,7 @@ const Profile = () => {
                         justifyContent: "flex-end",
                       }}
                     >
-                      {profileUser.googleAccount ? (
+                      {isGoogleProviderLinked || profileUser.googleAccount ? (
                         <>
                           <button
                             className="custom-edit"
