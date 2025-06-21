@@ -990,13 +990,6 @@ const Profile = () => {
                     <p className=" primary">Contributions</p>
                   </div>
                   <div className="col-md offset-md-1">
-                    {/* <span
-  style={{ cursor: 'pointer', color: '#007bff', textDecoration: 'underline' }}
-  onClick={handleShowFollowersModal}
->
-  {profileUser.followers ? profileUser.followers.length : 0} Research Fellows
-</span> */}
-
                     <h2
                       className="primary"
                       style={{ cursor: "pointer" }}
@@ -1017,10 +1010,6 @@ const Profile = () => {
                     <p className=" primary">Research Fellows</p>
                   </div>
                 </div>
-
-                {/* <button className="custom" onClick={increaseContributions}>
-  Increase Contributions
-</button> */}
               </div>
             </div>
 

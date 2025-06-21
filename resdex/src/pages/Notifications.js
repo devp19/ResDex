@@ -147,6 +147,19 @@ const Notifications = () => {
     setVisibleCount((prevCount) => prevCount + 5);
   };
 
+  // Function to format timestamp without seconds
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   return (
     <div className="mt-4 fade-in">
       <div className="row justify-content-center d-flex display fade-in">
@@ -257,7 +270,7 @@ const Notifications = () => {
                           marginLeft: "10px",
                         }}
                       >
-                        {new Date(notification.timestamp).toLocaleString()}
+                        {formatTimestamp(notification.timestamp)}
                       </span>
                     </div>
                   </li>
