@@ -92,6 +92,7 @@ const Profile = () => {
   const [followersLoading, setFollowersLoading] = useState(false);
 
   const [showCopiedToast, setShowCopiedToast] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   const [showShareModal, setShowShareModal] = useState(false);
 
@@ -323,7 +324,18 @@ const Profile = () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setShowCopiedToast(true);
-      setTimeout(() => setShowCopiedToast(false), 3000);
+      setFadeOut(false);
+      
+      // Start fade out after 2 seconds
+      setTimeout(() => {
+        setFadeOut(true);
+      }, 2000);
+      
+      // Hide completely after fade out animation (2s + 1.5s = 3.5s total)
+      setTimeout(() => {
+        setShowCopiedToast(false);
+        setFadeOut(false);
+      }, 3500);
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
@@ -1662,6 +1674,8 @@ const Profile = () => {
             padding: "10px 20px",
             borderRadius: "5px",
             zIndex: 9999,
+            opacity: fadeOut ? 0 : 1,
+            transition: "opacity 1.5s ease-in-out",
           }}
         >
           Profile link copied to clipboard!
