@@ -36,6 +36,8 @@ app.use(cors({
     "http://127.0.0.1:3002",
     "https://resdex.onrender.com",
     "https://www.resdex.onrender.com",
+    "https://resdex.onrender.com/get",
+    "https://resdex.onrender.com/put",
     "https://resdex.onrender.com/upload",
     "https://resdex.onrender.com/delete",
   ],
