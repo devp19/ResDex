@@ -1176,36 +1176,6 @@ const Profile = () => {
                   </>
                 )}
               </div>
-
-              <div className="row d-flex justify-content-center">
-                <div className="col">
-                  <div
-                    className="col-md"
-                    style={{ position: "relative", textAlign: "left" }}
-                  >
-                    {isOwnProfile && (
-                      <button
-                        className="custom-view"
-                        onClick={handleShareModalOpen}
-                        style={{ padding: "10px 20px", borderRadius: "100px" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="white"
-                          className="bi bi-share-fill"
-                          viewBox="0 0 16 16"
-                          style={{ marginRight: "8px" }}
-                        >
-                          <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
-                        </svg>
-                        Share Profile
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* <p className='primary'> 
