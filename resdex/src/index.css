@@ -1,7 +1,5 @@
 *{
-  color: rgb(255, 255, 255);
   scroll-behavior: smooth;
-
 }
 
 @font-face {
@@ -417,6 +415,20 @@ input:focus, select:focus, button:focus {
   border: 1px solid rgb(0, 0, 0);
   cursor: pointer;
   
+}
+
+.chat-button {
+  background-color: #007bff !important;
+  border: 1px solid #007bff !important;
+  transition: all 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #0056b3 !important;
+  border: 1px solid #0056b3 !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .disable {
