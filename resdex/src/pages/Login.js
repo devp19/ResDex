@@ -23,6 +23,10 @@ import useAnimationEffect from "../hooks/useAnimationEffect";
 import { FormField, MessageDisplay } from "../components/common";
 import GoogleSignupModal from "../components/GoogleSignupModal";
 import Logo from "../images/index.png";
+import {
+  handleGoogleSignInFlow,
+  handleGoogleSignupCompleteFlow,
+} from "../utils/auth";
 
 const Login = () => {
   // Use the custom animation hook
@@ -39,123 +43,29 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Function to handle Google sign-in
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if user exists in our database
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        // User exists, navigate to their profile
-        const userData = userDocSnap.data();
-        const username = userData.username;
-        if (username) {
-          navigate(`/profile/${username}`);
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
-        } else {
-          setError("User data incomplete. Please contact support.");
-        }
-      } else {
-        // User doesn't exist, show modal to collect additional info
-        setGoogleUser(user);
-        const fullName = user.displayName || "";
-        const displayName = user.displayName
-          ? user.displayName.toLowerCase().replace(/\s+/g, "")
-          : user.email.split("@")[0];
-        setInitialFullName(fullName);
-        setInitialDisplayName(displayName);
-        setModalError("");
-        setShowGoogleModal(true);
-      }
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-      if (error.code === "auth/popup-closed-by-user") {
-        setError("Sign-in was cancelled. Please try again.");
-      } else {
-        setError("Failed to sign in with Google. Please try again.");
-      }
-    }
-  };
+  const handleGoogleSignIn = () =>
+    handleGoogleSignInFlow({
+      auth,
+      db,
+      navigate,
+      setGoogleUser,
+      setInitialFullName,
+      setInitialDisplayName,
+      setModalError,
+      setShowGoogleModal,
+      setError,
+    });
 
   // Function to handle Google signup completion
-  const handleGoogleSignupComplete = async (userData) => {
-    if (!googleUser) return;
-
-    try {
-      // Check if username exists
-      const usernameQuery = query(
-        collection(db, "usernames"),
-        where("username", "==", userData.displayName)
-      );
-      const usernameQuerySnapshot = await getDocs(usernameQuery);
-
-      if (!usernameQuerySnapshot.empty) {
-        // Username already exists, show error in modal
-        setModalError(
-          "Username already exists. Please choose a different one."
-        );
-        return;
-      }
-
-      // Store username in usernames collection
-      await setDoc(doc(db, "usernames", userData.displayName), {
-        username: userData.displayName,
-        userId: googleUser.uid,
-      });
-
-      // Store user data in users collection
-      await setDoc(doc(db, "users", googleUser.uid), {
-        uid: googleUser.uid,
-        fullName: userData.fullName,
-        displayName: userData.displayName,
-        email: googleUser.email,
-        profilePicture: googleUser.photoURL,
-        username: userData.displayName,
-        contributions: 0,
-        googleAccount: true,
-      });
-
-      // Add user to search index
-      const searchIndexRef = doc(db, "searchIndex", "usersList");
-      const searchIndexDoc = await getDoc(searchIndexRef);
-
-      if (!searchIndexDoc.exists()) {
-        await setDoc(searchIndexRef, {
-          users: [
-            {
-              uid: googleUser.uid,
-              username: userData.displayName,
-              fullName: userData.fullName,
-            },
-          ],
-        });
-      } else {
-        await updateDoc(searchIndexRef, {
-          users: arrayUnion({
-            userId: googleUser.uid,
-            username: userData.displayName,
-            fullName: userData.fullName,
-          }),
-        });
-      }
-
-      setShowGoogleModal(false);
-      setModalError("");
-      navigate(`/profile/${userData.displayName}`);
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
-    } catch (error) {
-      console.error("Error completing Google signup:", error);
-      setModalError("Failed to complete signup. Please try again.");
-    }
-  };
+  const handleGoogleSignupComplete = (userData) =>
+    handleGoogleSignupCompleteFlow({
+      db,
+      googleUser,
+      userData,
+      setModalError,
+      setShowGoogleModal,
+      navigate,
+    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
