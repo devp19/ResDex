@@ -10,7 +10,6 @@ import {
   limit,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { useNavigate } from "react-router-dom";
 import Select, { components } from "react-select";
 import Logo from "../images/dark-transparent.png";
 import useAnimationEffect from "../hooks/useAnimationEffect";
@@ -45,6 +44,7 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [universitySuggestions, setUniversitySuggestions] = useState([]);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -67,6 +67,8 @@ const Search = () => {
       handleSearch(query, newSearchType.value);
     }
   }, [location.search]);
+
+
 
   // Handle clicking outside to close suggestions
   useEffect(() => {
@@ -257,16 +259,7 @@ const Search = () => {
   };
 
   const handleResultClick = (result) => {
-    if (searchType.value === "users") {
-      navigate(`/profile/${result.username}`);
-    } else {
-      // Handle paper navigation
-      console.log("Navigate to paper:", result);
-    }
-  };
-
-  const goToProfile = (username) => {
-    navigate(`/profile/${username}`);
+    // Handle result click if needed
   };
 
   const handleUniversitySuggestionClick = (university) => {
@@ -509,12 +502,13 @@ const Search = () => {
                         </span>
                       </div>
                     </div>
-                    <button
+                    <a
+                      href={`/profile/${result.username}`}
                       className="custom-view"
-                      onClick={() => goToProfile(result.username)}
+                      style={{ textDecoration: 'none' }}
                     >
                       View Profile ↗︎
-                    </button>
+                    </a>
                   </div>
                   {searchType.value === "papers" && result.matchedPdf && (
                     <div style={{ marginTop: "20px", width: "100%" }}>

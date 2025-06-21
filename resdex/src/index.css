@@ -1,12 +1,12 @@
-*{
+* {
   color: rgb(255, 255, 255);
   scroll-behavior: smooth;
-
 }
 
 @font-face {
   font-family: Akros;
-  src: url("./fonts/AkrosRegular.woff") format("woff"), url("./fonts/AkrosRegular.woff2")  format("woff2");
+  src: url("./fonts/AkrosRegular.woff") format("woff"),
+    url("./fonts/AkrosRegular.woff2") format("woff2");
 }
 @font-face {
   font-family: Monarque;
@@ -40,19 +40,15 @@
   font-family: Baskerville;
   font-weight: normal;
   font-style: normal;
-  
 }
 .helveticabold {
   font-family: HelveticaBold;
   font-weight: normal;
   font-style: normal;
-  
 }
 
 a {
-
   cursor: pointer;
-
 }
 
 .monarque {
@@ -60,7 +56,6 @@ a {
   font-weight: normal;
   font-style: italic;
 }
-
 
 .primary {
   color: #1a1a1a;
@@ -74,7 +69,7 @@ a {
   margin-right: 50px;
   margin-left: 50px;
 }
-.medium{
+.medium {
   font-size: 30px;
 }
 
@@ -90,28 +85,28 @@ a {
 }
 
 body::-webkit-scrollbar {
-  width: 5px; 
+  width: 5px;
 }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #1a1a1a; 
-  border-radius: 20px; 
+  background-color: #1a1a1a;
+  border-radius: 20px;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color:#E5E3DF;
+  background-color: #e5e3df;
   margin-left: 40px;
   margin-right: 40px;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -131,7 +126,6 @@ code {
   width: 100%;
   background: none;
 }
-
 
 .center-sample {
   display: flex;
@@ -172,7 +166,7 @@ code {
   border-radius: 50%;
 }
 
-.minus{
+.minus {
   margin-top: -15px;
 }
 
@@ -180,17 +174,17 @@ code {
   font-size: 90px;
 }
 
-.length{
+.length {
   width: 100%;
 }
 
-#headline-img{
+#headline-img {
   height: auto;
   max-height: 400px;
   border-radius: 50px;
 }
 
-#headline-2{
+#headline-2 {
   height: auto;
   max-height: 200px;
   border-radius: 50px;
@@ -210,15 +204,14 @@ code {
   font-size: 20px;
 }
 
-.regular{
+.regular {
   color: white;
 }
 .smaller-text {
   font-size: 15px;
 }
 
-#navbar-logo{
-
+#navbar-logo {
   height: 40px;
 }
 
@@ -226,7 +219,7 @@ code {
   border-radius: 30vh;
 }
 
-#img-login{
+#img-login {
   height: auto;
   width: auto;
   max-height: 100px;
@@ -240,7 +233,6 @@ code {
   padding-left: 50px;
   padding-right: 50px;
 }
-
 
 .nav-item {
   padding-left: 5px;
@@ -275,7 +267,6 @@ code {
   width: 100%;
 }
 
-
 .bottom-container {
   display: flex;
   height: 40vh;
@@ -288,7 +279,7 @@ code {
 }
 
 .column-content {
-  padding: 15px; 
+  padding: 15px;
   background-color: transparent;
   border: none;
   /* border-top: 2px solid white; */
@@ -310,7 +301,7 @@ code {
 }
 
 .custom {
-  color:rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
   background-color: #1a1a1a;
   text-decoration: none;
   margin-top: 30px;
@@ -342,7 +333,6 @@ code {
 
 .custom-edit:hover {
   transform: translateY(-10px);
-
 }
 
 .footeranimate {
@@ -351,14 +341,13 @@ code {
   justify-content: center;
 }
 
-.footeranimate:hover{
+.footeranimate:hover {
   transform: translateY(-5px);
   font-size: 18px;
 }
 
-
 .custom-read {
-  color:black;
+  color: black;
   background-color: white;
   text-decoration: none;
   font-size: 15px;
@@ -371,7 +360,7 @@ code {
 
 .custom-view,
 .custom-view-2 {
-  color:rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
   background-color: #1a1a1a;
   text-decoration: none;
   font-size: 15px;
@@ -384,7 +373,9 @@ code {
   transition: 0.5s;
 }
 
-input:focus, select:focus, button:focus {
+input:focus,
+select:focus,
+button:focus {
   outline: none;
   box-shadow: none;
   border-color: inherit;
@@ -393,42 +384,66 @@ input:focus, select:focus, button:focus {
 .search-input-group input:focus,
 .search-input-group select:focus,
 .search-input-group button:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: inherit;
+  outline: none;
+  box-shadow: none;
+  border-color: inherit;
 }
 
-
-
 .custom:hover,
-.custom-read:hover{
+.custom-read:hover {
   color: white;
   background-color: #555;
   border: 1px solid white;
-
 }
 
-.custom-view:hover{
+.custom-view:hover {
   color: white;
   background-color: #555;
   border: 1px solid rgb(0, 0, 0);
   cursor: pointer;
-  
+}
+
+.chat-button {
+  background-color: #007bff !important;
+  border: 1px solid #007bff !important;
+  transition: all 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #0056b3 !important;
+  border: 1px solid #0056b3 !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.chat-button {
+  background-color: #007bff !important;
+  border: 1px solid #007bff !important;
+  transition: all 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #0056b3 !important;
+  border: 1px solid #0056b3 !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .disable {
   overflow: hidden;
 }
 
-.up{
+.up {
   margin-top: -30px;
-} 
+}
 
 .right {
   margin-right: 15px;
 }
 
-.last-container{
+.last-container {
   margin-top: 50px;
   border-top: 2px solid white;
   display: flex;
@@ -461,7 +476,6 @@ input:focus, select:focus, button:focus {
 .reduce {
   margin-top: -45px;
 }
-
 
 .profile-picture-container {
   position: relative;
@@ -512,13 +526,13 @@ input:focus, select:focus, button:focus {
   border-radius: 5px;
 }
 
-.upload-cont{
+.upload-cont {
   margin-top: 50px;
   padding-top: 50px;
-border-top: 1px solid white;
+  border-top: 1px solid white;
 }
 
-.actual-upload{
+.actual-upload {
   margin: 10px;
   border-radius: 5px;
   background-color: rgb(0, 0, 0);
@@ -533,7 +547,7 @@ border-top: 1px solid white;
   height: 300px;
 }
 
-.uploaded{
+.uploaded {
   margin: 10px;
   border-radius: 5px;
   background-color: rgb(0, 0, 0);
@@ -581,7 +595,7 @@ border-top: 1px solid white;
   color: #aaaaaa;
 }
 
-.marginleft{
+.marginleft {
   margin-left: 20px;
 }
 
@@ -590,19 +604,16 @@ border-top: 1px solid white;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 5px; 
+  gap: 5px;
 }
-
-
 
 .horizontal-line {
-  width: 100%; 
+  width: 100%;
   height: 1px;
-  background-color: rgb(27, 27, 27); 
-  margin-top: 30px; 
-  opacity: 0.8; 
+  background-color: rgb(27, 27, 27);
+  margin-top: 30px;
+  opacity: 0.8;
 }
-
 
 .profile-cards-container {
   display: flex;
@@ -611,7 +622,6 @@ border-top: 1px solid white;
   margin-top: 70px;
   padding: 20px;
 }
-
 
 .profile-card {
   background-color: white;
@@ -622,7 +632,6 @@ border-top: 1px solid white;
   text-align: center;
   margin: 45px;
 }
-
 
 .social-button {
   width: 100%;
@@ -639,7 +648,6 @@ border-top: 1px solid white;
 .social-button:hover {
   background-color: #555;
 }
-
 
 .pdf-container::-webkit-scrollbar {
   height: 8px;
@@ -658,7 +666,6 @@ border-top: 1px solid white;
 .pdf-container::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-
 
 .interest-pill {
   display: inline-block;
@@ -686,7 +693,7 @@ border-top: 1px solid white;
   cursor: default;
 }
 
-.interest-pill:hover{
+.interest-pill:hover {
   transform: translateY(-10px);
   background-color: #888;
   color: white;
@@ -708,8 +715,12 @@ border-top: 1px solid white;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0.6; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .carousel-slide h1 {
@@ -857,7 +868,6 @@ border-top: 1px solid white;
   box-shadow: 0 0.5rem 1rem -0.25rem var(--clr-primary-900);
 }
 
-
 .fade-in2 {
   opacity: 0;
   transform: translateY(-50px);
@@ -881,7 +891,6 @@ border-top: 1px solid white;
   opacity: 1;
   transform: translateY(0);
 }
-
 
 label {
   pointer-events: none;
@@ -915,57 +924,43 @@ button {
     font-size: 70px;
   }
 
-  .column-content h3{
+  .column-content h3 {
     font-size: 20px;
   }
 }
-
 
 @media only screen and (max-height: 670px) {
   .title {
     font-size: 50px;
   }
 
-  .secondary{
+  .secondary {
     font-size: 20px;
-  };
-  
+  }
 }
 
 @media only screen and (max-width: 1015px) {
-  .column-content h3{
+  .column-content h3 {
     font-size: 18px;
   }
 
   .profile-img {
     padding: 20px;
     border-radius: 50%;
-
   }
 
   .profile-img-2 {
     border-radius: 50%;
-
   }
-
 }
-
-
 
 @media only screen and (max-width: 577px) {
- .title {
-  font-size: 50px;
- }
-
+  .title {
+    font-size: 50px;
+  }
 }
 
-
-
-
-
-
 /* Testimonial Box with integrated buttons */
-
 
 /* Navigation Buttons - now positioned inside the box */
 .carousel-button {
@@ -1060,7 +1055,7 @@ button {
 .carousel-indicators {
   display: flex;
   justify-content: center;
-  gap: 1.0rem;
+  gap: 1rem;
   margin-top: 2rem;
 }
 
@@ -1082,7 +1077,8 @@ button {
 }
 
 /* Navigation tooltips */
-.nav-link, .nav-button {
+.nav-link,
+.nav-button {
   position: relative;
   display: inline-block;
 }
@@ -1117,8 +1113,14 @@ button {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(5px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* Make sure your nav container has proper stacking */
@@ -1202,9 +1204,6 @@ button {
 .social-links a:hover {
   transform: scale(1.2);
 }
-
-
-
 
 .box .modal-content {
   border-radius: 12px;
