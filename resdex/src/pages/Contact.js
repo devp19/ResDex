@@ -1,60 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import emailjs from 'emailjs-com';
+import React, { useState } from "react";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import emailjs from "emailjs-com";
+import useAnimationEffect from "../hooks/useAnimationEffect";
+import { FormField, MessageDisplay } from "../components/common";
 
 const Contact = () => {
+  // Use the custom animation hook
+  useAnimationEffect();
 
-  useEffect(() => {
-    // Animate scrolling marquee once
-    const scrollers = document.querySelectorAll(".scroller");
-    scrollers.forEach((scroller) => {
-      if (scroller.getAttribute("data-animated")) return;
-  
-      scroller.setAttribute("data-animated", true);
-      const scrollerInner = scroller.querySelector(".scroller__inner");
-      const scrollerContent = Array.from(scrollerInner.children);
-  
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        duplicatedItem.setAttribute("aria-hidden", true);
-        scrollerInner.appendChild(duplicatedItem);
-      });
-    });
-  
-    // Fade-in on scroll using IntersectionObserver
-    const fadeIns = document.querySelectorAll('.fade-in');
-  
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target); // Optional: fade-in only once
-          }
-        });
-      },
-      {
-        threshold: 0.05,
-      }
-    );
-  
-    fadeIns.forEach((el) => observer.observe(el));
-  
-    return () => {
-      fadeIns.forEach((el) => observer.unobserve(el));
-    };
-  }, []);
-  
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const sendTicket = (e) => {
     e.preventDefault();
@@ -66,7 +27,6 @@ const Contact = () => {
       message: body,
     };
 
-
     emailjs
       .send(
         process.env.REACT_APP_EMAILJS_SERVICE_ID,
@@ -76,80 +36,84 @@ const Contact = () => {
       )
       .then(
         (response) => {
-          console.log('SUCCESS!', response.status, response.text);
-          setSuccess('Ticket submitted successfully!');
-          setError('');
-          navigate('/success')
+          console.log("SUCCESS!", response.status, response.text);
+          setSuccess("Ticket submitted successfully!");
+          setError("");
+          navigate("/success");
         },
         (err) => {
-          console.error('FAILED...', err);
-          setError('Failed to submit ticket. Please try again.');
-          setSuccess('');
+          console.error("FAILED...", err);
+          setError("Failed to submit ticket. Please try again.");
+          setSuccess("");
         }
       );
   };
 
-  
-
   return (
     <div>
       <br />
-      <h1 className="center primary monarque mt-3 fade-in">Question, Issue, Feature?</h1>
+      <h1 className="center primary monarque mt-3 fade-in">
+        Question, Issue, Feature?
+      </h1>
       <p className="center primary fade-in">Send a ticket down below!</p>
 
       <div>
-        <div className="container fade-in" style={{ marginTop: '60px' }}>
+        <div className="container fade-in" style={{ marginTop: "60px" }}>
           <div className="row center">
-            <div className='col-md-7 box'>
-            <Form className="contact-form" onSubmit={sendTicket}>
-              <Form.Group className="mb-3" controlId="formBasicFullName">
-                <Form.Label className='primary'>Full Name</Form.Label>
-                <Form.Control
+            <div className="col-md-7 box">
+              <form className="contact-form" onSubmit={sendTicket}>
+                <FormField
+                  label="Full Name"
                   type="text"
                   placeholder="Enter full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
+                  controlId="formBasicFullName"
                   required
                 />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label className='primary'>Email address</Form.Label>
-                <Form.Control
+
+                <FormField
+                  label="Email address"
                   type="email"
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  controlId="formBasicEmail"
                   required
                 />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicSubject">
-                <Form.Label className='primary'>Subject</Form.Label>
-                <Form.Control
+
+                <FormField
+                  label="Subject"
                   type="text"
                   placeholder="Enter subject"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
+                  controlId="formBasicSubject"
                 />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicBody">
-                <Form.Label className='primary'>Body</Form.Label>
-                <Form.Control
-                  as="textarea"
+
+                <FormField
+                  label="Body"
+                  type="textarea"
                   placeholder="Enter Message (Max 1500 Characters)"
                   value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  controlId="formBasicBody"
+                  required
                   rows="5"
                   maxLength="1500"
-                  onChange={(e) => setBody(e.target.value)}
-                  required
-                  style={{ height: '200px' }}
+                  style={{ height: "200px" }}
                 />
-              </Form.Group>
-              {error && <p style={{ color: 'red' }}>{error}</p>}
-              {success && <p style={{ color: 'green' }}>{success}</p>}
-              <Button className="custom" style={{marginBottom: '20px' }} type="submit">
-                Submit Ticket
-              </Button>
-            </Form>
+
+                <MessageDisplay error={error} success={success} />
+
+                <Button
+                  className="custom"
+                  style={{ marginBottom: "20px" }}
+                  type="submit"
+                >
+                  Submit Ticket
+                </Button>
+              </form>
             </div>
           </div>
         </div>

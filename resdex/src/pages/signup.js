@@ -1,98 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } from 'firebase/auth';
-import { auth, db } from '../firebaseConfig';
-import Logo from '../images/index.png';
-import { collection, addDoc, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion, getDoc} from 'firebase/firestore';
-import { Form, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-
-
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+  signOut,
+} from "firebase/auth";
+import { auth, db } from "../firebaseConfig";
+import Logo from "../images/index.png";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  getDoc,
+} from "firebase/firestore";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import useAnimationEffect from "../hooks/useAnimationEffect";
+import { FormField, MessageDisplay } from "../components/common";
 
 const Signup = () => {
-
-  useEffect(() => {
-        const scrollers = document.querySelectorAll(".scroller");
-        scrollers.forEach((scroller) => {
-          if (scroller.getAttribute("data-animated")) return;
-      
-          scroller.setAttribute("data-animated", true);
-          const scrollerInner = scroller.querySelector(".scroller__inner");
-          const scrollerContent = Array.from(scrollerInner.children);
-      
-          scrollerContent.forEach((item) => {
-            const duplicatedItem = item.cloneNode(true);
-            duplicatedItem.setAttribute("aria-hidden", true);
-            scrollerInner.appendChild(duplicatedItem);
-          });
-        });
-      
-        const fadeIns = document.querySelectorAll('.fade-in');
-      
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          {
-            threshold: 0.05,
-          }
-        );
-      
-        fadeIns.forEach((el) => observer.observe(el));
-      
-        return () => {
-          fadeIns.forEach((el) => observer.unobserve(el));
-        };
-      }, []);
+  // Use the custom animation hook
+  useAnimationEffect();
 
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(true);
-  const [fullName, setFullName] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
- const handleSignup = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
-    const username = displayName.toLowerCase().replace(/\s+/g, '');
+    const username = displayName.toLowerCase().replace(/\s+/g, "");
     const usernameRegex = /^[a-zA-Z0-9]+$/;
 
     if (username.length < 3) {
-      setError('Username must be at least 3 characters long');
+      setError("Username must be at least 3 characters long");
       return;
     }
 
     if (!usernameRegex.test(username)) {
-      setError('Username can only contain letters and numbers, with no spaces or special characters.');
+      setError(
+        "Username can only contain letters and numbers, with no spaces or special characters."
+      );
       return;
     }
 
     if (password !== password2) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     try {
       console.log("Checking if username exists...");
-      const usernameQuery = query(collection(db, 'usernames'), where('username', '==', username));
+      const usernameQuery = query(
+        collection(db, "usernames"),
+        where("username", "==", username)
+      );
       const usernameQuerySnapshot = await getDocs(usernameQuery);
-      
+
       if (!usernameQuerySnapshot.empty) {
-        setError('Username already exists. Please choose a different one.');
+        setError("Username already exists. Please choose a different one.");
         return;
       }
 
       console.log("Creating user with email and password...");
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
       console.log("User created:", user.uid);
 
@@ -103,13 +90,13 @@ const Signup = () => {
       await updateProfile(auth.currentUser, { displayName: fullName });
 
       console.log("Adding username to 'usernames' collection...");
-      await setDoc(doc(db, 'usernames', username), {
+      await setDoc(doc(db, "usernames", username), {
         username: username,
-        userId: user.uid
+        userId: user.uid,
       });
 
       console.log("Adding user details to 'users' collection...");
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         fullName: fullName,
         displayName: username,
@@ -120,16 +107,18 @@ const Signup = () => {
       });
 
       console.log("Adding user to 'searchIndex' collection array...");
-      const searchIndexRef = doc(db, 'searchIndex', 'usersList'); 
+      const searchIndexRef = doc(db, "searchIndex", "usersList");
 
       const searchIndexDoc = await getDoc(searchIndexRef);
       if (!searchIndexDoc.exists()) {
         await setDoc(searchIndexRef, {
-          users: [{
-            uid: user.uid,
-            username: username,
-            fullName: fullName,
-          }]
+          users: [
+            {
+              uid: user.uid,
+              username: username,
+              fullName: fullName,
+            },
+          ],
         });
       } else {
         await updateDoc(searchIndexRef, {
@@ -137,24 +126,24 @@ const Signup = () => {
             userId: user.uid,
             username: username,
             fullName: fullName,
-          })
+          }),
         });
       }
 
       console.log("Firestore write operations completed successfully");
-      
-      setSuccess('Verification email sent! Please check your inbox to verify your email address.');
+
+      setSuccess(
+        "Verification email sent! Please check your inbox to verify your email address."
+      );
       await signOut(auth);
       setTimeout(() => {
-        navigate('/login');
+        navigate("/login");
       }, 3000);
     } catch (authError) {
       console.error("Error during authentication:", authError);
       setError(authError.message);
     }
   };
-
-
 
   const handlePassword2Change = (e) => {
     const value = e.target.value;
@@ -164,83 +153,92 @@ const Signup = () => {
 
   return (
     <div>
-      <div className='container fade-in top'>
-    
-        <div className='row d-flex justify-content-center'>
-            <div className='col-md-5 box'>
-            <div className='row d-flex justify-content-center' style={{marginTop: '50px'}}>
-                <h3 className='center primary monarque'>ResDex | Sign Up</h3>
-                <img src={Logo} alt='ResDex Logo' className='center' id='img-login'></img>
-              </div>
-              <div className='row d-flex justify-content-center'>
-          <Form className='login-form' onSubmit={handleSignup}>
-            <Form.Group className="mb-3" controlId="formBasicFullName">
-              <Form.Label className='primary'>Full Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicDisplayName">
-              <Form.Label className='primary'>Display Name (Username)</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter display name"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className='primary'>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label className='primary'>Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicPassword2">
-              <Form.Label className='primary'>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Retype Password"
-                value={password2}
-                onChange={handlePassword2Change}
-                isInvalid={!passwordMatch && password2.length > 0}
-                required='true'
-              />
-              <Form.Control.Feedback type="invalid">
-                Passwords do not match
-              </Form.Control.Feedback>
-            </Form.Group>
+      <div className="container fade-in top">
+        <div className="row d-flex justify-content-center">
+          <div className="col-md-5 box">
+            <div
+              className="row d-flex justify-content-center"
+              style={{ marginTop: "50px" }}
+            >
+              <h3 className="center primary monarque">ResDex | Sign Up</h3>
+              <img
+                src={Logo}
+                alt="ResDex Logo"
+                className="center"
+                id="img-login"
+              ></img>
+            </div>
+            <div className="row d-flex justify-content-center">
+              <form className="login-form" onSubmit={handleSignup}>
+                <FormField
+                  label="Full Name"
+                  type="text"
+                  placeholder="Enter full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  controlId="formBasicFullName"
+                  required
+                />
 
-            {error && <p className="error-text primary">{error}</p>}
-            {success && <p className="success-text primary">{success}</p>}
+                <FormField
+                  label="Display Name (Username)"
+                  type="text"
+                  placeholder="Enter display name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  controlId="formBasicDisplayName"
+                  required
+                />
 
-            <Button className='custom' type="submit">
-              Sign Up
-            </Button>
-            <p className='primary'>
-              <br />
-              Already have an account? <Link className='primary' to="/login">Sign In</Link>
-            </p>
-          </Form>
-          </div>
+                <FormField
+                  label="Email address"
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  controlId="formBasicEmail"
+                  required
+                />
+
+                <FormField
+                  label="Password"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  controlId="formBasicPassword"
+                  required
+                />
+
+                <FormField
+                  label="Confirm Password"
+                  type="password"
+                  placeholder="Confirm password"
+                  value={password2}
+                  onChange={handlePassword2Change}
+                  controlId="formBasicPassword2"
+                  required
+                />
+
+                {!passwordMatch && password2 && (
+                  <p style={{ color: "red" }}>Passwords do not match</p>
+                )}
+
+                <MessageDisplay error={error} success={success} />
+
+                <Button className="custom" type="submit">
+                  Sign Up
+                </Button>
+                <p className="primary">
+                  <br></br>
+                  <br></br>
+                  Already have an account?{" "}
+                  <Link className="primary" to="/login">
+                    Sign In
+                  </Link>
+                </p>
+              </form>
+            </div>
           </div>
         </div>
       </div>
