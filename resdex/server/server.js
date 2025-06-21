@@ -18,6 +18,7 @@ const io = socketIo(server, {
       "https://resdex.onrender.com",
       "https://www.resdex.onrender.com",
       "https://resdex.onrender.com/upload",
+      "https://resdex.onrender.com/delete",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -35,7 +36,8 @@ app.use(cors({
     "http://127.0.0.1:3002",
     "https://resdex.onrender.com",
     "https://www.resdex.onrender.com",
-    "https://resdex.onrender.com/upload"
+    "https://resdex.onrender.com/upload",
+    "https://resdex.onrender.com/delete",
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
