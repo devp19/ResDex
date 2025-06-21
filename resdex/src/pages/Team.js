@@ -9,6 +9,8 @@ import kush from "../images/kushceo.png";
 import fenil from "../images/fenilceo.png";
 import jay from "../images/jayceo.png";
 import darsh from "../images/darshceo.png";
+import bhavi from "../images/bhaviceo.png";
+import deep from "../images/deepceo.png";
 
 const Team = () => {
   // Use the custom animation hook
@@ -46,7 +48,7 @@ const Team = () => {
           bio: "Deep specializes in medical outsourcing with extensive knowledge in healthcare systems and patient care coordination.",
           linkedin: "https://www.linkedin.com/in/deepptll/",
           email: "dpptl16@gmail.com",
-          image: Empty,
+          image: deep,
         },
         {
           name: "Bhavi Singh",
@@ -54,7 +56,7 @@ const Team = () => {
           bio: "Bhavi has a strong background in medical administration and patient service coordination.",
           linkedin: "https://www.linkedin.com/in/bhavendra-singh-75bbb129b/",
           email: "bhavendrasingh08.com",
-          image: Empty,
+          image: bhavi,
         },
       ],
     },
