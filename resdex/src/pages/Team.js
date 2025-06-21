@@ -36,7 +36,7 @@ const Team = () => {
       members: [
         {
           name: "Deep Patel",
-          position: ["Medical Outsourcing"],
+          position: ["Outreach"],
           bio: "Deep specializes in medical outsourcing with extensive knowledge in healthcare systems and patient care coordination.",
           linkedin: "https://www.linkedin.com/in/deepptll/",
           email: "dpptl16@gmail.com",
@@ -44,7 +44,7 @@ const Team = () => {
         },
         {
           name: "Bhavi Singh",
-          position: ["Medical Outsourcing"],
+          position: ["Outreach"],
           bio: "Bhavi has a strong background in medical administration and patient service coordination.",
           linkedin: "https://www.linkedin.com/in/bhavendra-singh-75bbb129b/",
           email: "bhavendrasingh08.com",
