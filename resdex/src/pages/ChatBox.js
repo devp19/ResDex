@@ -1,9 +1,6 @@
 // src/pages/ChatBox.js
 import { useEffect, useState, useRef } from 'react';
-import { db } from '../firebaseConfig';
-import {
-  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, getDoc, getDocs, limit,
-} from 'firebase/firestore';
+import io from 'socket.io-client';
 
 export default function ChatBox({ recipient, currentUser, onClose }) {
   const [message, setMessage] = useState('');
@@ -11,38 +8,14 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sending, setSending] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   const chatId = [currentUser.uid, recipient.uid].sort().join('_');
-  const messagesRef = collection(db, 'chats', chatId, 'messages');
-
-  // Local storage functions
-  const getLocalMessages = () => {
-    try {
-      const stored = localStorage.getItem(`chat_${chatId}`);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error('Error reading from local storage:', error);
-      return [];
-    }
-  };
-
-  const saveLocalMessage = (messageData) => {
-    try {
-      const existingMessages = getLocalMessages();
-      const newMessage = {
-        id: Date.now().toString(),
-        ...messageData,
-        timestamp: new Date().toISOString()
-      };
-      const updatedMessages = [...existingMessages, newMessage];
-      localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
-      return newMessage;
-    } catch (error) {
-      console.error('Error saving to local storage:', error);
-      throw error;
-    }
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,60 +25,198 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
     scrollToBottom();
   }, [messages]);
 
+  // Load existing messages from server when component mounts
   useEffect(() => {
     if (!currentUser || !recipient) {
-      setError('Invalid user data');
       setLoading(false);
       return;
     }
 
-    console.log('Loading messages from local storage for chat ID:', chatId);
+    const loadMessages = async () => {
+      try {
+        console.log('📚 Loading messages from server for chat:', chatId);
+        
+        // Fetch messages from server
+        const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
+        const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`);
+        if (response.ok) {
+          const serverMessages = await response.json();
+          console.log('📨 Loaded messages from server:', serverMessages);
+          
+          // Also check localStorage as backup
+          const storedMessages = localStorage.getItem(`chat_${chatId}`);
+          let localMessages = [];
+          if (storedMessages) {
+            try {
+              localMessages = JSON.parse(storedMessages);
+            } catch (error) {
+              console.error('Error parsing stored messages:', error);
+            }
+          }
+          
+          // Merge server and local messages, preferring server messages
+          const allMessages = [...serverMessages, ...localMessages];
+          const uniqueMessages = allMessages.filter((msg, index, self) => 
+            index === self.findIndex(m => m.id === msg.id)
+          );
+          
+          // Sort by timestamp
+          uniqueMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+          
+          setMessages(uniqueMessages);
+          
+          // Update localStorage with merged messages
+          localStorage.setItem(`chat_${chatId}`, JSON.stringify(uniqueMessages));
+        } else {
+          console.error('Failed to fetch messages from server');
+          // Fallback to localStorage only
+          const storedMessages = localStorage.getItem(`chat_${chatId}`);
+          if (storedMessages) {
+            try {
+              const parsedMessages = JSON.parse(storedMessages);
+              setMessages(parsedMessages);
+            } catch (error) {
+              console.error('Error parsing stored messages:', error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        // Fallback to localStorage only
+        const storedMessages = localStorage.getItem(`chat_${chatId}`);
+        if (storedMessages) {
+          try {
+            const parsedMessages = JSON.parse(storedMessages);
+            setMessages(parsedMessages);
+          } catch (error) {
+            console.error('Error parsing stored messages:', error);
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, [chatId, currentUser, recipient]);
+
+  // Initialize Socket.IO connection
+  useEffect(() => {
+    console.log('🔍 Debug - ChatBox initialized with:', {
+      currentUser: currentUser ? { uid: currentUser.uid, email: currentUser.email } : null,
+      recipient: recipient ? { uid: recipient.uid, fullName: recipient.fullName } : null,
+      chatId
+    });
+
+    console.log('🔌 Connecting to Socket.IO server...');
+    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
+    const newSocket = io(serverUrl);
     
-    // Load messages from local storage
-    const localMessages = getLocalMessages();
-    console.log('Loaded messages:', localMessages);
-    
-    setMessages(localMessages);
-    setLoading(false);
-    setError(null);
-  }, [currentUser, recipient, chatId]);
+    newSocket.on('connect', () => {
+      console.log('✅ Connected to Socket.IO server');
+      setIsConnected(true);
+      
+      // Join the private chat room
+      newSocket.emit('join', {
+        userId: currentUser.uid,
+        username: currentUser.displayName || currentUser.fullName || currentUser.email,
+        chatId: chatId
+      });
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Socket.IO connection error:', error);
+      setError(`Connection failed: ${error.message}`);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('❌ Disconnected from Socket.IO server');
+      setIsConnected(false);
+    });
+
+    newSocket.on('message', (messageData) => {
+      console.log('📨 Received message:', messageData);
+      setMessages(prev => {
+        // Check if message already exists to avoid duplicates
+        const exists = prev.some(msg => msg.id === messageData.id);
+        if (!exists) {
+          const updatedMessages = [...prev, messageData];
+          // Update localStorage
+          localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+          return updatedMessages;
+        }
+        return prev;
+      });
+      // Clear typing indicators when message is received
+      setTypingUsers([]);
+    });
+
+    newSocket.on('typing', (data) => {
+      console.log('⌨️ Typing indicator:', data);
+      if (data.isTyping) {
+        setTypingUsers(prev => {
+          const filtered = prev.filter(user => user.userId !== data.userId);
+          return [...filtered, { userId: data.userId, username: data.username }];
+        });
+      } else {
+        setTypingUsers(prev => prev.filter(user => user.userId !== data.userId));
+      }
+    });
+
+    newSocket.on('userJoined', (data) => {
+      console.log('👤 User joined:', data);
+    });
+
+    newSocket.on('userLeft', (data) => {
+      console.log('👤 User left:', data);
+    });
+
+    newSocket.on('error', (error) => {
+      console.error('❌ Socket error:', error);
+      setError(error.message);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      console.log('🔌 Disconnecting from Socket.IO server...');
+      newSocket.disconnect();
+    };
+  }, [currentUser, chatId]);
 
   const sendMessage = async () => {
-    if (!message.trim() || sending) return;
-    
-    // Check if user is authenticated
-    if (!currentUser || !currentUser.uid) {
-      setError('You must be logged in to send messages');
-      return;
-    }
+    if (!message.trim() || sending || !socket || !isConnected) return;
     
     setSending(true);
     try {
-      console.log('=== SENDING MESSAGE (LOCAL STORAGE) ===');
-      console.log('Message:', message.trim());
-      
       const messageData = {
+        id: Date.now().toString(),
         text: message.trim(),
         senderId: currentUser.uid,
         senderName: currentUser.displayName || currentUser.fullName || currentUser.email,
+        timestamp: new Date().toISOString(),
+        chatId: chatId
       };
 
-      // Save to local storage
-      const savedMessage = saveLocalMessage(messageData);
-      console.log('✅ Message saved to local storage:', savedMessage);
-
-      // Update messages state
-      setMessages(prev => [...prev, savedMessage]);
+      console.log('📤 Sending message:', messageData);
+      
+      // Immediately add message to UI and localStorage for instant feedback
+      const updatedMessages = [...messages, messageData];
+      setMessages(updatedMessages);
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+      
+      // Send message via Socket.IO
+      socket.emit('message', messageData);
+      
       setMessage('');
       setError(null);
     } catch (error) {
       console.error("❌ Error sending message:", error);
-      setError(`Failed to send message: ${error.message}`);
+      setError('Failed to send message');
     } finally {
       setSending(false);
     }
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -114,21 +225,54 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
     }
   };
 
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+    
+    // Send typing indicator
+    if (socket && isConnected) {
+      socket.emit('typing', {
+        chatId,
+        userId: currentUser.uid,
+        username: currentUser.displayName || currentUser.fullName || currentUser.email,
+        isTyping: true
+      });
+      
+      // Clear typing indicator after 2 seconds of no typing
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      typingTimeoutRef.current = setTimeout(() => {
+        if (socket && isConnected) {
+          socket.emit('typing', {
+            chatId,
+            userId: currentUser.uid,
+            username: currentUser.displayName || currentUser.fullName || currentUser.email,
+            isTyping: false
+          });
+        }
+      }, 2000);
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-8 w-80 bg-white border shadow-xl rounded-lg z-50" style={{
       backgroundColor: '#ffffff', 
       border: '2px solid #1a1a1a', 
-      maxHeight: '900px',
-      minHeight: '500px',
+      maxHeight: '600px',
+      minHeight: '400px',
       boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-      borderRadius: '8px'
+      borderRadius: '8px',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Header */}
       <div className="flex justify-between items-center p-3 border-b rounded-t-lg" style={{
         borderColor: '#1a1a1a', 
         backgroundColor: '#1a1a1a',
         borderTopLeftRadius: '6px',
-        borderTopRightRadius: '6px'
+        borderTopRightRadius: '6px',
+        flexShrink: 0
       }}>
         <div className="flex items-center">
           <div className="w-8 h-8 rounded-full bg-gray-300 mr-3 flex items-center justify-center overflow-hidden">
@@ -148,7 +292,9 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             <h4 className="font-semibold text-sm text-white">
               {recipient.fullName || recipient.displayName || 'User'}
             </h4>
-            <p className="text-xs text-white">Online</p>
+            <p className="text-xs text-white">
+              {isConnected ? 'Online' : 'Connecting...'}
+            </p>
           </div>
         </div>
         <div className="flex items-center">
@@ -162,10 +308,12 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="h-64 overflow-y-auto p-3" style={{
+      {/* Messages - Smaller with scrolling */}
+      <div className="flex-1 overflow-y-auto p-3" style={{
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e0e0e0'
+        borderBottom: '1px solid #e0e0e0',
+        maxHeight: '300px',
+        minHeight: '200px'
       }}>
         {error && (
           <div className="flex justify-center items-center h-full">
@@ -185,51 +333,64 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             </p>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className={`mb-2 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
-              <div className={`inline-block p-2 rounded-lg max-w-xs ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-black' : 'bg-black-200 text-gray-800'}`} style={{
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}>
-                <p className="text-sm break-words" style={{color: msg.senderId === currentUser.uid ? '#030000' : '#333333'}}>{msg.text}</p>
-                <p className="text-xs mt-1" style={{color: msg.senderId === currentUser.uid ? '#030000' : '#030000'}}>
-                  {msg.timestamp ? 
-                    new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
-                    'Just now'
-                  }
-                </p>
+          <>
+            {messages.map((msg) => (
+              <div key={msg.id} className={`mb-2 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
+                <div className={`inline-block p-2 rounded-lg max-w-xs ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-black' : 'bg-gray-200 text-gray-800'}`} style={{
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  fontSize: '12px',
+                  lineHeight: '1.3'
+                }}>
+                  <p className="break-words" style={{color: msg.senderId === currentUser.uid ? '#ffffff' : '#333333'}}>{msg.text}</p>
+                  <p className="text-xs mt-1" style={{color: msg.senderId === currentUser.uid ? '#ffffff' : '#666666'}}>
+                    {msg.timestamp ? 
+                      new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
+                      'Just now'
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+            {typingUsers.length > 0 && (
+              <div className="text-left mb-2">
+                <div className="inline-block p-2 rounded-lg bg-gray-100 text-gray-600 text-xs">
+                  {typingUsers.map(user => user.username).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                </div>
+              </div>
+            )}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-3" style={{backgroundColor: '#f8f9fa'}}>
+      {/* Permanent Input Box */}
+      <div className="p-3" style={{backgroundColor: '#f8f9fa', flexShrink: 0}}>
         <div className="flex">
           <input
             className="flex-1 border rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="Type a message..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleTyping}
             onKeyPress={handleKeyPress}
-            disabled={sending}
+            disabled={sending || !isConnected}
             style={{
               border: '1px solid #1a1a1a', 
               borderRadius: '4px 0 0 4px',
               backgroundColor: '#ffffff',
-              color: '#333333'
+              color: '#333333',
+              fontSize: '12px'
             }}
           />
           <button
             className="text-white px-4 py-2 rounded-r text-sm font-medium transition-colors hover:opacity-90"
             onClick={sendMessage}
-            disabled={!message.trim() || sending}
+            disabled={!message.trim() || sending || !isConnected}
             style={{
-              backgroundColor: (message.trim() && !sending) ? '#1a1a1a' : '#cccccc',
+              backgroundColor: (message.trim() && !sending && isConnected) ? '#1a1a1a' : '#cccccc',
               borderRadius: '0 4px 4px 0',
-              cursor: (message.trim() && !sending) ? 'pointer' : 'not-allowed',
-              color: '#ffffff'
+              cursor: (message.trim() && !sending && isConnected) ? 'pointer' : 'not-allowed',
+              color: '#ffffff',
+              fontSize: '12px'
             }}
           >
             {sending ? '...' : 'Send'}

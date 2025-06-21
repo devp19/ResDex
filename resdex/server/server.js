@@ -10,14 +10,21 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: ["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3002"],
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
   }
 });
 
-const port = 5001;
+const port = process.env.PORT || 5001;
 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3002"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 const upload = multer();
@@ -25,53 +32,90 @@ const upload = multer();
 // In-memory storage for messages (no MongoDB)
 const messages = new Map(); // chatId -> array of messages
 const chats = new Map(); // chatId -> chat info
+const activeUsers = new Map(); // socketId -> user info
 
 // Socket.IO connection handling for real-time messaging
 io.on('connection', (socket) => {
   console.log('👤 User connected:', socket.id);
 
-  // Join a chat room for private one-on-one conversation
-  socket.on('join-chat', (chatId) => {
-    socket.join(chatId);
-    console.log(`🔗 User ${socket.id} joined chat: ${chatId}`);
+  // Handle user joining a chat room
+  socket.on('join', (data) => {
+    try {
+      const { userId, username, chatId } = data;
+      console.log(`🔗 User ${username} (${userId}) joining chat: ${chatId}`);
+      
+      // Store user info
+      activeUsers.set(socket.id, { userId, username, chatId });
+      
+      // Join the chat room
+      socket.join(chatId);
+      
+      // Notify others in the room
+      socket.to(chatId).emit('userJoined', {
+        userId,
+        username,
+        message: `${username} joined the chat`
+      });
+      
+      console.log(`✅ User ${username} joined chat room: ${chatId}`);
+    } catch (error) {
+      console.error('❌ Error joining chat:', error);
+      socket.emit('error', { message: 'Failed to join chat' });
+    }
   });
 
-  // Handle new message (like iMessage)
-  socket.on('send-message', async (messageData) => {
+  // Handle new message
+  socket.on('message', (messageData) => {
     try {
-      console.log('📨 Received message from client:', messageData);
-      const { chatId, senderId, senderName, text } = messageData;
+      console.log('📨 Received message:', messageData);
+      const { chatId, text, senderId, senderName } = messageData;
       
-      // Create message object
-      const message = {
-        id: Date.now() + Math.random(), // Simple unique ID
-        chatId,
-        senderId,
-        senderName,
-        text,
-        timestamp: new Date()
-      };
-      
-      console.log('💾 Storing message in memory:', message);
       // Store message in memory
       if (!messages.has(chatId)) {
         messages.set(chatId, []);
       }
-      messages.get(chatId).push(message);
+      messages.get(chatId).push(messageData);
       
-      // Deliver message instantly to all users in the chat (real-time like iMessage)
-      console.log(`📤 Broadcasting message to chat ${chatId}:`, message);
-      io.to(chatId).emit('new-message', message);
+      // Broadcast message to all users in the chat room
+      io.to(chatId).emit('message', messageData);
       
-      console.log(`💬 Message delivered: "${text}"`);
+      console.log(`💬 Message delivered to chat ${chatId}: "${text}"`);
     } catch (error) {
       console.error('❌ Error handling message:', error);
-      socket.emit('message-error', { error: 'Failed to send message' });
+      socket.emit('error', { message: 'Failed to send message' });
     }
   });
 
+  // Handle typing indicator
+  socket.on('typing', (data) => {
+    try {
+      const { chatId, userId, username, isTyping } = data;
+      socket.to(chatId).emit('typing', { userId, username, isTyping });
+    } catch (error) {
+      console.error('❌ Error handling typing indicator:', error);
+    }
+  });
+
+  // Handle disconnect
   socket.on('disconnect', () => {
-    console.log('👋 User disconnected:', socket.id);
+    try {
+      const userData = activeUsers.get(socket.id);
+      if (userData) {
+        const { userId, username, chatId } = userData;
+        
+        // Notify others in the room
+        socket.to(chatId).emit('userLeft', {
+          userId,
+          username,
+          message: `${username} left the chat`
+        });
+        
+        activeUsers.delete(socket.id);
+        console.log(`👋 User ${username} disconnected from chat: ${chatId}`);
+      }
+    } catch (error) {
+      console.error('❌ Error handling disconnect:', error);
+    }
   });
 });
 
@@ -202,9 +246,10 @@ res.json({
   }
 });
 
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Backend server running at http://localhost:${port}`);
-  console.log(`💬 Real-time messaging enabled with Socket.IO`);
-  console.log(`💾 Messages stored in memory (no database)`);
+  console.log(`🌐 Network accessible at http://YOUR_IP_ADDRESS:${port}`);
+  console.log('💬 Real-time messaging enabled with Socket.IO');
+  console.log('💾 Messages stored in memory (no database)');
 });
  
