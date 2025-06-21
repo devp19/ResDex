@@ -273,44 +273,47 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   };
 
   return (
-    <div className="fixed bottom-4 right-8 w-96 bg-white border shadow-xl rounded-lg z-50" style={{
-      backgroundColor: '#f2f0eb', 
+    <div className="fixed bottom-4 right-8 w-96 bg-white border shadow-xl rounded-lg z-50 relative" style={{
+      backgroundColor: '#000000', 
       border: '1px solid #746c6c', 
-      maxHeight: '20px',
+      maxHeight: '600px',
       minHeight: '400px',
       boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
       borderRadius: '8px',
       display: 'flex',
       flexDirection: 'column'
     }}>
+      {/* Exit Button - Top Right */}
+      <button 
+        onClick={onClose} 
+        className=" top-1 right-1 z-10 text-black hover:text-gray-300 transition-colors" 
+        style={{fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer', padding: '8px', lineHeight: '1', fontWeight: 'normal'}}
+      >
+        &times;
+      </button>
+
       {/* Header */}
-      <div className="flex justify-between items-center p-2 border-b rounded-t-lg" style={{
-        borderColor: '#f2f0eb', 
+      <div className="p-3 border-b" style={{
+        borderColor: '#746c6c', 
         backgroundColor: '#f2f0eb',
-        borderTopLeftRadius: '6px',
-        borderTopRightRadius: '6px',
+        borderTopLeftRadius: '8px',
+        borderTopRightRadius: '8px',
         flexShrink: 0,
-        minHeight: '40px',
-        maxHeight: '40px'
+        paddingRight: '40px', // Create space for the close button
       }}>
-        <div className="flex items-center flex-1 min-w-0">
-          <div className="min-w-0 flex-1">
+        <div className="min-w-0">
+          <div className="flex items-center">
             <h4 className="font-semibold text-sm text-black truncate">
               {recipient.fullName || recipient.displayName || 'User'}
             </h4>
-            <p className="text-xs text-gray-300">
-              {isConnected ? 'Online' : 'Connecting...'}
-            </p>
+            <div 
+              className="w-2 h-2 rounded-full ml-2" 
+              style={{
+                backgroundColor: isConnected ? '#34C759' : '#8E8E93',
+                flexShrink: 0
+              }}
+            />
           </div>
-        </div>
-        <div className="flex items-center flex-shrink-0">
-          <button 
-            onClick={onClose} 
-            className="text-white hover:text-white transition-colors" 
-            style={{fontSize: '16px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px'}}
-          >
-            &times;
-          </button>
         </div>
       </div>
 
@@ -318,7 +321,7 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
       <div className="flex-1 overflow-y-auto p-3" style={{
         backgroundColor: '#f2f0eb',
         borderBottom: '1px solid #746c6c',
-        maxHeight: '350px',
+        maxHeight: '480px', // Adjusted height
         minHeight: '250px'
       }}>
         {error && (
@@ -356,11 +359,11 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
           <>
             {messages.map((msg) => (
               <div key={msg.id} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                <div className={`inline-block p-2 rounded-lg max-w-[10%]`} style={{
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                <div className={`inline-block p-2 rounded-lg max-w-[70%]`} style={{
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                   fontSize: '13px',
                   lineHeight: '1.4',
-                  borderRadius: '50px',
+                  borderRadius: '18px',
                   backgroundColor: msg.senderId === currentUser.uid ? '#2f2f2e' : '#e5e5ea',
                 }}>
                   <p className="break-words" style={{
@@ -373,7 +376,8 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
                   <p className="text-xs mt-1 opacity-70" style={{
                     color: msg.senderId === currentUser.uid ? '#e5e5ea' : '#6c6c70',
                     margin: '0',
-                    textAlign: msg.senderId === currentUser.uid ? 'right' : 'left'
+                    textAlign: msg.senderId === currentUser.uid ? 'right' : 'left',
+                    fontSize: '10px'
                   }}>
                     {msg.timestamp ? 
                       new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
@@ -408,8 +412,8 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             style={{
               border: '1px solid #746c6c', 
               borderRadius: '18px 0 0 18px',
-              backgroundColor: '#3a3a3c',
-              color: '#ffffff',
+              backgroundColor: '#ffffff',
+              color: '#000000',
               fontSize: '13px'
             }}
           />
@@ -418,7 +422,7 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
             onClick={sendMessage}
             disabled={!message.trim() || sending || !isConnected}
             style={{
-              backgroundColor: (message.trim() && !sending && isConnected) ? '#007aff' : '#3a3a3c',
+              backgroundColor: (message.trim() && !sending && isConnected) ? '#007aff' : '#a7a7a7',
               borderRadius: '0 18px 18px 0',
               cursor: (message.trim() && !sending && isConnected) ? 'pointer' : 'not-allowed',
               color: '#ffffff',
