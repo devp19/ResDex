@@ -5,6 +5,7 @@ import MAC from "../images/mac.png";
 import OTTAWA from "../images/ottawa.png";
 import UFT from "../images/uft.png";
 import LOO from "../images/loo.png";
+import WLU from "../images/wlu.png";
 import CAPTION from "../images/captionblack.png";
 import Alert from "react-bootstrap/Alert";
 import Empty from "../images/empty-pic.webp";
@@ -55,33 +56,42 @@ const Home = () => {
 
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
     let interval;
     if (isAutoPlaying) {
       interval = setInterval(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+        goToNext();
       }, 5000);
     }
     return () => clearInterval(interval);
   }, [isAutoPlaying, testimonials.length]);
 
+  const handleNavigation = (nextIndex) => {
+    setIsFading(true);
+    setTimeout(() => {
+      setCurrentTestimonial(nextIndex);
+      setIsFading(false);
+    }, 500); // This should match the CSS transition time
+  };
+
   const goToTestimonial = (index) => {
-    setCurrentTestimonial(index);
+    handleNavigation(index);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const goToNext = () => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    const nextIndex = (currentTestimonial + 1) % testimonials.length;
+    handleNavigation(nextIndex);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const goToPrev = () => {
-    setCurrentTestimonial(
-      (prev) => (prev - 1 + testimonials.length) % testimonials.length
-    );
+    const prevIndex = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+    handleNavigation(prevIndex);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
@@ -194,6 +204,7 @@ const Home = () => {
               <img style={{ height: "50px" }} src={OTTAWA} alt="" />
               <img style={{ height: "50px" }} src={UFT} alt="" />
               <img style={{ height: "50px" }} src={LOO} alt="" />
+              <img style={{ height: "50px", marginRight: "30px" }} src={WLU} alt="" />
             </div>
           </div>
         </div>
@@ -336,7 +347,7 @@ const Home = () => {
                 <p className="primary kugile mt-3">&lt;</p>
               </button>
 
-              <div className="testimonial-content">
+              <div className={`testimonial-content ${isFading ? 'fading' : ''}`}>
                 <h3 className="testimonial-number">
                   {testimonials[currentTestimonial].number}
                 </h3>

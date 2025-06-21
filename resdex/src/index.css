@@ -752,12 +752,16 @@ border-top: 1px solid white;
 }
 
 .indicator {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #5e5e5e;
+  background: #8a8a8a;
+  border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .indicator.active {
@@ -984,6 +988,8 @@ button {
   z-index: 10;
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
 }
 
 .carousel-button:hover {
@@ -1002,6 +1008,16 @@ button {
 /* Testimonial Content */
 .testimonial-content {
   padding: 0 1rem; /* Give space so text doesn't touch buttons */
+  min-height: 200px; /* Fixed height to prevent misalignment */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.testimonial-content.fading {
+  opacity: 0;
 }
 
 /* Rest of your existing testimonial styles... */
@@ -1052,13 +1068,16 @@ button {
 }
 
 .indicator {
-  width: 15px;
-  height: 15px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #8a8a8a;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .indicator.active {
