@@ -316,19 +316,21 @@ const Search = () => {
   return (
     <div className="container">
       <div className="row mt-4">
-        <div className="row justify-content-center d-flex fade-in">
-          <img
-            src={Logo}
-            style={{ maxWidth: "70px", fill: "black" }}
-            alt="resdex-logo"
-          ></img>
+        <div style={{ textAlign: 'center' }}>
+          <div className="row justify-content-center d-flex fade-in">
+            <img
+              src={Logo}
+              style={{ maxWidth: "70px", fill: "black" }}
+              alt="resdex-logo"
+            ></img>
+          </div>
+          <div className="row text-center fade-in">
+            <p className="primary">⏐</p>
+          </div>
+          <h1 className="primary monarque fade-in">Explore ResDex</h1>
         </div>
-        <div className="row text-center fade-in">
-          <p className="primary">⏐</p>
-        </div>
-        <h1 className="center primary monarque fade-in">Explore ResDex</h1>
         <br />
-        <div className="d-flex justify-content-center input fade-in">
+        <div className="d-flex justify-content-center input fade-in" style={{ marginTop: '20px' }}>
           <div
             className="input-group search-input-group box d-flex"
             style={{
