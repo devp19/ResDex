@@ -19,73 +19,132 @@ const Notifications = () => {
   const [visibleCount, setVisibleCount] = useState(5);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const isAcceptedFollowNotification = (notification) => {
+    return (
+      typeof notification.message === "string" &&
+      notification.message.startsWith(
+        "Your follow request has been accepted by"
+      )
+    );
+  };
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setCurrentUser(user);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setCurrentUserId(user.uid);
-        await fetchNotifications(user.uid);
+        setCurrentUser(user);
       } else {
-        setNotifications([]);
         setCurrentUserId(null);
+        setCurrentUser(null);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  const fetchNotifications = async (userId) => {
-    try {
-      const userDocRef = doc(db, "users", userId);
-      const userDoc = await getDoc(userDocRef);
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!currentUserId) return;
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const userNotifications = userData.notifications || [];
-        setNotifications(userNotifications);
+      const userDocRef = doc(db, "users", currentUserId);
+      try {
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          setNotifications(userData.notifications || []);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
       }
+    };
+
+    fetchNotifications();
+  }, [currentUserId]);
+
+  const handleDismissNotification = async (notification) => {
+    const userDocRef = doc(db, "users", currentUserId);
+    try {
+      await updateDoc(userDocRef, {
+        notifications: arrayRemove(notification),
+      });
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((n) => n !== notification)
+      );
+      window.location.reload();
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      console.error("Error dismissing notification:", error);
     }
   };
 
-  const handleAcceptRequest = async (notification, requesterUID) => {
+  const handleAcceptRequest = async (request) => {
+    const requesterRef = doc(db, "users", request.requesterId);
+    const currentUserRef = doc(db, "users", currentUserId);
+
     try {
-      // Update current user's following list
-      const currentUserRef = doc(db, "users", currentUserId);
       await updateDoc(currentUserRef, {
-        following: arrayUnion(requesterUID),
-        notifications: arrayRemove(notification),
+        followers: arrayUnion(request.requesterId),
+        following: arrayUnion(request.requesterId),
+        followRequests: arrayRemove(request),
+        notifications: arrayRemove(request),
       });
 
-      // Update requester's followers list
-      const requesterRef = doc(db, "users", requesterUID);
       await updateDoc(requesterRef, {
+        following: arrayUnion(currentUserId),
         followers: arrayUnion(currentUserId),
+        pendingFollowRequests: arrayRemove(currentUserId),
       });
 
-      // Refresh notifications
-      await fetchNotifications(currentUserId);
+      const acceptanceNotification = {
+        message: `Your follow request has been accepted by ${currentUser.displayName}!`,
+        timestamp: new Date().toISOString(),
+        status: "accepted",
+      };
+      await updateDoc(requesterRef, {
+        notifications: arrayUnion(acceptanceNotification),
+      });
+
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((n) => n !== request)
+      );
+
+      console.log(
+        `You have accepted ${request.requesterName}'s follow request and are now following them.`
+      );
+      window.location.reload();
     } catch (error) {
       console.error("Error accepting follow request:", error);
     }
   };
 
-  const handleDeclineRequest = async (notification) => {
+  const handleDeclineRequest = async (request) => {
+    const requesterRef = doc(db, "users", request.requesterId);
+    const currentUserRef = doc(db, "users", currentUserId);
+
     try {
-      const currentUserRef = doc(db, "users", currentUserId);
       await updateDoc(currentUserRef, {
-        notifications: arrayRemove(notification),
+        followRequests: arrayRemove(request),
+        notifications: arrayRemove(request),
       });
 
-      await fetchNotifications(currentUserId);
+      await updateDoc(requesterRef, {
+        pendingFollowRequests: arrayRemove(currentUserId),
+      });
+
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((n) => n !== request)
+      );
+
+      console.log(
+        `You have declined ${request.requesterName}'s follow request.`
+      );
+      window.location.reload();
     } catch (error) {
       console.error("Error declining follow request:", error);
     }
   };
 
   const loadMoreNotifications = () => {
-    setVisibleCount((prev) => prev + 5);
+    setVisibleCount((prevCount) => prevCount + 5);
   };
 
   return (
@@ -109,53 +168,120 @@ const Notifications = () => {
                 .slice(0, visibleCount)
                 .map((notification, index) => (
                   <li className="center primary" key={index}>
-                    <div className="notification-item mb-3 p-3 border rounded">
-                      <p className="mb-2">{notification.message}</p>
-                      {notification.type === "follow_request" && (
-                        <div className="d-flex gap-2">
-                          <button
-                            className="btn btn-success btn-sm"
-                            onClick={() =>
-                              handleAcceptRequest(
-                                notification,
-                                notification.requesterUID
-                              )
-                            }
+                    <div className="box primary p-4">
+                      {notification.status === "pending" ? (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="primary"
+                            className="bi bi-dot"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                          </svg>
+                          <a
+                            className="primary"
+                            target="_blank"
+                            href={`https://resdex.ca/profile/${notification.requesterName}`}
+                          >
+                            {notification.fullName}
+                          </a>{" "}
+                          sent you a follow request!
+                          <br></br>
+                          <br></br>
+                          <a
+                            className="custom-view"
+                            style={{ marginLeft: "15px", marginRight: "10px" }}
+                            onClick={() => handleAcceptRequest(notification)}
                           >
                             Accept
-                          </button>
-                          <button
-                            className="btn btn-danger btn-sm"
+                          </a>
+                          <a
+                            className="custom-view m-1"
                             onClick={() => handleDeclineRequest(notification)}
                           >
                             Decline
+                          </a>
+                          <br></br>
+                        </>
+                      ) : isAcceptedFollowNotification(notification) ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span className="primary">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="primary"
+                              className="bi bi-dot"
+                              viewBox="0 0 16 16"
+                            >
+                              <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                            </svg>{" "}
+                            {notification.message}
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleDismissNotification(notification)
+                            }
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "gray",
+                              fontSize: "1.2em",
+                              marginLeft: "10px",
+                              cursor: "pointer",
+                              lineHeight: 1,
+                            }}
+                            aria-label="Dismiss notification"
+                            title="Dismiss"
+                          >
+                            &times;
                           </button>
                         </div>
+                      ) : (
+                        notification.message
                       )}
+                      <br></br>
+                      <span
+                        style={{
+                          fontSize: "small",
+                          color: "gray",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        {new Date(notification.timestamp).toLocaleString()}
+                      </span>
                     </div>
                   </li>
                 ))
             ) : (
-              <li className="center primary">
-                <p className="primary">You're all caught up!</p>
-              </li>
+              <p className="primary" style={{ marginLeft: "15px" }}>
+                You're all caught up!
+              </p>
             )}
           </ul>
         </div>
-      </div>
-
-      {notifications.length > visibleCount && (
-        <div className="row d-flex justify-content-center mt-3">
-          <div className="col-md-7 text-center">
-            <button
-              className="btn btn-outline-primary"
-              onClick={loadMoreNotifications}
-            >
-              Load More
-            </button>
+        <div
+          className="row d-flex justify-content-center"
+          style={{ marginTop: "-50px", marginLeft: "20px" }}
+        >
+          <div className="col-md-2 d-flex justify-content-center">
+            {notifications.length > visibleCount && (
+              <a onClick={loadMoreNotifications} className="custom-view mt-3">
+                Load More
+              </a>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
