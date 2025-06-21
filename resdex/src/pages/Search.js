@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   collection,
   getDocs,
@@ -10,7 +10,6 @@ import {
   limit,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { useNavigate } from "react-router-dom";
 import Select, { components } from "react-select";
 import Logo from "../images/dark-transparent.png";
 import useAnimationEffect from "../hooks/useAnimationEffect";
@@ -45,7 +44,31 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [universitySuggestions, setUniversitySuggestions] = useState([]);
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('q');
+    const type = params.get('type');
+
+    if (query) {
+      setSearchTerm(query);
+      
+      let newSearchType = { value: 'users', label: 'Users' };
+      if (type === 'papers') {
+        newSearchType = { value: 'papers', label: 'Papers' };
+      } else if (type === 'universities') {
+        newSearchType = { value: 'universities', label: 'Universities' };
+      }
+      setSearchType(newSearchType);
+      
+      handleSearch(query, newSearchType.value);
+    }
+  }, [location.search]);
+
+
 
   // Handle clicking outside to close suggestions
   useEffect(() => {
@@ -98,18 +121,20 @@ const Search = () => {
     }
 
     const newTimeout = setTimeout(() => {
-      handleSearch(newSearchTerm);
+      handleSearch(newSearchTerm, searchType.value);
     }, 300);
 
     setDebounceTimeout(newTimeout);
   };
 
-  const handleSearch = async (term) => {
+  const handleSearch = async (term, searchTypeValue) => {
+    const typeToSearch = searchTypeValue || searchType.value;
+
     if (term.trim() !== "") {
       const processedTerm = term.toLowerCase();
       let filteredResults = [];
 
-      if (searchType.value === "users" && processedTerm.length >= 3) {
+      if (typeToSearch === "users" && processedTerm.length >= 3) {
         try {
           const searchIndexDocRef = doc(db, "searchIndex", "usersList");
           const searchIndexDoc = await getDoc(searchIndexDocRef);
@@ -150,56 +175,30 @@ const Search = () => {
           setResults([]);
         }
       } else if (
-        searchType.value === "universities" &&
+        typeToSearch === "universities" &&
         processedTerm.length >= 2
       ) {
         try {
-          const searchIndexDocRef = doc(db, "searchIndex", "usersList");
-          const searchIndexDoc = await getDoc(searchIndexDocRef);
-          if (searchIndexDoc.exists()) {
-            const usersList = searchIndexDoc.data().users || [];
+          const usersRef = collection(db, "users");
+          const q = query(
+            usersRef,
+            where("organization", ">=", term),
+            where("organization", "<=", term + "\uf8ff")
+          );
+          
+          const querySnapshot = await getDocs(q);
+          const results = querySnapshot.docs.map(doc => ({
+            userId: doc.id,
+            ...doc.data()
+          }));
+          
+          setResults(results);
 
-            // Filter users by organization/university
-            filteredResults = usersList.filter((user) => {
-              // First get the user's organization from their document
-              return true; // We'll filter after getting the full user data
-            });
-
-            const updatedResults = [];
-
-            for (let user of filteredResults) {
-              const userDocRef = doc(db, "users", user.userId);
-              const docSnapshot = await getDoc(userDocRef);
-
-              if (docSnapshot.exists()) {
-                const userData = docSnapshot.data();
-                const organization = userData.organization;
-                const profilePicture = userData.profilePicture || null;
-
-                // Only include users whose organization matches the search term
-                if (
-                  organization &&
-                  organization.toLowerCase().includes(processedTerm)
-                ) {
-                  updatedResults.push({
-                    ...user,
-                    organization: organization,
-                    profilePicture: profilePicture,
-                  });
-                }
-              }
-            }
-
-            setResults(updatedResults);
-          } else {
-            console.warn("No users found in searchIndex.");
-            setResults([]);
-          }
         } catch (error) {
-          console.error("Error fetching from searchIndex:", error);
+          console.error("Error fetching from users collection:", error);
           setResults([]);
         }
-      } else if (searchType.value === "papers" && processedTerm.length >= 3) {
+      } else if (typeToSearch === "papers" && processedTerm.length >= 3) {
         try {
           const searchIndexDocRef = doc(db, "searchIndex", "papersList");
           const searchIndexDoc = await getDoc(searchIndexDocRef);
@@ -260,22 +259,13 @@ const Search = () => {
   };
 
   const handleResultClick = (result) => {
-    if (searchType.value === "users") {
-      navigate(`/profile/${result.username}`);
-    } else {
-      // Handle paper navigation
-      console.log("Navigate to paper:", result);
-    }
-  };
-
-  const goToProfile = (username) => {
-    navigate(`/profile/${username}`);
+    // Handle result click if needed
   };
 
   const handleUniversitySuggestionClick = (university) => {
     setSearchTerm(university);
     setUniversitySuggestions([]);
-    handleSearch(university);
+    handleSearch(university, searchType.value);
   };
 
   const customStyles = {
@@ -512,12 +502,13 @@ const Search = () => {
                         </span>
                       </div>
                     </div>
-                    <button
+                    <a
+                      href={`/profile/${result.username}`}
                       className="custom-view"
-                      onClick={() => goToProfile(result.username)}
+                      style={{ textDecoration: 'none' }}
                     >
                       View Profile ↗︎
-                    </button>
+                    </a>
                   </div>
                   {searchType.value === "papers" && result.matchedPdf && (
                     <div style={{ marginTop: "20px", width: "100%" }}>

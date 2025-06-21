@@ -3,6 +3,7 @@ import Empty from "../images/empty-pic.webp";
 import "./Team.css";
 import useAnimationEffect from "../hooks/useAnimationEffect";
 import { Logo } from "../components/common";
+import Dev from "../images/dev.jpg";
 
 const Team = () => {
   // Use the custom animation hook
@@ -82,6 +83,14 @@ const Team = () => {
           bio: "Jay brings innovative solutions to complex development challenges with a focus on performance and scalability.",
           linkedin: "https://www.linkedin.com/in/jay-patel-wlu/",
           email: "jaypt2105@gmail.com",
+          image: Empty,
+        },
+        {
+          name: "Darsh Kansara",
+          position: ["Full-Stack Developer"],
+          bio: "Darsh is a passionate full-stack developer with expertise in modern web technologies. He specializes in creating seamless user experiences and scalable backend solutions, contributing to ResDex's technical excellence.",
+          linkedin: "https://www.linkedin.com/in/darshk22/",
+          email: "darshk0822@gmail.com",
           image: Empty,
         },
       ],
