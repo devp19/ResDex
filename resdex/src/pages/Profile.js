@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import ProfilePictureUpload from "./ProfilePictureUpload";
 import PDFUpload from "./PDFUpload";
+import CertificationUpload from "./CertificationUpload";
 // import { s3 } from '../awsConfig';
 import { s3 } from "../cloudflareConfig";
 import Select from "react-select";
@@ -71,22 +72,28 @@ const Profile = () => {
   const [newAbout, setNewAbout] = useState("");
   const [loading, setLoading] = useState(true);
   const [pdfs, setPdfs] = useState([]);
+  const [certifications, setCertifications] = useState([]);
   const [contributionsCount, setContributionsCount] = useState(
     profileUser ? profileUser.contributions : 0
   );
   const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
+  const [currentCertificationIndex, setCurrentCertificationIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [pdfToRemove, setPdfToRemove] = useState(null);
+  const [certificationToRemove, setCertificationToRemove] = useState(null);
 
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
+  const [editedCertificationTitle, setEditedCertificationTitle] = useState("");
+  const [editedCertificationDescription, setEditedCertificationDescription] = useState("");
   const [requestSent, setRequestSent] = useState(false);
 
   const [editedTags, setEditedTags] = useState([]);
+  const [editedCertificationTags, setEditedCertificationTags] = useState([]);
 
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersList, setFollowersList] = useState([]);
@@ -118,8 +125,12 @@ const Profile = () => {
     setShowShareModal(true);
   };
 
+  const handleOrganizationClick = (org) => {
+    navigate(`/search?q=${encodeURIComponent(org)}&type=universities`);
+  };
+
   const handleTagClick = (tag) => {
-    navigate(`/search?q=${encodeURIComponent(tag)}`);
+    navigate(`/search?q=${encodeURIComponent(tag)}&type=papers`);
   };
 
   const handleChatClick = () => {
@@ -442,6 +453,92 @@ const Profile = () => {
     }
   };
 
+  const handleEditCertification = (certification) => {
+    if (!currentUser || !profileUser || currentUser.uid !== profileUser.uid) {
+      return;
+    }
+    setCertificationToRemove(certification);
+    setEditedCertificationTitle(certification.title);
+    setEditedCertificationDescription(certification.description);
+    setEditedCertificationTags(
+      certification.topics
+        ? certification.topics.map((topic) => ({ value: topic, label: topic }))
+        : []
+    );
+    setShowRemoveModal(true);
+  };
+
+  const saveCertificationChanges = async () => {
+    if (!certificationToRemove) return;
+    try {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const updatedCertifications = certifications.map((cert) =>
+        cert.url === certificationToRemove.url
+          ? {
+              ...cert,
+              title: editedCertificationTitle,
+              description: editedCertificationDescription,
+              topics: editedCertificationTags.map((tag) => tag.value),
+            }
+          : cert
+      );
+      await updateDoc(userDocRef, { certifications: updatedCertifications });
+      setCertifications(updatedCertifications);
+      console.log("Successfully updated certification in Firestore");
+    } catch (error) {
+      console.error("Error updating certification:", error);
+      alert("Failed to update certification. Please try again.");
+    } finally {
+      setShowRemoveModal(false);
+      setCertificationToRemove(null);
+    }
+  };
+
+  const confirmRemoveCertification = async () => {
+    if (!certificationToRemove) return;
+
+    try {
+      const response = await fetch("https://resdex.onrender.com/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.uid,
+          objectKey: certificationToRemove.objectKey,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) throw new Error(result.message);
+
+      const updatedCertifications = certifications.filter(
+        (cert) => cert.objectKey !== certificationToRemove.objectKey
+      );
+      await updateDoc(doc(db, "users", currentUser.uid), { certifications: updatedCertifications });
+
+      const searchIndexDocRef = doc(db, "searchIndex", "certificationsList");
+      const searchIndexDoc = await getDoc(searchIndexDocRef);
+
+      if (searchIndexDoc.exists()) {
+        const certificationsList = searchIndexDoc.data().certifications || [];
+        const updatedCertificationsList = certificationsList.filter(
+          (cert) => cert.objectKey !== certificationToRemove.objectKey
+        );
+
+        await updateDoc(searchIndexDocRef, { certifications: updatedCertificationsList });
+      }
+
+      setCertifications(updatedCertifications);
+      console.log("Successfully removed certification from both R2 and Firestore");
+    } catch (error) {
+      console.error("Error removing certification:", error);
+      alert("Failed to remove certification. Please try again.");
+    } finally {
+      setShowRemoveModal(false);
+      setCertificationToRemove(null);
+    }
+  };
+
   const fetchPDFs = useCallback(async (userId) => {
     try {
       const userDocRef = doc(db, "users", userId);
@@ -456,6 +553,23 @@ const Profile = () => {
     } catch (error) {
       console.error("Error fetching PDFs:", error);
       setPdfs([]);
+    }
+  }, []);
+
+  const fetchCertifications = useCallback(async (userId) => {
+    try {
+      const userDocRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+
+      if (userData && userData.certifications && userData.certifications.length > 0) {
+        setCertifications(userData.certifications);
+      } else {
+        setCertifications([]);
+      }
+    } catch (error) {
+      console.error("Error fetching certifications:", error);
+      setCertifications([]);
     }
   }, []);
 
@@ -474,6 +588,7 @@ const Profile = () => {
       }
       if (cachedProfile && cachedProfile.uid) {
         await fetchPDFs(cachedProfile.uid);
+        await fetchCertifications(cachedProfile.uid);
       }
 
       const usernamesRef = collection(db, "usernames");
@@ -519,6 +634,7 @@ const Profile = () => {
         );
         saveProfileToLocalStorage(username, userData);
         await fetchPDFs(userData.uid);
+        await fetchCertifications(userData.uid);
       }
     } catch (error) {
       console.error("Error fetching profile data: ", error);
@@ -526,7 +642,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [username, fetchPDFs]);
+  }, [username, fetchPDFs, fetchCertifications]);
 
   useEffect(() => {
     fetchProfileData();
@@ -537,6 +653,12 @@ const Profile = () => {
       fetchPDFs(profileUser.uid);
     }
   }, [profileUser, fetchPDFs]);
+
+  useEffect(() => {
+    if (profileUser && profileUser.uid) {
+      fetchCertifications(profileUser.uid);
+    }
+  }, [profileUser, fetchCertifications]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -1103,7 +1225,6 @@ const Profile = () => {
                 style={{ maxHeight: "50px" }}
               >
                 {!isOwnProfile && (
-                  <>
                     <a
                       className="custom-view"
                       onClick={toggleFollow}
@@ -1217,7 +1338,14 @@ const Profile = () => {
                       <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z" />
                       <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z" />
                     </svg>
-                    {organization}
+                    <span
+                      onClick={() => handleOrganizationClick(organization)}
+                      style={{ cursor: "pointer", color: "black", textDecoration: 'none' }}
+                      onMouseEnter={(e) => e.target.style.opacity = 0.7}
+                      onMouseLeave={(e) => e.target.style.opacity = 1}
+                    >
+                      {organization}
+                    </span>
                   </p>
                 )}
 
@@ -1449,6 +1577,261 @@ const Profile = () => {
                         No Documents Uploaded
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Certifications Section */}
+              <div className="mt-5">
+                <div
+                  style={{ borderRadius: "5px", margin: "0px" }}
+                  className="row d-flex justify-content-center"
+                >
+                  <div className="col-md-12 box">
+                    <div className="row" style={{ marginTop: "-10px" }}>
+                      <div className="col-md d-flex align-items-center">
+                        <h4 className="primary">Certifications</h4>
+                      </div>
+
+                      <div
+                        className="col-md"
+                        style={{ position: "relative", textAlign: "right" }}
+                      >
+                        {isOwnProfile && (
+                          <CertificationUpload
+                            user={currentUser}
+                            onUploadComplete={() => fetchCertifications(currentUser.uid)}
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        borderRadius: "5px",
+                        padding: "20px",
+                        paddingBottom: "50px",
+                        border: "1px solid white",
+                        marginBottom: "10px",
+                      }}
+                      className="row justify-content-center align-items-center"
+                    >
+                      {certifications.length > 0 ? (
+                        <div style={{ width: "100%", maxWidth: "800px" }}>
+                          <div className="position-relative">
+                            {/* Left Arrow */}
+                            {certifications.length > 1 && (
+                              <button
+                                style={{
+                                  position: "absolute",
+                                  left: "-50px",
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  background: "transparent",
+                                  border: "none",
+                                  width: "40px",
+                                  height: "40px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  cursor: "pointer",
+                                  zIndex: 10,
+                                  transition: "all 0.3s ease"
+                                }}
+                                onClick={() => {
+                                  const newIndex = currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1;
+                                  setCurrentCertificationIndex(newIndex);
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.opacity = "0.7";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.opacity = "1";
+                                }}
+                              >
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  fill="black"
+                                  viewBox="0 0 16 16"
+                                >
+                                  <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                </svg>
+                              </button>
+                            )}
+
+                            {/* Right Arrow */}
+                            {certifications.length > 1 && (
+                              <button
+                                style={{
+                                  position: "absolute",
+                                  right: "-50px",
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  background: "transparent",
+                                  border: "none",
+                                  width: "40px",
+                                  height: "40px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  cursor: "pointer",
+                                  zIndex: 10,
+                                  transition: "all 0.3s ease"
+                                }}
+                                onClick={() => {
+                                  const newIndex = currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0;
+                                  setCurrentCertificationIndex(newIndex);
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.opacity = "0.7";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.opacity = "1";
+                                }}
+                              >
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  fill="black"
+                                  viewBox="0 0 16 16"
+                                >
+                                  <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                              </button>
+                            )}
+
+                            {/* Custom Carousel Container */}
+                            <div 
+                              style={{ 
+                                display: "flex", 
+                                alignItems: "center", 
+                                justifyContent: "center",
+                                gap: "20px",
+                                padding: "20px 0"
+                              }}
+                            >
+                              {/* Previous Certification (if exists) */}
+                              {certifications.length > 1 && (
+                                <div
+                                  style={{
+                                    opacity: 0.6,
+                                    transition: "all 0.3s ease",
+                                    maxWidth: "200px",
+                                    width: "100%",
+                                    cursor: "pointer"
+                                  }}
+                                  onClick={() => {
+                                    const newIndex = currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1;
+                                    setCurrentCertificationIndex(newIndex);
+                                  }}
+                                >
+                                  <iframe
+                                    title="prev-certification"
+                                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1].url)}&embedded=true`}
+                                    style={{
+                                      width: "100%",
+                                      height: "200px",
+                                      border: "none",
+                                      borderRadius: "8px",
+                                      pointerEvents: "none",
+                                    }}
+                                  />
+                                  <p className="primary mt-2" style={{ fontSize: "12px", textAlign: "center" }}>
+                                    {certifications[currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1].title}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Main Certification */}
+                              <div
+                                style={{
+                                  position: "relative",
+                                  display: "inline-block",
+                                  maxWidth: "400px",
+                                  width: "100%",
+                                }}
+                              >
+                                <iframe
+                                  title={`certification-${currentCertificationIndex}`}
+                                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex].url)}&embedded=true`}
+                                  style={{
+                                    width: "100%",
+                                    height: "300px",
+                                    border: "none",
+                                    borderRadius: "10px",
+                                    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                                    pointerEvents: "none",
+                                  }}
+                                />
+                                
+                                {/* Title below the preview */}
+                                <h5 className="primary mt-3" style={{ margin: "0", fontSize: "16px", textAlign: "center" }}>
+                                  {certifications[currentCertificationIndex].title}
+                                </h5>
+                              </div>
+
+                              {/* Next Certification (if exists) */}
+                              {certifications.length > 1 && (
+                                <div
+                                  style={{
+                                    opacity: 0.6,
+                                    transition: "all 0.3s ease",
+                                    maxWidth: "200px",
+                                    width: "100%",
+                                    cursor: "pointer"
+                                  }}
+                                  onClick={() => {
+                                    const newIndex = currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0;
+                                    setCurrentCertificationIndex(newIndex);
+                                  }}
+                                >
+                                  <iframe
+                                    title="next-certification"
+                                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0].url)}&embedded=true`}
+                                    style={{
+                                      width: "100%",
+                                      height: "200px",
+                                      border: "none",
+                                      borderRadius: "8px",
+                                      pointerEvents: "none",
+                                    }}
+                                  />
+                                  <p className="primary mt-2" style={{ fontSize: "12px", textAlign: "center" }}>
+                                    {certifications[currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0].title}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="text-center mt-3">
+                              <button
+                                className="custom"
+                                style={{ marginRight: "10px" }}
+                                onClick={() => window.open(certifications[currentCertificationIndex].url, "_blank")}
+                              >
+                                View ⇗
+                              </button>
+                              {isOwnProfile && (
+                                <button
+                                  className="custom"
+                                  onClick={() => handleEditCertification(certifications[currentCertificationIndex])}
+                                >
+                                  Edit Certification
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className="text-center primary"
+                          style={{ marginTop: "40px" }}
+                        >
+                          No Certifications Uploaded
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1820,8 +2203,8 @@ const Profile = () => {
               <Form.Control
                 type="text"
                 placeholder="Enter new title"
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
+                value={certificationToRemove ? editedCertificationTitle : editedTitle}
+                onChange={(e) => certificationToRemove ? setEditedCertificationTitle(e.target.value) : setEditedTitle(e.target.value)}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formDocumentDescription">
@@ -1831,8 +2214,8 @@ const Profile = () => {
                 rows={3}
                 maxLength={150}
                 placeholder="Enter new description"
-                value={editedDescription}
-                onChange={(e) => setEditedDescription(e.target.value)}
+                value={certificationToRemove ? editedCertificationDescription : editedDescription}
+                onChange={(e) => certificationToRemove ? setEditedCertificationDescription(e.target.value) : setEditedDescription(e.target.value)}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formDocumentTags">
@@ -1843,13 +2226,17 @@ const Profile = () => {
                 options={interestOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
-                value={editedTags}
+                value={certificationToRemove ? editedCertificationTags : editedTags}
                 onChange={(selected) => {
                   if (selected.length <= 3) {
-                    setEditedTags(selected);
+                    if (certificationToRemove) {
+                      setEditedCertificationTags(selected);
+                    } else {
+                      setEditedTags(selected);
+                    }
                   }
                 }}
-                isOptionDisabled={() => editedTags.length >= 3}
+                isOptionDisabled={() => (certificationToRemove ? editedCertificationTags : editedTags).length >= 3}
                 placeholder="Select a topic!"
                 styles={customStyles}
               />
@@ -1859,14 +2246,14 @@ const Profile = () => {
         <Modal.Footer
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
         >
-          <Button className="custom-view" onClick={confirmRemove}>
+          <Button className="custom-view" onClick={certificationToRemove ? confirmRemoveCertification : confirmRemove}>
             Remove
           </Button>
           <div className="ms-auto">
             {/* <Button onClick={() => setShowRemoveModal(false)} className="me-2 custom-view">
         Cancel
       </Button> */}
-            <Button className="custom-view" onClick={saveChanges}>
+            <Button className="custom-view" onClick={certificationToRemove ? saveCertificationChanges : saveChanges}>
               Save Changes
             </Button>
           </div>
