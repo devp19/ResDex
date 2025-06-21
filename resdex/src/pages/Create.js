@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { auth, db } from '../firebaseConfig'; // Assuming you have firebaseConfig set up
 import { components } from 'react-select';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import googleDocsService from '../services/googleDocsService';
 
 const Create = () => {
 
   useEffect(() => {
+      // Check for OAuth redirect response
+      if (googleDocsService.handleAuthRedirect()) {
+        // Authentication was successful via redirect
+        console.log('Google authentication successful via redirect');
+      }
+
       // Animate scrolling marquee once
       const scrollers = document.querySelectorAll(".scroller");
       scrollers.forEach((scroller) => {
@@ -68,8 +75,9 @@ const Create = () => {
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [selectedCollaborators, setSelectedCollaborators] = useState([]);
   const [collaboratorOptions, setCollaboratorOptions] = useState([]);
-
-
+  const [showGoogleAuthModal, setShowGoogleAuthModal] = useState(false);
+  const [isCreatingDoc, setIsCreatingDoc] = useState(false);
+  const [googleDocUrl, setGoogleDocUrl] = useState('');
 
   const CustomOption = (props) => {
     return (
@@ -86,7 +94,6 @@ const Create = () => {
     );
   };
 
-
   const CustomMultiValue = (props) => {
     return (
       <components.MultiValue {...props}>
@@ -101,10 +108,6 @@ const Create = () => {
       </components.MultiValue>
     );
   };
-
-
-
-
 
   const customStyles = {
     option: (provided, state) => ({
@@ -173,8 +176,47 @@ const Create = () => {
     }
   };
 
+  // Handle Google Docs authentication
+  const handleGoogleAuth = async () => {
+    try {
+      const isAuthenticated = await googleDocsService.isAuthenticated();
+      if (isAuthenticated) {
+        setShowGoogleAuthModal(false);
+        return true;
+      } else {
+        setShowGoogleAuthModal(true);
+        return false;
+      }
+    } catch (error) {
+      console.error('Google auth error:', error);
+      setError('Google authentication failed. Please try again.');
+      setShowGoogleAuthModal(true);
+      return false;
+    }
+  };
 
-  
+  // Create Google Doc for the research
+  const createGoogleDoc = async (researchData) => {
+    try {
+      setIsCreatingDoc(true);
+      const result = await googleDocsService.createResearchDocument(researchData);
+      
+      if (result.success) {
+        setGoogleDocUrl(result.documentUrl);
+        return result.documentUrl;
+      } else {
+        console.error('Failed to create Google Doc:', result.error);
+        setError(`Google Doc creation failed: ${result.error}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error creating Google Doc:', error);
+      setError(`Google Doc creation failed: ${error.message}`);
+      return null;
+    } finally {
+      setIsCreatingDoc(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
@@ -194,14 +236,36 @@ const Create = () => {
             interests: selectedTopics.map(topic => topic.label),
             collaborators: selectedCollaborators.map(collaborator => collaborator.label),
             createdAt: new Date(),
+            author: userData.fullName || 'Unknown Author',
           };
+
+          // Try to create Google Doc
+          let googleDocUrl = null;
+          try {
+            const isAuthenticated = await handleGoogleAuth();
+            if (isAuthenticated) {
+              googleDocUrl = await createGoogleDoc(newResearch);
+              if (googleDocUrl) {
+                newResearch.googleDocUrl = googleDocUrl;
+                setSuccess('Research created successfully! Google Doc created.');
+              } else {
+                setSuccess('Research created successfully! (Google Doc creation failed)');
+              }
+            } else {
+              // User needs to authenticate
+              setShowGoogleAuthModal(true);
+              setSuccess('Research created successfully! Please authenticate to create Google Doc.');
+            }
+          } catch (error) {
+            console.error('Google Docs error:', error);
+            setSuccess('Research created successfully! (Google Doc creation failed)');
+          }
   
           // Update the user's document with the new research entry
           await updateDoc(userDocRef, {
             collaboratedResearch: arrayUnion(newResearch)
           });
   
-          setSuccess('Research created successfully!');
           setError('');
           navigate(`/profile/${username}`); // Use the actual username
         }
@@ -212,7 +276,6 @@ const Create = () => {
       setSuccess('');
     }
   };
-
 
   return (
     <div>
@@ -297,13 +360,109 @@ const Create = () => {
       </Form.Group>
               {error && <p style={{ color: 'red' }}>{error}</p>}
               {success && <p style={{ color: 'green' }}>{success}</p>}
-              <Button className="custom" style={{ marginBottom: '20px' }} type="submit" onClick={handleSubmit}>
-  Create
-</Button>
+              {googleDocUrl && (
+                <div className="mb-3">
+                  <p style={{ color: 'green' }}>
+                    Google Doc created!{' '}
+                    <a href={googleDocUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'blue' }}>
+                      Open Document
+                    </a>
+                  </p>
+                </div>
+              )}
+              <Button 
+                className="custom" 
+                style={{ marginBottom: '20px' }} 
+                type="submit" 
+                onClick={handleSubmit}
+                disabled={isCreatingDoc}
+              >
+                {isCreatingDoc ? 'Creating...' : 'Create'}
+              </Button>
             </Form>
           </div>
         </div>
       </div>
+
+      {/* Google Authentication Modal */}
+      <Modal show={showGoogleAuthModal} onHide={() => setShowGoogleAuthModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="primary">Google Docs Authentication</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="primary">
+            To create a Google Doc for your research, you need to authenticate with Google.
+            This will allow ResDex to create a document in your Google Drive.
+          </p>
+          <p className="primary">
+            Choose an authentication method:
+          </p>
+          <div className="mb-3">
+            <Button 
+              variant="outline-primary" 
+              className="w-100 mb-2"
+              onClick={async () => {
+                try {
+                  setError(''); // Clear any previous errors
+                  await googleDocsService.initialize();
+                  setShowGoogleAuthModal(false);
+                  // Retry creating the document
+                  const user = auth.currentUser;
+                  if (user) {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                      const userData = userDoc.data();
+                      const researchData = {
+                        title: Title,
+                        description: description,
+                        interests: selectedTopics.map(topic => topic.label),
+                        collaborators: selectedCollaborators.map(collaborator => collaborator.label),
+                        author: userData.fullName || 'Unknown Author',
+                      };
+                      const docUrl = await createGoogleDoc(researchData);
+                      if (docUrl) {
+                        setGoogleDocUrl(docUrl);
+                        setSuccess('Google Doc created successfully!');
+                      }
+                    }
+                  }
+                } catch (error) {
+                  console.error('Authentication error:', error);
+                  setError(`Authentication failed: ${error.message}. Try the redirect method below.`);
+                }
+              }}
+            >
+              Try Popup Authentication
+            </Button>
+            <Button 
+              variant="outline-secondary" 
+              className="w-100"
+              onClick={async () => {
+                try {
+                  setError(''); // Clear any previous errors
+                  await googleDocsService.authenticateWithRedirect();
+                  // The page will redirect to Google OAuth
+                } catch (error) {
+                  console.error('Redirect authentication error:', error);
+                  setError(`Redirect authentication failed: ${error.message}`);
+                }
+              }}
+            >
+              Use Redirect Authentication (Recommended)
+            </Button>
+          </div>
+          <p className="text-muted small">
+            If popup authentication doesn't work due to browser restrictions, 
+            use the redirect method which will take you to Google's authentication page.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowGoogleAuthModal(false)}>
+            Skip
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
