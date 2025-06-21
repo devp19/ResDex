@@ -193,13 +193,6 @@ const Profile = () => {
 
   const navigate = useNavigate(); // (add this inside your component, e.g., near `useEffect`)
 
-  const goToProfile = (username) => {
-    setShowFollowersModal(false); // close the modal first
-    setTimeout(() => {
-      navigate(`/profile/${username}`);
-    }, 200); // slight delay to ensure modal animates out
-  };
-
   const checkFollowStatus = useCallback(async () => {
     if (!currentUser || !profileUser) return;
 
@@ -1637,12 +1630,13 @@ const Profile = () => {
                       </span>
                     </div>
                   </div>
-                  <button
+                  <a
+                    href={`/profile/${result.username}`}
                     className="custom-view"
-                    onClick={() => goToProfile(result.username)}
+                    style={{ textDecoration: 'none' }}
                   >
                     View Profile ↗︎
-                  </button>
+                  </a>
                 </div>
               </div>
             ))
