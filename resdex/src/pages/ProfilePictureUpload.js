@@ -3,6 +3,7 @@ import { storage, db } from '../firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import Spinner from 'react-bootstrap/Spinner';
+import { Modal } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -12,16 +13,24 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
-  const [crop, setCrop] = useState({
-    unit: '%',
-    width: 100,
-    height: 100,
-    x: 0,
-    y: 0,
-    aspect: 1
-  });
+  const [crop, setCrop] = useState();
   const [imageSrc, setImageSrc] = useState(null);
   const imgRef = useRef(null);
+
+  const onImageLoad = (e) => {
+    const { width, height } = e.currentTarget;
+    const size = Math.min(width, height) * 0.8;
+    const x = (width - size) / 2;
+    const y = (height - size) / 2;
+    setCrop({
+        unit: 'px',
+        x,
+        y,
+        width: size,
+        height: size,
+        aspect: 1,
+    });
+  };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -101,14 +110,7 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
     setShowCropModal(false);
     setImageSrc(null);
     setSelectedFile(null);
-    setCrop({
-      unit: '%',
-      width: 100,
-      height: 100,
-      x: 0,
-      y: 0,
-      aspect: 1
-    });
+    setCrop();
   };
 
   const handleUpload = async (file) => {
@@ -170,53 +172,47 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       zIndex: 1000,
     },
-    cropModal: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-      zIndex: 1001,
-    },
-    cropContainer: {
-      backgroundColor: '#e5e3df',
-      padding: '20px',
-      borderRadius: '10px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      overflow: 'auto',
-    },
     cropImage: {
       maxWidth: '100%',
       maxHeight: '60vh',
     },
-    cropButtons: {
-      display: 'flex',
-      justifyContent: 'center',
-      gap: '10px',
-      marginTop: '20px',
-    },
-    cropButton: {
-      padding: '10px 20px',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer',
-      fontSize: '14px',
-      fontWeight: 'bold',
-    },
-    saveButton: {
-      backgroundColor: '#2a2a2a',
-      color: 'white',
-    },
-    cancelButton: {
-      backgroundColor: '#6c757d',
-      color: 'white',
+    cropContainer: {
+      position: 'relative',
+      display: 'inline-block',
     }
   };
+
+  // Add custom CSS for circular crop
+  const customCropStyles = `
+    .ReactCrop__crop-selection {
+      border-radius: 50% !important;
+      border: 2px solid #fff !important;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5) !important;
+    }
+    .ReactCrop__drag-handle {
+      border-radius: 50% !important;
+      background: #fff !important;
+      border: 2px solid #2a2a2a !important;
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .ReactCrop__drag-handle.ord-nw {
+      top: -6px !important;
+      left: -6px !important;
+    }
+    .ReactCrop__drag-handle.ord-ne {
+      top: -6px !important;
+      right: -6px !important;
+    }
+    .ReactCrop__drag-handle.ord-sw {
+      bottom: -6px !important;
+      left: -6px !important;
+    }
+    .ReactCrop__drag-handle.ord-se {
+      bottom: -6px !important;
+      right: -6px !important;
+    }
+  `;
 
   return (
     <div>
@@ -228,45 +224,75 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
         onChange={handleProfilePictureChange}
       />
       
+      {/* Custom CSS for circular crop */}
+      <style>{customCropStyles}</style>
+      
       {/* Crop Modal */}
-      {showCropModal && imageSrc && (
-        <div style={styles.cropModal}>
-          <div style={styles.cropContainer}>
-            <h4 style={{ color: 'black', textAlign: 'center', marginBottom: '20px' }}>
-              Crop Your Profile Picture
-            </h4>
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              aspect={1}
-              circularCrop
-            >
-              <img
-                ref={imgRef}
-                src={imageSrc}
-                alt="Crop preview"
-                style={styles.cropImage}
-              />
-            </ReactCrop>
-            <div style={styles.cropButtons}>
-              <button
-                style={{ ...styles.cropButton, ...styles.saveButton }}
-                onClick={handleCropComplete}
-                disabled={loading}
+      <Modal
+        show={showCropModal}
+        onHide={handleCancelCrop}
+        className="box"
+        size="lg"
+        centered
+      >
+        <Modal.Header
+          style={{
+            background: "#e5e3df",
+            borderBottom: "1px solid white",
+          }}
+          closeButton
+        >
+          <Modal.Title className="primary">
+            Crop Your Profile Picture
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{
+            background: "#e5e3df",
+            borderBottom: "1px solid white",
+            textAlign: 'center',
+          }}
+        >
+          {imageSrc && (
+            <div style={styles.cropContainer}>
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                aspect={1}
+                circularCrop
               >
-                {loading ? 'Saving...' : 'Save & Upload'}
-              </button>
-              <button
-                style={{ ...styles.cropButton, ...styles.cancelButton }}
-                onClick={handleCancelCrop}
-                disabled={loading}
-              >
-                Cancel
-              </button>
+                <img
+                  ref={imgRef}
+                  src={imageSrc}
+                  alt="Crop preview"
+                  style={styles.cropImage}
+                  onLoad={onImageLoad}
+                />
+              </ReactCrop>
             </div>
-          </div>
-        </div>
-      )}
+          )}
+          <p className="primary" style={{ marginTop: '15px', fontSize: '14px' }}>
+            Drag the corners to adjust the crop area. The image will be cropped to a perfect circle.
+          </p>
+        </Modal.Body>
+        <Modal.Footer
+          style={{
+            background: "#e5e3df",
+            borderBottom: "1px solid white",
+          }}
+        >
+          <a className="custom-view" onClick={handleCancelCrop}>
+            Cancel
+          </a>
+          <a 
+            className="custom-view" 
+            onClick={handleCropComplete}
+            style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
+          >
+            {loading ? 'Saving...' : 'Save & Upload'}
+          </a>
+        </Modal.Footer>
+      </Modal>
       
       {loading && (
         <div style={styles.loadingOverlay}>
