@@ -10,7 +10,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3002"],
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:3002", 
+      "http://127.0.0.1:3000", 
+      "http://127.0.0.1:3002",
+      "https://resdex.onrender.com",
+      "https://www.resdex.onrender.com"
+    ],
     methods: ["GET", "POST"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -20,7 +27,14 @@ const io = socketIo(server, {
 const port = process.env.PORT || 5001;
 
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3002"],
+  origin: [
+    "http://localhost:3000", 
+    "http://localhost:3002", 
+    "http://127.0.0.1:3000", 
+    "http://127.0.0.1:3002",
+    "https://resdex.onrender.com",
+    "https://www.resdex.onrender.com"
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]

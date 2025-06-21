@@ -109,12 +109,19 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
     });
 
     console.log('🔌 Connecting to Socket.IO server...');
-    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
-    const newSocket = io(serverUrl);
+    const serverUrl = process.env.REACT_APP_SERVER_URL || 'https://resdex.onrender.com';
+    console.log('🌐 Server URL:', serverUrl);
+    
+    const newSocket = io(serverUrl, {
+      transports: ['websocket', 'polling'],
+      timeout: 20000,
+      forceNew: true
+    });
     
     newSocket.on('connect', () => {
       console.log('✅ Connected to Socket.IO server');
       setIsConnected(true);
+      setError(null);
       
       // Join the private chat room
       newSocket.emit('join', {
@@ -127,6 +134,16 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
     newSocket.on('connect_error', (error) => {
       console.error('❌ Socket.IO connection error:', error);
       setError(`Connection failed: ${error.message}`);
+      setIsConnected(false);
+      
+      // Try to provide helpful error messages
+      if (error.message.includes('xhr poll error')) {
+        setError('Unable to connect to chat server. Please check your internet connection or try again later.');
+      } else if (error.message.includes('timeout')) {
+        setError('Connection timeout. The server might be starting up. Please try again in a moment.');
+      } else {
+        setError(`Connection error: ${error.message}`);
+      }
     });
 
     newSocket.on('disconnect', () => {
@@ -316,10 +333,24 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
         minHeight: '200px'
       }}>
         {error && (
-          <div className="flex justify-center items-center h-full">
-            <p style={{color: '#dc3545', fontSize: '12px', textAlign: 'center'}}>
+          <div className="flex flex-col justify-center items-center h-full">
+            <p style={{color: '#dc3545', fontSize: '12px', textAlign: 'center', marginBottom: '10px'}}>
               {error}
             </p>
+            <button 
+              onClick={() => window.location.reload()}
+              style={{
+                backgroundColor: '#1a1a1a',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                fontSize: '12px',
+                cursor: 'pointer'
+              }}
+            >
+              Retry Connection
+            </button>
           </div>
         )}
         {loading ? (
