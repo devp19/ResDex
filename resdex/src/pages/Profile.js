@@ -22,7 +22,6 @@ import Carousel from "react-bootstrap/Carousel";
 import blank from "../images/empty-pic.webp";
 import { canadianUniversities } from "../Orgs/canadianUniversities";
 import { QRCodeSVG } from "qrcode.react";
-
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/dark-transparent.png";
 import GoogleSignupModal from "../components/GoogleSignupModal";
@@ -30,6 +29,7 @@ import {
   handleLinkGoogleAccount,
   handleUnlinkGoogleAccount,
 } from "../utils/auth";
+import ChatBox from "./ChatBox";
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -53,6 +53,7 @@ const getProfileFromLocalStorage = (username) => {
 };
 
 const Profile = () => {
+  const [showChat, setShowChat] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -110,6 +111,7 @@ const Profile = () => {
   const [googleToastType, setGoogleToastType] = useState("success"); // 'success' or 'error'
 
   const [showUnlinkModal, setShowUnlinkModal] = useState(false);
+  const [showChatConfirmModal, setShowChatConfirmModal] = useState(false);
 
   const handleShareModalOpen = () => {
     setShowShareModal(true);
@@ -117,6 +119,15 @@ const Profile = () => {
 
   const handleTagClick = (tag) => {
     navigate(`/search?q=${encodeURIComponent(tag)}`);
+  };
+
+  const handleChatClick = () => {
+    setShowChatConfirmModal(true);
+  };
+
+  const startChat = () => {
+    setShowChatConfirmModal(false);
+    setShowChat(true);
   };
 
   const interestOptions = [
@@ -1087,63 +1098,119 @@ const Profile = () => {
                 style={{ maxHeight: "50px" }}
               >
                 {!isOwnProfile && (
-                  <a
-                    className="custom-view"
-                    onClick={toggleFollow}
-                    disabled={isRequestInProgress || requestSent}
-                  >
-                    {requestSent ? (
-                      <span style={{ position: "relative", top: "7px" }}>
-                        Request Sent
-                        <svg
-                          style={{ marginLeft: "10px" }}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="white"
-                          class="bi bi-send-plus-fill"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 1.59 2.498C8 14 8 13 8 12.5a4.5 4.5 0 0 1 5.026-4.47zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
-                          <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5" />
-                        </svg>
-                      </span>
-                    ) : isFollowing ? (
-                      <span style={{ position: "relative", top: "7px" }}>
-                        Unfollow
-                        <svg
-                          style={{ marginLeft: "10px" }}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="white"
-                          class="bi bi-people-fill"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
-                        </svg>
-                      </span>
-                    ) : (
-                      <span style={{ position: "relative", top: "7px" }}>
-                        Follow
-                        <svg
-                          style={{ marginLeft: "10px" }}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="white"
-                          class="bi bi-person-fill-add"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                          <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
-                        </svg>
-                      </span>
-                    )}
-                  </a>
+                  <>
+                    <a
+                      className="custom-view"
+                      onClick={toggleFollow}
+                      disabled={isRequestInProgress || requestSent}
+                      style={{ marginRight: "10px" }}
+                    >
+                      {requestSent ? (
+                        <span style={{ position: "relative", top: "7px" }}>
+                          Request Sent
+                          <svg
+                            style={{ marginLeft: "10px" }}
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="white"
+                            class="bi bi-send-plus-fill"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 1.59 2.498C8 14 8 13 8 12.5a4.5 4.5 0 0 1 5.026-4.47zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
+                            <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5" />
+                          </svg>
+                        </span>
+                      ) : isFollowing ? (
+                        <span style={{ position: "relative", top: "7px" }}>
+                          Unfollow
+                          <svg
+                            style={{ marginLeft: "10px" }}
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="white"
+                            class="bi bi-people-fill"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <span style={{ position: "relative", top: "7px" }}>
+                          Follow
+                          <svg
+                            style={{ marginLeft: "10px" }}
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="white"
+                            class="bi bi-person-fill-add"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3.5 3.5 0 0 1 6 0" />
+                            <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                          </svg>
+                        </span>
+                      )}
+                    </a>
+
+                    <a
+                      className="custom-view chat-button"
+                      onClick={handleChatClick}
+                      style={{ padding: "10px 20px", borderRadius: "100px" }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="white"
+                        className="bi bi-chat-dots-fill"
+                        viewBox="0 0 16 16"
+                        style={{ marginRight: "8px" }}
+                      >
+                        <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                      </svg>
+                      Chat
+                    </a>
+                  </>
                 )}
               </div>
+
+              <div className="row d-flex justify-content-center">
+                <div className="col">
+                  <div
+                    className="col-md"
+                    style={{ position: "relative", textAlign: "left" }}
+                  >
+                    {isOwnProfile && (
+                      <button
+                        className="custom-view"
+                        onClick={handleShareModalOpen}
+                        style={{ padding: "10px 20px", borderRadius: "100px" }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="white"
+                          className="bi bi-share-fill"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: "8px" }}
+                        >
+                          <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
+                        </svg>
+                        Share Profile
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* <p className='primary'> 
+   <span className='primary'><strong className='primary'>Following:</strong> {followingCount}</span>
+</p> */}
 
             <p className="primary">{about}</p>
             <div
@@ -1582,6 +1649,64 @@ const Profile = () => {
       </div>
 
       <Modal
+        show={showChatConfirmModal}
+        onHide={() => setShowChatConfirmModal(false)}
+        centered
+      >
+        <Modal.Header
+          style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
+          closeButton
+        >
+          <Modal.Title className="primary">Start Chat</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
+        >
+          <div className="text-center">
+            <div className="mb-3">
+              <img
+                src={
+                  profileUser?.profilePicture ||
+                  "https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de"
+                }
+                alt="Profile"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+            <p className="primary">
+              Start a conversation with{" "}
+              <strong>
+                {profileUser?.fullName || profileUser?.displayName}
+              </strong>
+              ?
+            </p>
+            <p className="text-muted" style={{ fontSize: "14px" }}>
+              You can discuss research, collaborate on projects, or simply
+              connect with fellow researchers.
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer
+          style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
+        >
+          <button
+            className="custom-view"
+            onClick={() => setShowChatConfirmModal(false)}
+          >
+            Cancel
+          </button>
+          <button className="custom-view" onClick={startChat}>
+            Start Chat
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
         show={showFollowersModal}
         onHide={() => setShowFollowersModal(false)}
         centered
@@ -1861,6 +1986,43 @@ const Profile = () => {
           </button>
         </Modal.Footer>
       </Modal>
+
+      {currentUser && profileUser && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            zIndex: 9999,
+          }}
+        >
+          {showChat ? (
+            <ChatBox
+              currentUser={currentUser}
+              recipient={profileUser}
+              onClose={() => setShowChat(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setShowChat(true)}
+              style={{
+                backgroundColor: "#1a1a1a",
+                color: "#ffffff",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                border: "none",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                fontSize: "20px",
+                cursor: "pointer",
+              }}
+              title="Open Chat"
+            >
+              💬
+            </button>
+          )}
+        </div>
+      )}
 
       <GoogleSignupModal
         show={showGoogleModal}
