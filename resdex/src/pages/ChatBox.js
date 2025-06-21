@@ -1,6 +1,9 @@
 // src/pages/ChatBox.js
 import { useEffect, useState, useRef } from 'react';
-import io from 'socket.io-client';
+import { db } from '../firebaseConfig';
+import {
+  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, getDoc, getDocs, limit,
+} from 'firebase/firestore';
 
 export default function ChatBox({ recipient, currentUser, onClose }) {
   const [message, setMessage] = useState('');
@@ -8,10 +11,38 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sending, setSending] = useState(false);
-  const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
 
   const chatId = [currentUser.uid, recipient.uid].sort().join('_');
+  const messagesRef = collection(db, 'chats', chatId, 'messages');
+
+  // Local storage functions
+  const getLocalMessages = () => {
+    try {
+      const stored = localStorage.getItem(`chat_${chatId}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error reading from local storage:', error);
+      return [];
+    }
+  };
+
+  const saveLocalMessage = (messageData) => {
+    try {
+      const existingMessages = getLocalMessages();
+      const newMessage = {
+        id: Date.now().toString(),
+        ...messageData,
+        timestamp: new Date().toISOString()
+      };
+      const updatedMessages = [...existingMessages, newMessage];
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+      return newMessage;
+    } catch (error) {
+      console.error('Error saving to local storage:', error);
+      throw error;
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -21,103 +52,60 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
     scrollToBottom();
   }, [messages]);
 
-  // Initialize Socket.IO connection for real-time messaging
   useEffect(() => {
-    console.log('🔌 Initializing Socket.IO connection...');
-    const newSocket = io('http://localhost:5001');
-    
-    newSocket.on('connect', () => {
-      console.log('✅ Socket.IO connected successfully');
-    });
-    
-    newSocket.on('connect_error', (error) => {
-      console.error('❌ Socket.IO connection error:', error);
-    });
-    
-    setSocket(newSocket);
-
-    return () => {
-      console.log('🔌 Closing Socket.IO connection...');
-      newSocket.close();
-    };
-  }, []);
-
-  // Join chat room and load chat history
-  useEffect(() => {
-    if (!currentUser || !recipient || !socket) {
-      console.log('⚠️ Missing data:', { currentUser: !!currentUser, recipient: !!recipient, socket: !!socket });
+    if (!currentUser || !recipient) {
       setError('Invalid user data');
       setLoading(false);
       return;
     }
 
-    console.log('🔗 Joining chat room:', chatId);
-    // Join the private one-on-one chat room
-    socket.emit('join-chat', chatId);
-
-    console.log('📚 Loading existing messages...');
-    // Load existing messages from memory (for page refresh)
-    fetch(`http://localhost:5001/api/chats/${chatId}/messages`)
-      .then(response => response.json())
-      .then(data => {
-        console.log('📚 Messages loaded:', data);
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setMessages(data);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Error loading messages:", err);
-        setError('Failed to load messages');
-        setLoading(false);
-      });
-
-    // Listen for new real-time messages (like iMessage)
-    socket.on('new-message', (newMessage) => {
-      console.log('💬 New message received:', newMessage);
-      setMessages(prev => [...prev, newMessage]);
-    });
-
-    socket.on('message-error', (errorData) => {
-      console.error('❌ Message error:', errorData);
-      setError(errorData.error);
-    });
-
-    return () => {
-      socket.off('new-message');
-      socket.off('message-error');
-    };
-  }, [socket, chatId, currentUser, recipient]);
+    console.log('Loading messages from local storage for chat ID:', chatId);
+    
+    // Load messages from local storage
+    const localMessages = getLocalMessages();
+    console.log('Loaded messages:', localMessages);
+    
+    setMessages(localMessages);
+    setLoading(false);
+    setError(null);
+  }, [currentUser, recipient, chatId]);
 
   const sendMessage = async () => {
-    if (!message.trim() || sending || !socket) {
-      console.log('⚠️ Cannot send message:', { message: message.trim(), sending, socket: !!socket });
+    if (!message.trim() || sending) return;
+    
+    // Check if user is authenticated
+    if (!currentUser || !currentUser.uid) {
+      setError('You must be logged in to send messages');
       return;
     }
     
     setSending(true);
     try {
+      console.log('=== SENDING MESSAGE (LOCAL STORAGE) ===');
+      console.log('Message:', message.trim());
+      
       const messageData = {
-        chatId,
+        text: message.trim(),
         senderId: currentUser.uid,
         senderName: currentUser.displayName || currentUser.fullName || currentUser.email,
-        text: message.trim()
       };
 
-      console.log('📤 Sending message:', messageData);
-      // Send message via Socket.IO for real-time delivery
-      socket.emit('send-message', messageData);
+      // Save to local storage
+      const savedMessage = saveLocalMessage(messageData);
+      console.log('✅ Message saved to local storage:', savedMessage);
+
+      // Update messages state
+      setMessages(prev => [...prev, savedMessage]);
       setMessage('');
       setError(null);
     } catch (error) {
       console.error("❌ Error sending message:", error);
-      setError('Failed to send message');
+      setError(`Failed to send message: ${error.message}`);
     } finally {
       setSending(false);
     }
   };
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -127,11 +115,23 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 bg-white border shadow-xl rounded-lg" style={{backgroundColor: '#e5e3df', border: '1px solid #1a1a1a', maxHeight: '500px', zIndex: 9999}}>
+    <div className="fixed bottom-4 right-8 w-80 bg-white border shadow-xl rounded-lg z-50" style={{
+      backgroundColor: '#ffffff', 
+      border: '2px solid #1a1a1a', 
+      maxHeight: '900px',
+      minHeight: '500px',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+      borderRadius: '8px'
+    }}>
       {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b" style={{borderColor: '#1a1a1a'}}>
+      <div className="flex justify-between items-center p-3 border-b rounded-t-lg" style={{
+        borderColor: '#1a1a1a', 
+        backgroundColor: '#1a1a1a',
+        borderTopLeftRadius: '6px',
+        borderTopRightRadius: '6px'
+      }}>
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-gray-300 mr-3 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gray-300 mr-3 flex items-center justify-center overflow-hidden">
             {recipient.profilePicture ? (
               <img 
                 src={recipient.profilePicture} 
@@ -139,52 +139,59 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
-              <span style={{color: '#1a1a1a', fontSize: '14px'}}>
+              <span style={{color: '#1a1a1a', fontSize: '14px', fontWeight: 'bold'}}>
                 {(recipient.fullName || recipient.displayName || 'U').charAt(0).toUpperCase()}
               </span>
             )}
           </div>
           <div>
-            <h4 className="font-semibold text-sm" style={{color: '#1a1a1a'}}>
+            <h4 className="font-semibold text-sm text-white">
               {recipient.fullName || recipient.displayName || 'User'}
             </h4>
-            <p className="text-xs" style={{color: '#666'}}>Online</p>
+            <p className="text-xs text-white">Online</p>
           </div>
         </div>
-        <button 
-          onClick={onClose} 
-          className="text-gray-400 hover:text-red-600 transition-colors" 
-          style={{fontSize: '20px', background: 'none', border: 'none', cursor: 'pointer'}}
-        >
-          &times;
-        </button>
+        <div className="flex items-center">
+          <button 
+            onClick={onClose} 
+            className="text-white hover:text-white transition-colors" 
+            style={{fontSize: '18px', background: 'none', border: 'none', cursor: 'pointer'}}
+          >
+            &times;
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="h-64 overflow-y-auto p-3" style={{backgroundColor: 'white'}}>
+      <div className="h-64 overflow-y-auto p-3" style={{
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #e0e0e0'
+      }}>
         {error && (
           <div className="flex justify-center items-center h-full">
-            <p style={{color: '#dc3545', fontSize: '14px', textAlign: 'center'}}>
+            <p style={{color: '#dc3545', fontSize: '12px', textAlign: 'center'}}>
               {error}
             </p>
           </div>
         )}
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <p style={{color: '#666', fontSize: '14px'}}>Loading messages...</p>
+            <p style={{color: '#666666', fontSize: '12px'}}>Loading...</p>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex justify-center items-center h-full">
-            <p style={{color: '#666', textAlign: 'center', fontSize: '14px'}}>
-              No messages yet. Start the conversation!
+            <p style={{color: '#666666', textAlign: 'center', fontSize: '12px'}}>
+              No messages yet
             </p>
           </div>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id} className={`mb-3 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
-              <div className={`inline-block p-3 rounded-lg max-w-xs ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                <p className="text-sm break-words">{msg.text}</p>
-                <p className="text-xs opacity-75 mt-1">
+            <div key={msg.id} className={`mb-2 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
+              <div className={`inline-block p-2 rounded-lg max-w-xs ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-black' : 'bg-black-200 text-gray-800'}`} style={{
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              }}>
+                <p className="text-sm break-words" style={{color: msg.senderId === currentUser.uid ? '#030000' : '#333333'}}>{msg.text}</p>
+                <p className="text-xs mt-1" style={{color: msg.senderId === currentUser.uid ? '#030000' : '#030000'}}>
                   {msg.timestamp ? 
                     new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
                     'Just now'
@@ -198,28 +205,34 @@ export default function ChatBox({ recipient, currentUser, onClose }) {
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t" style={{borderColor: '#1a1a1a'}}>
+      <div className="p-3" style={{backgroundColor: '#f8f9fa'}}>
         <div className="flex">
           <input
-            className="flex-1 border rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={sending}
-            style={{border: '1px solid #1a1a1a', borderRadius: '5px 0 0 5px', color: 'black'}}
+            style={{
+              border: '1px solid #1a1a1a', 
+              borderRadius: '4px 0 0 4px',
+              backgroundColor: '#ffffff',
+              color: '#333333'
+            }}
           />
           <button
             className="text-white px-4 py-2 rounded-r text-sm font-medium transition-colors hover:opacity-90"
             onClick={sendMessage}
             disabled={!message.trim() || sending}
             style={{
-              backgroundColor: (message.trim() && !sending) ? '#1a1a1a' : '#ccc',
-              borderRadius: '0 5px 5px 0',
-              cursor: (message.trim() && !sending) ? 'pointer' : 'not-allowed'
+              backgroundColor: (message.trim() && !sending) ? '#1a1a1a' : '#cccccc',
+              borderRadius: '0 4px 4px 0',
+              cursor: (message.trim() && !sending) ? 'pointer' : 'not-allowed',
+              color: '#ffffff'
             }}
           >
-            {sending ? 'Sending...' : 'Send'}
+            {sending ? '...' : 'Send'}
           </button>
         </div>
       </div>

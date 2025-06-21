@@ -11,9 +11,9 @@ import Select from 'react-select';
 import Carousel from 'react-bootstrap/Carousel';
 import blank from '../images/empty-pic.webp';
 import { canadianUniversities } from '../Orgs/canadianUniversities';
-import ChatBox from './ChatBox';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../images/dark-transparent.png';
+import ChatBox from './ChatBox';
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -1352,15 +1352,40 @@ Edit Profile
     </button>
   </Modal.Footer>
 </Modal>
-{showChat && currentUser && profileUser && (
-  <ChatBox
-    currentUser={currentUser}
-    recipient={profileUser}
-    onClose={() => setShowChat(false)}
-  />
+{currentUser && profileUser && (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    zIndex: 9999
+  }}>
+    {showChat ? (
+       <ChatBox
+         currentUser={currentUser}
+         recipient={profileUser}
+         onClose={() => setShowChat(false)}
+       />
+    ) : (
+      <button
+        onClick={() => setShowChat(true)}
+        style={{
+          backgroundColor: '#1a1a1a',
+          color: '#ffffff',
+          borderRadius: '50%',
+          width: '50px',
+          height: '50px',
+          border: 'none',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+          fontSize: '20px',
+          cursor: 'pointer'
+        }}
+        title="Open Chat"
+      >
+        💬
+      </button>
+    )}
+   </div>
 )}
-
-
     </div>
   );
 
