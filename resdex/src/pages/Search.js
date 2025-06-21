@@ -15,6 +15,7 @@ import Select, { components } from "react-select";
 import Logo from "../images/dark-transparent.png";
 import useAnimationEffect from "../hooks/useAnimationEffect";
 import { LoadingSpinner } from "../components/common";
+import { canadianUniversities } from "../Orgs/canadianUniversities";
 
 const DropdownIndicator = (props) => {
   return (
@@ -43,20 +44,54 @@ const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
+  const [universitySuggestions, setUniversitySuggestions] = useState([]);
   const navigate = useNavigate();
+
+  // Handle clicking outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (universitySuggestions.length > 0) {
+        const searchContainer = document.querySelector(".search-input-group");
+        if (searchContainer && !searchContainer.contains(event.target)) {
+          setUniversitySuggestions([]);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [universitySuggestions.length]);
 
   const searchOptions = [
     { value: "users", label: "Users" },
     { value: "papers", label: "Papers" },
+    { value: "universities", label: "Universities" },
   ];
 
   const handleSearchTypeChange = (selectedOption) => {
     setSearchType(selectedOption);
+    setSearchTerm("");
+    setResults([]);
+    setUniversitySuggestions([]);
   };
 
   const handleSearchInputChange = (event) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
+
+    // Show university suggestions for university search
+    if (searchType.value === "universities" && newSearchTerm.length >= 2) {
+      const filteredUniversities = canadianUniversities
+        .filter((uni) =>
+          uni.toLowerCase().includes(newSearchTerm.toLowerCase())
+        )
+        .slice(0, 5); // Limit to 5 suggestions
+      setUniversitySuggestions(filteredUniversities);
+    } else {
+      setUniversitySuggestions([]);
+    }
 
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
@@ -102,6 +137,56 @@ const Search = () => {
                   organization: organization,
                   profilePicture: profilePicture,
                 });
+              }
+            }
+
+            setResults(updatedResults);
+          } else {
+            console.warn("No users found in searchIndex.");
+            setResults([]);
+          }
+        } catch (error) {
+          console.error("Error fetching from searchIndex:", error);
+          setResults([]);
+        }
+      } else if (
+        searchType.value === "universities" &&
+        processedTerm.length >= 2
+      ) {
+        try {
+          const searchIndexDocRef = doc(db, "searchIndex", "usersList");
+          const searchIndexDoc = await getDoc(searchIndexDocRef);
+          if (searchIndexDoc.exists()) {
+            const usersList = searchIndexDoc.data().users || [];
+
+            // Filter users by organization/university
+            filteredResults = usersList.filter((user) => {
+              // First get the user's organization from their document
+              return true; // We'll filter after getting the full user data
+            });
+
+            const updatedResults = [];
+
+            for (let user of filteredResults) {
+              const userDocRef = doc(db, "users", user.userId);
+              const docSnapshot = await getDoc(userDocRef);
+
+              if (docSnapshot.exists()) {
+                const userData = docSnapshot.data();
+                const organization = userData.organization;
+                const profilePicture = userData.profilePicture || null;
+
+                // Only include users whose organization matches the search term
+                if (
+                  organization &&
+                  organization.toLowerCase().includes(processedTerm)
+                ) {
+                  updatedResults.push({
+                    ...user,
+                    organization: organization,
+                    profilePicture: profilePicture,
+                  });
+                }
               }
             }
 
@@ -187,10 +272,16 @@ const Search = () => {
     navigate(`/profile/${username}`);
   };
 
+  const handleUniversitySuggestionClick = (university) => {
+    setSearchTerm(university);
+    setUniversitySuggestions([]);
+    handleSearch(university);
+  };
+
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: "100px",
+      width: searchType.value === "universities" ? "140px" : "100px",
       borderTopRightRadius: "5px",
       borderBottomRightRadius: "5px",
       backgroundColor: "#1a1a1a",
@@ -206,7 +297,7 @@ const Search = () => {
     }),
     menu: (provided) => ({
       ...provided,
-      width: "120px",
+      width: searchType.value === "universities" ? "160px" : "120px",
     }),
     option: (provided, state) => ({
       ...provided,
@@ -246,6 +337,7 @@ const Search = () => {
               borderRadius: "6px",
               marginBottom: "100px",
               padding: "20px",
+              position: "relative",
             }}
           >
             <Select
@@ -260,7 +352,11 @@ const Search = () => {
             <input
               type="search"
               className="form-control"
-              placeholder={`Search ${searchType.label}`}
+              placeholder={
+                searchType.value === "universities"
+                  ? "Search by university name..."
+                  : `Search ${searchType.label}`
+              }
               value={searchTerm}
               onChange={handleSearchInputChange}
               style={{
@@ -268,6 +364,59 @@ const Search = () => {
                 borderBottomLeftRadius: "0px",
               }}
             />
+            {/* University suggestions dropdown */}
+            {searchType.value === "universities" &&
+              universitySuggestions.length > 0 && (
+                <div
+                  style={{
+                    width: "100%",
+                    backgroundColor: "white",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    marginTop: "5px",
+                  }}
+                >
+                  {universitySuggestions.map((university, index) => (
+                    <div
+                      key={index}
+                      className="p-2 cursor-pointer"
+                      style={{
+                        borderBottom:
+                          index < universitySuggestions.length - 1
+                            ? "1px solid #eee"
+                            : "none",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        handleUniversitySuggestionClick(university)
+                      }
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#f8f9fa";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "white";
+                      }}
+                    >
+                      <div className="d-flex align-items-center">
+                        <svg
+                          style={{ marginRight: "10px" }}
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="grey"
+                          className="bi bi-buildings"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z" />
+                          <path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1H8zm2 0h1v1H8zM8 5h1v1H8zm2 0h1v1H8zm2 0h1v1H8zm0-2h1v1H8z" />
+                        </svg>
+                        <span style={{ color: "black" }}>{university}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
           </div>
         </div>
         <div className="mt-3 center">
@@ -394,7 +543,9 @@ const Search = () => {
           ) : (
             searchTerm.trim() !== "" && (
               <p className="primary">
-                No results found. Please enter 3 or more characters.
+                {searchType.value === "universities"
+                  ? "No users found at this university. Try searching for a different university or check the spelling."
+                  : "No results found. Please enter 3 or more characters."}
               </p>
             )
           )}
