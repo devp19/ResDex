@@ -410,7 +410,7 @@ const Signup = () => {
                 <Button
                   className="custom"
                   type="submit"
-                  style={{ marginBlock: "10px" }}
+                  style={{ width: "100%", marginBlock: "10px" }}
                 >
                   Sign Up
                 </Button>

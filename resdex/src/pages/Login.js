@@ -280,9 +280,18 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 controlId="formBasicPassword"
+                className="mb-0"
               />
 
-              <Link className="primary" to="/recovery">
+              <Link
+                className="primary"
+                to="/recovery"
+                style={{
+                  fontSize: "13px",
+                  marginBlock: "10px",
+                  display: "inline-block",
+                }}
+              >
                 Forgot your password?
               </Link>
               <br></br>
@@ -290,7 +299,11 @@ const Login = () => {
               <MessageDisplay error={error} />
 
               <div className="text-center">
-                <Button className="custom" type="submit">
+                <Button
+                  className="custom"
+                  type="submit"
+                  style={{ width: "100%" }}
+                >
                   Sign In
                 </Button>
               </div>
