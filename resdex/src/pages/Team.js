@@ -3,7 +3,14 @@ import Empty from "../images/empty-pic.webp";
 import "./Team.css";
 import useAnimationEffect from "../hooks/useAnimationEffect";
 import { Logo } from "../components/common";
-import Dev from "../images/dev.jpg";
+import dev from "../images/devceo.png";
+import tirth from "../images/tirthceo.png";
+import kush from "../images/kushceo.png";
+import fenil from "../images/fenilceo.png";
+import jay from "../images/jayceo.png";
+import darsh from "../images/darshceo.png";
+import bhavi from "../images/bhaviceo.png";
+import deep from "../images/deepceo.png";
 
 const Team = () => {
   // Use the custom animation hook
@@ -20,7 +27,7 @@ const Team = () => {
           bio: "Dev is a passionate full-stack developer with expertise in JavaScript, React, and Node.js. He's been building web applications for over 5 years and leads our technical vision.",
           linkedin: "https://www.linkedin.com/in/devp19/",
           github: "https://github.com/devp19",
-          image: Empty,
+          image: dev,
         },
         {
           name: "Fenil Shah",
@@ -28,7 +35,7 @@ const Team = () => {
           bio: "Fenil brings exceptional organizational skills and a talent for bringing teams together. With a background in business and technology, he ensures our projects stay on track.",
           linkedin: "https://www.linkedin.com/in/fenilshah05/",
           github: "https://github.com/Fshah05",
-          image: Empty,
+          image: fenil,
         },
       ],
     },
@@ -41,7 +48,7 @@ const Team = () => {
           bio: "Deep specializes in medical outsourcing with extensive knowledge in healthcare systems and patient care coordination.",
           linkedin: "https://www.linkedin.com/in/deepptll/",
           email: "dpptl16@gmail.com",
-          image: Empty,
+          image: deep,
         },
         {
           name: "Bhavi Singh",
@@ -49,7 +56,7 @@ const Team = () => {
           bio: "Bhavi has a strong background in medical administration and patient service coordination.",
           linkedin: "https://www.linkedin.com/in/bhavendra-singh-75bbb129b/",
           email: "bhavendrasingh08.com",
-          image: Empty,
+          image: bhavi,
         },
       ],
     },
@@ -62,7 +69,7 @@ const Team = () => {
           bio: "Tirth combines creative design skills with strategic marketing to enhance our brand presence and user experience.",
           linkedin: "https://www.linkedin.com/in/tirthpatel2673/",
           email: "tirthpatel2673@gmail.com",
-          image: Empty,
+          image: tirth,
         },
       ],
     },
@@ -75,7 +82,7 @@ const Team = () => {
           bio: "Kush is a skilled developer with expertise in both frontend and backend technologies, ensuring robust application architecture.",
           linkedin: "https://www.linkedin.com/in/kushp4444/",
           email: "kushp4444@gmail.com",
-          image: Empty,
+          image: kush,
         },
         {
           name: "Jay Patel",
@@ -83,7 +90,7 @@ const Team = () => {
           bio: "Jay brings innovative solutions to complex development challenges with a focus on performance and scalability.",
           linkedin: "https://www.linkedin.com/in/jay-patel-wlu/",
           email: "jaypt2105@gmail.com",
-          image: Empty,
+          image: jay,
         },
         {
           name: "Darsh Kansara",
@@ -91,7 +98,7 @@ const Team = () => {
           bio: "Darsh is a passionate full-stack developer with expertise in modern web technologies. He specializes in creating seamless user experiences and scalable backend solutions, contributing to ResDex's technical excellence.",
           linkedin: "https://www.linkedin.com/in/darshk22/",
           email: "darshk0822@gmail.com",
-          image: Empty,
+          image: darsh,
         },
       ],
     },
