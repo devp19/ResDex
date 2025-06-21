@@ -21,6 +21,7 @@ import Select from "react-select";
 import Carousel from "react-bootstrap/Carousel";
 import blank from "../images/empty-pic.webp";
 import { canadianUniversities } from "../Orgs/canadianUniversities";
+import { QRCodeSVG } from "qrcode.react";
 
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/dark-transparent.png";
@@ -91,6 +92,10 @@ const Profile = () => {
 
   const handleShareModalOpen = () => {
     setShowShareModal(true);
+  };
+
+  const handleTagClick = (tag) => {
+    navigate(`/search?q=${encodeURIComponent(tag)}`);
   };
 
   const interestOptions = [
@@ -681,24 +686,62 @@ const Profile = () => {
                   style={{ position: "relative", textAlign: "right" }}
                 >
                   {isOwnProfile && (
-                    <button className="custom-edit" onClick={handleModalOpen}>
-                      <svg
-                        style={{ marginRight: "14px" }}
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        class="bi bi-pencil-square"
-                        fill="white"
-                        viewBox="0 0 16 16"
+                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                      <button 
+                        className="custom-edit" 
+                        onClick={handleModalOpen}
+                        style={{ 
+                          padding: "10px", 
+                          borderRadius: "50%",
+                          width: "40px",
+                          height: "40px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}
+                        title="Edit Profile"
                       >
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                        <path
-                          fill-rule="evenodd"
-                          d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                        />
-                      </svg>
-                      Edit Profile
-                    </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          class="bi bi-pencil-square"
+                          fill="white"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                          <path
+                            fill-rule="evenodd"
+                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        className="custom-edit"
+                        onClick={handleShareModalOpen}
+                        style={{ 
+                          padding: "10px", 
+                          borderRadius: "50%",
+                          width: "40px",
+                          height: "40px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}
+                        title="Share Profile"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="white"
+                          className="bi bi-share-fill"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
+                        </svg>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -850,41 +893,7 @@ const Profile = () => {
                   </a>
                 )}
               </div>
-
-              <div className="row d-flex justify-content-center">
-                <div className="col">
-                  <div
-                    className="col-md"
-                    style={{ position: "relative", textAlign: "left" }}
-                  >
-                    {isOwnProfile && (
-                      <button
-                        className="custom-view"
-                        onClick={handleShareModalOpen}
-                        style={{ padding: "10px 20px", borderRadius: "100px" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="white"
-                          className="bi bi-share-fill"
-                          viewBox="0 0 16 16"
-                          style={{ marginRight: "8px" }}
-                        >
-                          <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
-                        </svg>
-                        Share Profile
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
-
-            {/* <p className='primary'> 
-   <span className='primary'><strong className='primary'>Following:</strong> {followingCount}</span>
-</p> */}
 
             <p className="primary">{about}</p>
             <div
@@ -935,7 +944,23 @@ const Profile = () => {
                       <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z" />
                     </svg>
                     {interests.split(", ").map((interest, index) => (
-                      <span key={index} className="interest-pill">
+                      <span 
+                        key={index} 
+                        className="interest-pill"
+                        onClick={() => handleTagClick(interest)}
+                        style={{ 
+                          cursor: "pointer",
+                          transition: "all 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = "scale(1.05)";
+                          e.target.style.backgroundColor = "#2a2a2a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = "scale(1)";
+                          e.target.style.backgroundColor = "";
+                        }}
+                      >
                         {interest}
                       </span>
                     ))}
@@ -986,7 +1011,7 @@ const Profile = () => {
                         class="bi bi-person-lines-fill"
                         viewBox="0 0 16 16"
                       >
-                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
+                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
                       </svg>
                     </h2>
                     <p className=" primary">Research Fellows</p>
@@ -1086,6 +1111,19 @@ const Profile = () => {
                                           <span
                                             key={index}
                                             className="interest-pill"
+                                            onClick={() => handleTagClick(topic)}
+                                            style={{ 
+                                              cursor: "pointer",
+                                              transition: "all 0.2s ease"
+                                            }}
+                                            onMouseEnter={(e) => {
+                                              e.target.style.transform = "scale(1.05)";
+                                              e.target.style.backgroundColor = "#2a2a2a";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.target.style.transform = "scale(1)";
+                                              e.target.style.backgroundColor = "";
+                                            }}
                                           >
                                             {topic}
                                           </span>
@@ -1492,6 +1530,7 @@ const Profile = () => {
         show={showShareModal}
         onHide={() => setShowShareModal(false)}
         centered
+        size="md"
       >
         <Modal.Header
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
@@ -1503,20 +1542,50 @@ const Profile = () => {
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
         >
           <div className="text-center">
-            <p className="primary">Share this profile with others</p>
+            <p className="primary mb-3">Share this profile with others</p>
+            
+            {/* QR Code Section */}
+            <div className="mb-3">
+              <div 
+                style={{ 
+                  display: "inline-block", 
+                  padding: "15px", 
+                  backgroundColor: "white", 
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+                }}
+              >
+                <QRCodeSVG 
+                  value={window.location.href}
+                  size={150}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+              <p className="primary mt-2" style={{ fontSize: "12px", color: "#666" }}>
+                Scan this QR code to visit the profile
+              </p>
+            </div>
+
+            {/* Link Section */}
             <div className="input-group mb-3">
               <input
                 type="text"
                 className="form-control"
                 value={window.location.href}
                 readOnly
+                style={{ fontSize: "12px" }}
               />
               <button className="btn custom-view" onClick={handleShareProfile}>
                 Copy Link
               </button>
             </div>
 
-            <div className="d-flex justify-content-center gap-3 mt-3"></div>
+            <div className="d-flex justify-content-center gap-3 mt-2">
+              <p className="primary" style={{ fontSize: "12px", color: "#666" }}>
+                Share via link or scan the QR code above
+              </p>
+            </div>
           </div>
         </Modal.Body>
         <Modal.Footer
