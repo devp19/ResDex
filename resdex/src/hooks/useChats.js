@@ -18,26 +18,68 @@ const useChats = () => {
     // Query for chats where the current user is a participant
     const q = query(chatsRef, where('participants', 'array-contains', currentUser.uid));
 
+    console.log('🔍 Setting up chat listener for user:', currentUser.uid);
+
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       try {
+        console.log('📋 Chat snapshot received, docs count:', querySnapshot.docs.length);
+        
         const chatsData = await Promise.all(querySnapshot.docs.map(async (chatDoc) => {
           const chatData = chatDoc.data();
+          console.log('📄 Chat document data:', chatDoc.id, chatData);
+          
           const recipientId = chatData.participants.find(p => p !== currentUser.uid);
           
           if (!recipientId) {
+            console.warn('⚠️ Chat document missing recipient ID:', chatDoc.id, 'participants:', chatData.participants);
             return null;
           }
 
-          const userDocRef = doc(db, 'users', recipientId);
-          const userDoc = await getDoc(userDocRef);
-          
-          const recipient = userDoc.exists() ? userDoc.data() : { fullName: 'Unknown User', profilePicture: '' };
+          try {
+            const userDocRef = doc(db, 'users', recipientId);
+            const userDoc = await getDoc(userDocRef);
+            
+            let recipient;
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              recipient = {
+                uid: recipientId,
+                fullName: userData.fullName || userData.displayName || userData.username || 'Unknown User',
+                profilePicture: userData.profilePicture || '',
+                username: userData.username || 'unknown'
+              };
+            } else {
+              console.warn('⚠️ User document not found for recipient:', recipientId);
+              recipient = {
+                uid: recipientId,
+                fullName: 'Unknown User',
+                profilePicture: '',
+                username: 'unknown'
+              };
+            }
 
-          return {
-            id: chatDoc.id,
-            ...chatData,
-            recipient,
-          };
+            const chat = {
+              id: chatDoc.id,
+              ...chatData,
+              recipient,
+            };
+            
+            console.log('✅ Processed chat:', chat.id, 'recipient:', recipient.fullName);
+            return chat;
+          } catch (userError) {
+            console.error('❌ Error fetching user document for recipient:', recipientId, userError);
+            // Return a chat with fallback recipient data instead of null
+            return {
+              id: chatDoc.id,
+              ...chatData,
+              recipient: {
+                uid: recipientId,
+                fullName: 'Unknown User',
+                profilePicture: '',
+                username: 'unknown'
+              },
+            };
+          }
         }));
         
         const validChats = chatsData.filter(chat => chat !== null);
@@ -49,18 +91,28 @@ const useChats = () => {
           return new Date(bTimestamp) - new Date(aTimestamp);
         });
         
+        console.log('📊 Final chats list:', validChats.length, 'chats');
+        validChats.forEach(chat => {
+          console.log('  - Chat:', chat.id, 'Recipient:', chat.recipient.fullName, 'Participants:', chat.participants);
+        });
+        
         setChats(validChats);
         setLoading(false);
       } catch (err) {
+        console.error('❌ Error in useChats hook:', err);
         setError(err);
         setLoading(false);
       }
     }, (err) => {
+      console.error('❌ Error in onSnapshot:', err);
       setError(err);
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('🔌 Cleaning up chat listener');
+      unsubscribe();
+    };
   }, []);
 
   return { chats, loading, error };

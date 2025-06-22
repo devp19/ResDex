@@ -138,6 +138,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
     const sendMessage = async () => {
       if (!message.trim() || sending || !socket || !isConnected) return;
       
+      console.log('🚀 Sending message:', message.trim(), 'to chat:', chatId);
       setSending(true);
       const messageData = {
         text: message.trim(),
@@ -147,11 +148,13 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
         chatId: chatId
       };
       
+      console.log('📤 Message data being sent:', messageData);
       setMessages(prev => [...prev, messageData]);
       socket.emit('message', messageData);
       setMessage('');
       setSending(false);
       scrollToBottom();
+      console.log('✅ Message sent successfully');
     };
   
     const handleKeyPress = (e) => {

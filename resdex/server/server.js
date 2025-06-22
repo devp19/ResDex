@@ -112,14 +112,23 @@ io.on('connection', (socket) => {
       const chatRef = db.collection('chats').doc(chatId);
       const messagesRef = chatRef.collection('messages');
 
+      // First, let's check the current chat document to see what's in it
+      const chatDoc = await chatRef.get();
+      console.log('📄 Current chat document before update:', chatDoc.exists() ? chatDoc.data() : 'Document does not exist');
+
       // Save message to Firestore
       await messagesRef.add(messageData);
+      console.log('💾 Message saved to subcollection');
       
-      // Update the last message on the chat document
-      await chatRef.set({
-        lastMessage: { text, timestamp, senderId },
-        participants: chatId.split('_'),
-      }, { merge: true });
+      // Update only the last message on the chat document (don't overwrite participants)
+      await chatRef.update({
+        lastMessage: { text, timestamp, senderId }
+      });
+      console.log('🔄 Chat document updated with lastMessage');
+
+      // Let's check the chat document after the update
+      const updatedChatDoc = await chatRef.get();
+      console.log('📄 Chat document after update:', updatedChatDoc.data());
 
       // Broadcast message to all users in the chat room
       io.to(chatId).emit('message', messageData);
