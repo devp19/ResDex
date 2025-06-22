@@ -30,7 +30,7 @@ const ResDexBadge = () => (
       src={ResDexIcon}
       alt="ResDex Member"
       data-tooltip-id="resdex-badge-tooltip-search"
-      data-tooltip-content="Member of ResDex"
+      data-tooltip-content="Team Member"
       style={{
         marginLeft: "5px",
         cursor: "pointer",
