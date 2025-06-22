@@ -1,7 +1,6 @@
 .messages-container {
     display: flex;
     height: calc(100vh - 80px); /* Adjust 80px based on your navbar height */
-    background-color: #f2f0eb;
   }
   
   .conversation-list {
@@ -9,17 +8,25 @@
     border-right: 1px solid #d1d1d6;
     display: flex;
     flex-direction: column;
-    background-color: #ffffff;
   }
   
   .conversation-header {
     padding: 20px;
     border-bottom: 1px solid #d1d1d6;
   }
+
+  .conversation-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
   
   .conversation-header h2 {
     margin: 0;
     font-size: 24px;
+    color: #1a1a1a;
+    font-weight: 600;
   }
   
   .conversation-item {
@@ -32,11 +39,11 @@
   }
   
   .conversation-item:hover {
-    background-color: #f5f5f7;
+    background-color: rgba(245, 245, 247, 0.5);
   }
   
   .conversation-item.selected {
-    background-color: #e5e3df;
+    background-color: rgba(229, 227, 223, 0.5);
   }
   
   .profile-pic {
@@ -57,6 +64,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #1a1a1a;
   }
   
   .last-message {
@@ -66,11 +74,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .no-conversations-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
   
   .no-conversations {
-    padding: 20px;
+    padding: 0;
     text-align: center;
     color: #6c757d;
+    margin: 0;
   }
   
   .chat-window-container {
@@ -90,6 +108,30 @@
   .no-chat-selected h2 {
     font-size: 22px;
     margin-bottom: 10px;
+    color: #1a1a1a;
+  }
+
+  .messages-loading-container,
+  .messages-error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 80px);
+  }
+
+  .messages-loading-content,
+  .messages-error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #1a1a1a;
+  }
+
+  .messages-loading-content p,
+  .messages-error-content p {
+    margin: 0;
+    font-size: 16px;
   }
   
   /* Responsive Styles */
@@ -105,18 +147,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #f2f0eb;
       z-index: 100;
     }
   
     .hidden-on-mobile {
       display: none;
     }
-  }
-  
-  .loading-container, .error-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 80px);
   } 

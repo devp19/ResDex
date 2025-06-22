@@ -3,6 +3,7 @@ import useChats from '../hooks/useChats';
 import { auth } from '../firebaseConfig';
 import io from 'socket.io-client';
 import './Messages.css';
+import Logo from '../components/common/Logo';
 
 // ChatWindow component logic is now inside Messages.js
 const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
@@ -148,26 +149,26 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
     };
   
     return (
-        <div className="flex flex-col h-full bg-white rounded-lg shadow-md">
+        <div className="flex flex-col h-full rounded-lg shadow-md">
             <div className="p-3 border-b flex items-center flex-shrink-0">
                 {onBack && (
-                    <button onClick={onBack} className="mr-2 text-black hover:text-gray-600 md:hidden">
+                    <button onClick={onBack} className="custom-view">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
                             <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                         </svg>
                     </button>
                 )}
-                <h4 className="font-semibold text-sm text-black truncate">{recipient.fullName || 'User'}</h4>
+                <h4 className="primary mt-4">{recipient.fullName || 'User'}</h4>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-3">
                 {loading && <p className="text-center text-gray-500">Loading messages...</p>}
                 {error && <p className="text-center text-red-500">{error}</p>}
                 {!loading && !error && messages.length === 0 && <p className="text-center text-gray-500">No messages yet.</p>}
                 
                 {messages.map((msg, index) => (
                     <div key={index} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`inline-block p-2 rounded-lg max-w-[70%] text-sm ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
+                        <div className={`inline-block p-2 rounded-lg max-w-[70%] text-sm ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
                             <p className="break-words m-0">{msg.text}</p>
                             <p className={`text-xs mt-1 opacity-70 m-0 text-${msg.senderId === currentUser.uid ? 'right' : 'left'}`}>
                                 {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -177,7 +178,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 ))}
                  {typingUsers.length > 0 && (
                     <div className="text-left mb-2">
-                        <div className="inline-block p-2 rounded-lg bg-white text-gray-600 text-xs">
+                        <div className="inline-block p-2 rounded-lg bg-gray-200 text-gray-600 text-xs">
                         {typingUsers.map(user => user.username).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
                         </div>
                     </div>
@@ -185,23 +186,30 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 <div ref={messagesEndRef} />
             </div>
 
-            <div className="p-3 bg-white border-t flex-shrink-0">
-                <div className="flex">
+            <div className="p-3 border-t flex-shrink-0">
+                <div className="flex items-center gap-2 bg-gray-100 rounded-full p-2">
                     <input
-                        className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 bg-transparent border-none outline-none px-3 text-sm placeholder-gray-500 min-w-0"
                         placeholder="Type a message..."
                         value={message}
                         onChange={handleTyping}
                         onKeyPress={handleKeyPress}
                         disabled={sending || !isConnected}
+                        style={{ 
+                            background: 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            boxShadow: 'none'
+                        }}
                     />
                     <button
-                        className="text-white px-4 py-2 rounded-full text-sm font-medium transition-colors ml-2 disabled:bg-gray-400"
+                        className="flex-shrink-0 p-2 text-blue-500 hover:text-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-full hover:bg-blue-50"
                         onClick={sendMessage}
                         disabled={!message.trim() || sending || !isConnected}
-                        style={{backgroundColor: '#007aff'}}
                     >
-                        {sending ? '...' : 'Send'}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -222,18 +230,35 @@ const Messages = () => {
   }, []);
 
   if (loading) {
-    return <div className="loading-container"><p>Loading conversations...</p></div>;
+    return (
+      <div className="box">
+        <div className="messages-loading-content">
+          <Logo style={{ maxWidth: "60px", marginBottom: "20px" }} />
+          <p>Loading conversations...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="error-container"><p>Error loading conversations: {error.message}</p></div>;
+    return (
+      <div className="box">
+        <div className="messages-error-content">
+          <Logo style={{ maxWidth: "60px", marginBottom: "20px" }} />
+          <p>Error loading conversations: {error.message}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="messages-container">
+    <div className="box messages-container mt-4">
       <div className={`conversation-list ${selectedChat ? 'hidden-on-mobile' : ''}`}>
         <div className="conversation-header">
-          <h2>Messages</h2>
+          <div className="conversation-header-content">
+            <Logo style={{ maxWidth: "60px", marginBottom: "15px" }} />
+            <h2>Messages</h2>
+          </div>
         </div>
         {chats.length > 0 ? (
           chats.map(chat => (
@@ -246,7 +271,10 @@ const Messages = () => {
             </div>
           ))
         ) : (
-          <p className="no-conversations">No conversations yet.</p>
+          <div className="no-conversations-container">
+            <Logo style={{ maxWidth: "50px", marginBottom: "15px", opacity: "0.7" }} />
+            <p className="no-conversations">No conversations yet.</p>
+          </div>
         )}
       </div>
 
@@ -259,9 +287,10 @@ const Messages = () => {
             onBack={() => setSelectedChat(null)}
           />
         ) : (
-          <div className="no-chat-selected">
-            <h2>Select a conversation to start messaging</h2>
-            <p>Choose from your existing conversations on the left, or start a new one from a user's profile.</p>
+          <div className="no-chat-selected primary">
+            <Logo style={{ maxWidth: "80px", marginBottom: "20px", opacity: "0.8" }} />
+            <h2>Select a Conversation to Start Messaging</h2>
+            <p className='primary'>Choose from your existing conversations on the left, or start a new one from a user's profile.</p>
           </div>
         )}
       </div>
