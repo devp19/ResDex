@@ -85,7 +85,9 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
   
       newSocket.on('message', (messageData) => {
         if(messageData.chatId === chatId) {
-          setMessages(prev => [...prev, messageData]);
+          if (messageData.senderId !== currentUser.uid) {
+            setMessages(prev => [...prev, messageData]);
+          }
           setTypingUsers([]);
         }
       });
@@ -168,7 +170,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 
                 {messages.map((msg, index) => (
                     <div key={index} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`inline-block p-2 rounded-lg max-w-[70%] text-sm ${msg.senderId === currentUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                        <div className={`inline-block p-2 rounded-lg max-w-[70%] text-sm ${msg.senderId === currentUser.uid ? 'bg-gray-800 text-white' : 'bg-amber-800 text-white'}`}>
                             <p className="break-words m-0">{msg.text}</p>
                             <p className={`text-xs mt-1 opacity-70 m-0 text-${msg.senderId === currentUser.uid ? 'right' : 'left'}`}>
                                 {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -187,31 +189,19 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
             </div>
 
             <div className="p-3 border-t flex-shrink-0">
-                <div className="flex items-center gap-2 bg-gray-100 rounded-full p-2">
-                    <input
-                        className="flex-1 bg-transparent border-none outline-none px-3 text-sm placeholder-gray-500 min-w-0"
-                        placeholder="Type a message..."
-                        value={message}
-                        onChange={handleTyping}
-                        onKeyPress={handleKeyPress}
-                        disabled={sending || !isConnected}
-                        style={{ 
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            boxShadow: 'none'
-                        }}
-                    />
-                    <button
-                        className="flex-shrink-0 p-2 text-blue-500 hover:text-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-full hover:bg-blue-50"
-                        onClick={sendMessage}
-                        disabled={!message.trim() || sending || !isConnected}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
-                        </svg>
-                    </button>
-                </div>
+                <input
+                    className="box d-flex p-3 text-sm placeholder-gray-500 primary"
+                    style={{ 
+                        width: "100%",
+                        outline: "none",
+                        border: "1px solid rgba(255, 255, 255, 0.3)"
+                    }}
+                    placeholder="Type a message and press enter to send"
+                    value={message}
+                    onChange={handleTyping}
+                    onKeyPress={handleKeyPress}
+                    disabled={sending || !isConnected}
+                />
             </div>
         </div>
     );
