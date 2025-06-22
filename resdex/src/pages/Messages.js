@@ -53,7 +53,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
       const loadMessages = async () => {
         try {
           setLoading(true);
-          const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
+          const serverUrl = 'https://www.resdex.ca' || 'http://localhost:3000'
           const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`);
           if (response.ok) {
             const serverMessages = await response.json();
@@ -149,7 +149,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
       
       try {
         // Save message to Firestore via server API
-        const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
+        const serverUrl = 'https://www.resdex.ca' || 'http://localhost:3000'
         const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`, {
           method: 'POST',
           headers: {
