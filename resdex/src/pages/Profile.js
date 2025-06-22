@@ -13,6 +13,7 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
+  addDoc,
 } from "firebase/firestore";
 import ProfilePictureUpload from "./ProfilePictureUpload";
 import PDFUpload from "./PDFUpload";
@@ -90,7 +91,6 @@ const getProfileFromLocalStorage = (username) => {
 };
 
 const Profile = () => {
-  const [showChat, setShowChat] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -154,6 +154,8 @@ const Profile = () => {
   const [showUnlinkModal, setShowUnlinkModal] = useState(false);
   const [showChatConfirmModal, setShowChatConfirmModal] = useState(false);
 
+  const navigate = useNavigate(); // (add this inside your component, e.g., near `useEffect`)
+
   const handleShareModalOpen = () => {
     setShowShareModal(true);
   };
@@ -166,13 +168,54 @@ const Profile = () => {
     navigate(`/search?q=${encodeURIComponent(tag)}&type=papers`);
   };
 
-  const handleChatClick = () => {
-    setShowChatConfirmModal(true);
+  const handleChatClick = async () => {
+    if (!currentUser || !profileUser) return;
+    
+    try {
+      // Create or find the chat between current user and profile user
+      const chatId = await createOrFindChat(currentUser, profileUser);
+      
+      // Navigate to messages page with the chat ID
+      navigate(`/messages?chatId=${chatId}`);
+    } catch (error) {
+      console.error('Error creating/finding chat:', error);
+      // Show an error message or alert
+      alert('Unable to start chat. Please try again.');
+    }
+  };
+
+  const createOrFindChat = async (currentUser, profileUser) => {
+    // Check if a chat already exists between these users
+    const chatsRef = collection(db, 'chats');
+    const q = query(
+      chatsRef, 
+      where('participants', 'array-contains', currentUser.uid)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const existingChat = querySnapshot.docs.find(doc => {
+      const chatData = doc.data();
+      return chatData.participants.includes(profileUser.uid);
+    });
+
+    if (existingChat) {
+      return existingChat.id;
+    }
+
+    // Create a new chat if it doesn't exist
+    const newChatData = {
+      participants: [currentUser.uid, profileUser.uid],
+      createdAt: new Date().toISOString(),
+      lastMessage: null
+    };
+
+    const chatDocRef = await addDoc(chatsRef, newChatData);
+    return chatDocRef.id;
   };
 
   const startChat = () => {
     setShowChatConfirmModal(false);
-    setShowChat(true);
+    // setShowChat(true);
   };
 
   const interestOptions = [
@@ -246,8 +289,6 @@ const Profile = () => {
     setShowFollowersModal(true);
     fetchFollowersList();
   };
-
-  const navigate = useNavigate(); // (add this inside your component, e.g., near `useEffect`)
 
   const checkFollowStatus = useCallback(async () => {
     if (!currentUser || !profileUser) return;
@@ -2326,32 +2367,7 @@ const Profile = () => {
             zIndex: 9999,
           }}
         >
-          {showChat ? (
-            <ChatBox
-              currentUser={currentUser}
-              recipient={profileUser}
-              onClose={() => setShowChat(false)}
-            />
-          ) : (
-            <button
-              onClick={() => canChat && setShowChat(true)}
-              style={{
-                backgroundColor: "#1a1a1a",
-                color: "#ffffff",
-                borderRadius: "50%",
-                width: "50px",
-                height: "50px",
-                border: "none",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-                fontSize: "20px",
-                cursor: canChat ? "pointer" : "not-allowed",
-                opacity: canChat ? 1 : 0.6
-              }}
-              title={!canChat ? "You must be a research fellow to chat" : "Open Chat"}
-            >
-              💬
-            </button>
-          )}
+          {/* Chat functionality moved to Messages page */}
         </div>
       )}
 

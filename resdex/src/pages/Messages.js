@@ -4,6 +4,7 @@ import { auth } from '../firebaseConfig';
 import io from 'socket.io-client';
 import './Messages.css';
 import Logo from '../components/common/Logo';
+import { useSearchParams } from 'react-router-dom';
 
 // ChatWindow component logic is now inside Messages.js
 const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
@@ -248,6 +249,7 @@ const Messages = () => {
   const { chats, loading, error } = useChats();
   const [selectedChat, setSelectedChat] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const searchParams = useSearchParams()[0];
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -255,6 +257,19 @@ const Messages = () => {
     });
     return unsubscribe;
   }, []);
+
+  // Auto-select chat based on URL parameter
+  useEffect(() => {
+    if (chats.length > 0 && !selectedChat) {
+      const chatIdFromUrl = searchParams.get('chatId');
+      if (chatIdFromUrl) {
+        const chatToSelect = chats.find(chat => chat.id === chatIdFromUrl);
+        if (chatToSelect) {
+          setSelectedChat(chatToSelect);
+        }
+      }
+    }
+  }, [chats, selectedChat, searchParams]);
 
   if (loading) {
     return (
