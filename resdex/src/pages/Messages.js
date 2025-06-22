@@ -189,7 +189,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
             <div className="flex-1 overflow-y-auto p-3" style={{ height: '400px', maxHeight: '400px' }}>
                 {loading && <p className="text-center text-gray-500">Loading messages...</p>}
                 {error && <p className="text-center text-red-500">{error}</p>}
-                {!loading && !error && messages.length === 0 && <p className="text-center text-gray-500">No messages yet.</p>}
+                {!loading && !error && messages.length === 0 && <p className="text-center primary">Start a conversation! Say Hello!</p>}
                 
                 {messages.map((msg, index) => {
                     const isCurrentUser = msg.senderId === currentUser.uid;
@@ -302,22 +302,24 @@ const Messages = () => {
             <h2>Messages</h2>
           </div>
         </div>
-        {chats.length > 0 ? (
-          chats.map(chat => (
-            <div key={chat.id} className={`conversation-item ${selectedChat?.id === chat.id ? 'selected' : ''}`} onClick={() => setSelectedChat(chat)}>
-              <img src={chat.recipient.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'} alt={chat.recipient.fullName} className="profile-pic" />
-              <div className="conversation-details">
-                <p className="recipient-name">{chat.recipient.fullName}</p>
-                <p className="last-message">{chat.lastMessage?.text}</p>
+        <div className="conversation-items-container">
+          {chats.length > 0 ? (
+            chats.map(chat => (
+              <div key={chat.id} className={`conversation-item ${selectedChat?.id === chat.id ? 'selected' : ''}`} onClick={() => setSelectedChat(chat)}>
+                <img src={chat.recipient.profilePicture || 'https://firebasestorage.googleapis.com/v0/b/resdex-4b117.appspot.com/o/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.webp?alt=media&token=edabe458-161b-4a69-bc2e-630674bdb0de'} alt={chat.recipient.fullName} className="profile-pic" />
+                <div className="conversation-details">
+                  <p className="recipient-name">{chat.recipient.fullName}</p>
+                  <p className="last-message">{chat.lastMessage?.text}</p>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="no-conversations-container">
+              <Logo style={{ maxWidth: "50px", marginBottom: "15px", opacity: "0.7" }} />
+              <p className="no-conversations">No conversations yet.</p>
             </div>
-          ))
-        ) : (
-          <div className="no-conversations-container">
-            <Logo style={{ maxWidth: "50px", marginBottom: "15px", opacity: "0.7" }} />
-            <p className="no-conversations">No conversations yet.</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className={`chat-window-container ${!selectedChat ? 'hidden-on-mobile' : ''}`}>

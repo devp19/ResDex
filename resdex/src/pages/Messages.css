@@ -8,11 +8,13 @@
     border-right: 1px solid #d1d1d6;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Prevent overflow from the container itself */
   }
   
   .conversation-header {
     padding: 20px;
     border-bottom: 1px solid #d1d1d6;
+    flex-shrink: 0; /* Prevent header from shrinking */
   }
 
   .conversation-header-content {
@@ -27,6 +29,13 @@
     font-size: 24px;
     color: #1a1a1a;
     font-weight: 600;
+  }
+
+  /* Add a container for the scrollable chat items */
+  .conversation-items-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   
   .conversation-item {

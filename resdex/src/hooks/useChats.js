@@ -15,7 +15,8 @@ const useChats = () => {
     }
 
     const chatsRef = collection(db, 'chats');
-    const q = query(chatsRef, where('participants', 'array-contains', currentUser.uid), orderBy('lastMessage.timestamp', 'desc'));
+    // Query for chats where the current user is a participant
+    const q = query(chatsRef, where('participants', 'array-contains', currentUser.uid));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       try {
@@ -40,6 +41,14 @@ const useChats = () => {
         }));
         
         const validChats = chatsData.filter(chat => chat !== null);
+        
+        // Sort chats by lastMessage timestamp (newest first), with chats without lastMessage at the end
+        validChats.sort((a, b) => {
+          const aTimestamp = a.lastMessage?.timestamp || a.createdAt || '1970-01-01T00:00:00.000Z';
+          const bTimestamp = b.lastMessage?.timestamp || b.createdAt || '1970-01-01T00:00:00.000Z';
+          return new Date(bTimestamp) - new Date(aTimestamp);
+        });
+        
         setChats(validChats);
         setLoading(false);
       } catch (err) {

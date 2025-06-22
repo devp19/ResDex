@@ -170,18 +170,40 @@ const Profile = () => {
 
   const handleChatClick = async () => {
     if (!currentUser || !profileUser) return;
-    
+
     try {
       // Create or find the chat between current user and profile user
       const chatId = await createOrFindChat(currentUser, profileUser);
-      
+
+      // Wait for Firestore to confirm the chat exists in the user's chat list
+      await waitForChatToAppear(chatId, currentUser.uid);
+
       // Navigate to messages page with the chat ID
       navigate(`/messages?chatId=${chatId}`);
     } catch (error) {
       console.error('Error creating/finding chat:', error);
-      // Show an error message or alert
       alert('Unable to start chat. Please try again.');
     }
+  };
+
+  // Wait for the chat to appear in the user's chat list
+  const waitForChatToAppear = (chatId, userId, timeout = 3000) => {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const interval = setInterval(async () => {
+        const chatsRef = collection(db, 'chats');
+        const q = query(chatsRef, where('participants', 'array-contains', userId));
+        const querySnapshot = await getDocs(q);
+        const exists = querySnapshot.docs.some(doc => doc.id === chatId);
+        if (exists) {
+          clearInterval(interval);
+          resolve();
+        } else if (Date.now() - start > timeout) {
+          clearInterval(interval);
+          reject(new Error('Chat did not appear in time'));
+        }
+      }, 200);
+    });
   };
 
   const createOrFindChat = async (currentUser, profileUser) => {
@@ -1285,25 +1307,20 @@ const Profile = () => {
                       className="custom-view chat-button"
                       onClick={canChat ? handleChatClick : (e) => e.preventDefault()}
                       style={{ 
-                        padding: "10px 20px", 
-                        borderRadius: "100px",
+                        display: "flex",
+                        alignItems: "center",
+                        paddingLeft: "20px", 
+                        paddingRight: "20px", 
+                        borderRadius: "5px",
                         cursor: canChat ? "pointer" : "not-allowed",
                         opacity: canChat ? 1 : 0.6
                       }}
                       title={!canChat ? "You must be a research fellow to chat" : "Chat with this user"}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="white"
-                        className="bi bi-chat-dots-fill"
-                        viewBox="0 0 16 16"
-                        style={{ marginRight: "8px" }}
-                      >
-                        <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
-                      </svg>
-                      Chat
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" style={{ marginRight: "15px" }} height="16" fill="white" class="bi bi-envelope-fill" viewBox="0 0 16 16">
+  <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"/>
+</svg>
+                      Message
                     </a>
                   </>
                 )}
