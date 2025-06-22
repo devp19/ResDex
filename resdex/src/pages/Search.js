@@ -12,9 +12,43 @@ import {
 import { db } from "../firebaseConfig";
 import Select, { components } from "react-select";
 import Logo from "../images/dark-transparent.png";
+import ResDexIcon from "../images/logo-icon.png";
 import useAnimationEffect from "../hooks/useAnimationEffect";
 import { LoadingSpinner } from "../components/common";
 import { canadianUniversities } from "../Orgs/canadianUniversities";
+import { Tooltip } from "react-tooltip";
+
+// ResDex Team Member Configuration
+const RESDEX_TEAM_MEMBERS = [
+  "dev", "fenil", "deep", "bhavi", "tirth", "kush", "jay", "darsh"
+];
+
+// ResDex Badge Component
+const ResDexBadge = () => (
+  <>
+    <img
+      src={ResDexIcon}
+      alt="ResDex Member"
+      data-tooltip-id="resdex-badge-tooltip-search"
+      data-tooltip-content="Team Member"
+      style={{
+        marginLeft: "5px",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+        width: "16px",
+        height: "16px",
+      }}
+      onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
+      onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+    />
+    <Tooltip 
+      id="resdex-badge-tooltip-search" 
+      place="top" 
+      effect="solid" 
+      className="z-index-tooltip"
+    />
+  </>
+);
 
 const DropdownIndicator = (props) => {
   return (
@@ -473,6 +507,7 @@ const Search = () => {
                       <div>
                         <strong style={{ color: "black" }}>
                           {result.fullName}
+                          {RESDEX_TEAM_MEMBERS.includes(result.username) && <ResDexBadge />}
                         </strong>
 
                         <span>

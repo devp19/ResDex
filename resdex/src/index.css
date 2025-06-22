@@ -1129,7 +1129,9 @@ button {
   z-index: 10;
 }
 .z-index-tooltip {
-  z-index: 9999;
+  z-index: 1050;
+  font-size: 12px;
+  padding: 4px 8px !important;
 }
 /* Team.css */
 .team-card {

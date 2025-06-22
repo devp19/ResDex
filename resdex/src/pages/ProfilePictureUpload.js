@@ -31,7 +31,7 @@ const ProfilePictureUpload = ({ user, updateProfilePicture }) => {
         aspect: 1,
     });
   };
-
+  
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
 
