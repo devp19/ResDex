@@ -20,7 +20,7 @@ const About = () => {
             <div className="row text-center fade-in">
               <p className="primary">⏐</p>
             </div>
-            <h1 className="primary monarque text-center">About ResDex</h1>
+            <h1 className="primary monarque text-center mb-3">ResDex</h1>
             <p className="primary" style={{ 
               fontSize: "1.2rem", 
               lineHeight: "1.8", 
@@ -36,8 +36,11 @@ const About = () => {
           </div>
         </div>
 
+        <div className="horizontal-line" style={{marginBottom: "50px"}}> </div>
+
+
         {/* Mission Statement */}
-        <div className="row d-flex justify-content-center mb-5">
+        {/* <div className="row d-flex justify-content-center mb-5">
           <div className="col-12">
             <div style={{
               backgroundColor: "#1a1a1a",
@@ -46,7 +49,7 @@ const About = () => {
               border: "1px solid #333",
               color: "white"
             }}>
-              <h3 className="monarque mb-3 text-center" style={{ fontSize: "2rem", color: "white" }}>
+              <h3 className="mb-3 text-center" style={{ fontSize: "2rem", color: "white" }}>
                 Our Mission
               </h3>
               <p className="text-center" style={{ fontSize: "1.1rem", lineHeight: "1.7", color: "#e0e0e0" }}>
@@ -55,14 +58,14 @@ const About = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Our Story Section */}
         <div className="row d-flex justify-content-center mb-5">
           <div className="col-md-10">
             <div className="row align-items-center">
               <div className="col-md-6">
-                <h3 className="primary monarque mb-4" style={{ fontSize: "2.2rem" }}>
+                <h3 className="primary mb-4" style={{ fontSize: "2.2rem" }}>
                   Our Story
                 </h3>
                 <p className="primary" style={{ fontSize: "1.1rem", lineHeight: "1.7", color: "#555", marginBottom: "20px" }}>
@@ -78,7 +81,7 @@ const About = () => {
                   meaningful connections in their fields.
                 </p>
               </div>
-              <div className="col-md-6 text-center">
+              {/* <div className="col-md-6 text-center">
                 <img
                   src={About2}
                   alt="ResDex Story"
@@ -88,17 +91,38 @@ const About = () => {
                     borderRadius: "15px"
                   }}
                 />
-              </div>
+              </div> */}
+
+<div className="col-md-4 offset-md-1">
+            <div style={{
+              backgroundColor: "#1a1a1a",
+              padding: "40px",
+              borderRadius: "15px",
+              border: "1px solid #333",
+              color: "white"
+            }}>
+              <h3 className="mb-3 text-center" style={{ fontSize: "2rem", color: "white" }}>
+                Mission
+              </h3>
+              <p className="text-center" style={{ fontSize: "1.1rem", lineHeight: "1.7", color: "#e0e0e0" }}>
+                To help students and researchers wisely invest their most precious asset: their time 
+                and expertise, by creating meaningful connections and opportunities in the academic world.
+              </p>
+            </div>
+          </div>
+
             </div>
           </div>
         </div>
 
+        <div className="horizontal-line" style={{marginBottom: "50px"}}> </div>
+
         {/* Features Grid */}
         <div className="row d-flex justify-content-center mb-5">
           <div className="col-md-10">
-            <h3 className="primary monarque text-center mb-5" style={{ fontSize: "2.2rem" }}>
+            {/* <h3 className="primary text-center mb-5" style={{ fontSize: "2.2rem" }}>
               What We Offer
-            </h3>
+            </h3> */}
             <div className="row">
               <div className="col-md-4 mb-4">
                 <div style={{
@@ -123,7 +147,7 @@ const About = () => {
                       <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
                     </svg>
                   </div>
-                  <h4 className="primary monarque mb-3">Research Communities</h4>
+                  <h4 className="primary mb-3">Research Communities</h4>
                   <p className="primary" style={{ fontSize: "0.95rem", lineHeight: "1.6", color: "#666" }}>
                     Connect with researchers across institutions and disciplines. Build meaningful 
                     relationships that go beyond traditional networking.
@@ -154,7 +178,7 @@ const About = () => {
                       <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
                     </svg>
                   </div>
-                  <h4 className="primary monarque mb-3">Portfolio Building</h4>
+                  <h4 className="primary mb-3">Portfolio Building</h4>
                   <p className="primary" style={{ fontSize: "0.95rem", lineHeight: "1.6", color: "#666" }}>
                     Showcase your research papers, certifications, and contributions in one 
                     centralized location that grows with your academic career.
@@ -184,7 +208,7 @@ const About = () => {
                       <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
                     </svg>
                   </div>
-                  <h4 className="primary monarque mb-3">Real-Time Collaboration</h4>
+                  <h4 className="primary mb-3">Real-Time Collaboration</h4>
                   <p className="primary" style={{ fontSize: "0.95rem", lineHeight: "1.6", color: "#666" }}>
                     Communicate seamlessly with fellow researchers through our integrated 
                     chat system for discussions and project coordination.
@@ -205,38 +229,17 @@ const About = () => {
               borderRadius: "15px",
               marginBottom: "40px"
             }}>
-              <h3 className="monarque mb-4" style={{ fontSize: "2.2rem", color: "white" }}>
+              <h3 className=" mb-4" style={{ fontSize: "2.2rem", color: "white" }}>
                 Join the ResDex Community
               </h3>
-              <p style={{ fontSize: "1.1rem", lineHeight: "1.7", marginBottom: "30px", color: "#e0e0e0" }}>
+              <p style={{ fontSize: "1.1rem", lineHeight: "1.5", marginBottom: "40px", color: "#e0e0e0" }}>
                 Ready to transform your research experience? Join your community of students and 
                 researchers who are already building their academic networks, showcasing 
                 their work, and advancing their careers through ResDex.
               </p>
-              <button className="btn btn-light btn-lg" style={{
-                backgroundColor: "white",
-                color: "#1a1a1a",
-                border: "none",
-                padding: "12px 30px",
-                borderRadius: "25px",
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                transition: "all 0.3s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#007bff";
-                e.target.style.color = "white";
-                e.target.style.transform = "scale(1.05)";
-                e.target.style.boxShadow = "0 8px 25px rgba(0,0,0,0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "white";
-                e.target.style.color = "#1a1a1a";
-                e.target.style.transform = "scale(1)";
-                e.target.style.boxShadow = "none";
-              }}>
+              <a className="custom-read p-3 mt-2" href="https://resdex.ca/signup" target="_blank">
                 Start Your Journey Today
-              </button>
+              </a>
             </div>
           </div>
         </div>
