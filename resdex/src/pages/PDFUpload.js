@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/dark-transparent.png";
+import LotusLoader from "../components/common/LotusLoader";
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_UPLOADS_PER_DAY = 10;
@@ -202,6 +203,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
 
   return (
     <div>
+      {loading && <LotusLoader text="Uploading..." />}
       <input
         id="pdfInput"
         type="file"
@@ -325,7 +327,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
           closeButton
         >
-          <Modal.Title style={{ color: "black" }}>Document Details</Modal.Title>
+          <Modal.Title style={{ color: "black" }}>Paper Details</Modal.Title>
         </Modal.Header>
         <Modal.Body
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
@@ -337,10 +339,11 @@ const PDFUpload = ({ user, onUploadComplete }) => {
               <Form.Control
                 maxLength="50"
                 type="text"
-                placeholder="Enter document title"
+                placeholder="Enter paper title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
+                disabled={loading}
               />
             </Form.Group>
             <Form.Group className="mb-3 pt-3">
@@ -349,13 +352,14 @@ const PDFUpload = ({ user, onUploadComplete }) => {
                 maxLength="300"
                 as="textarea"
                 rows={3}
-                placeholder="Enter document description"
+                placeholder="Enter paper description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
+                disabled={loading}
               />
             </Form.Group>
-            <Form.Group className="mb-3 pt-3">
+            <Form.Group>
               <Form.Label style={{ color: "black" }}>
                 Relevant Topics
               </Form.Label>
@@ -374,6 +378,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
                 isOptionDisabled={() => selectedTopics.length >= 3}
                 placeholder="Select up to 3 topics"
                 styles={customStyles}
+                isDisabled={loading}
               />
             </Form.Group>
           </Form>
@@ -381,13 +386,17 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         <Modal.Footer
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
         >
-          <button className="custom-view" onClick={() => setShowModal(false)}>
+          <button
+            className="custom-view"
+            onClick={() => setShowModal(false)}
+            disabled={loading}
+          >
             Cancel
           </button>
           <button
             className="custom-view"
             onClick={handleUpload}
-            disabled={!title.trim()}
+            disabled={!title.trim() || loading}
           >
             Upload
           </button>
@@ -406,22 +415,13 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         </Modal.Body>
         <Modal.Footer>
           <button
-            className="custom border"
-            onClick={() => {
-              setErrorModal(false);
-              window.location.reload();
-            }}
+            className="custom-view"
+            onClick={() => setErrorModal(false)}
           >
-            Close
+            OK
           </button>
         </Modal.Footer>
       </Modal>
-
-      {loading && (
-        <div style={styles.loadingOverlay}>
-          <Spinner animation="border" variant="light" />
-        </div>
-      )}
     </div>
   );
 };
