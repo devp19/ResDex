@@ -168,22 +168,31 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 {error && <p className="text-center text-red-500">{error}</p>}
                 {!loading && !error && messages.length === 0 && <p className="text-center text-gray-500">No messages yet.</p>}
                 
-                {messages.map((msg, index) => (
-                    <div key={index} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                        <div 
-                            className="inline-block p-3 rounded-full text-sm custom-read text-white"
-                            style={{
-                                backgroundColor: msg.senderId === currentUser.uid ? '#1f2937' : '#92400e',
-                                maxWidth: 'fit-content'
-                            }}
-                        >
-                            <p className="break-words m-0">{msg.text}</p>
-                            <p className={`text-xs mt-1 opacity-70 m-0 text-${msg.senderId === currentUser.uid ? 'right' : 'left'}`} style={{ fontSize: "10px" }}>
-                                {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </p>
+                {messages.map((msg, index) => {
+                    const isCurrentUser = msg.senderId === currentUser.uid;
+                    return (
+                        <div key={index} className={`mb-3 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`}>
+                            <div 
+                                className="inline-block text-sm custom-read text-white"
+                                style={{
+                                    backgroundColor: isCurrentUser ? '#5b5b5b' : '#2a2a2a',
+                                    maxWidth: 'fit-content',
+                                    paddingLeft: '50px',
+                                    paddingRight: '50px',
+                                    paddingTop: '10px',
+                                    paddingBottom: '10px',
+                                    borderRadius: '20px',
+                                }}
+                            >
+                                <p className="break-words m-0">{msg.text}</p>
+                                
+                            </div>
+                            <p className={`text-xs mt-1 text-muted opacity-70 pt-2 m-0 text-${isCurrentUser ? 'right' : 'left'}`} style={{ fontSize: "10px", paddingLeft: '10px' }}>
+                                    {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </p>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                  {typingUsers.length > 0 && (
                     <div className="text-left mb-2">
                         <div className="inline-block p-2 rounded-lg bg-gray-200 text-gray-600 text-xs">
