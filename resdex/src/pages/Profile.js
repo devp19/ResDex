@@ -1482,13 +1482,12 @@ const Profile = () => {
                                 <div className="col-md-4">
                                   <iframe
                                     title="pdf"
-                                    src={pdf.url}
+                                    src={`${pdf.url}#toolbar=0&navpanes=0&scrollbar=0`}
                                     style={{
                                       width: "100%",
                                       height: "300px",
                                       border: "none",
                                       borderRadius: "5px",
-                                      pointerEvents: "none",
                                     }}
                                   />
                                 </div>
@@ -1728,13 +1727,12 @@ const Profile = () => {
                                 >
                                   <iframe
                                     title="prev-certification"
-                                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1].url)}&embedded=true`}
+                                    src={`${certifications[currentCertificationIndex > 0 ? currentCertificationIndex - 1 : certifications.length - 1].url}#toolbar=0&navpanes=0&scrollbar=0`}
                                     style={{
                                       width: "100%",
                                       height: "200px",
                                       border: "none",
                                       borderRadius: "8px",
-                                      pointerEvents: "none",
                                     }}
                                   />
                                   <p className="primary mt-2" style={{ fontSize: "12px", textAlign: "center" }}>
@@ -1754,14 +1752,13 @@ const Profile = () => {
                               >
                                 <iframe
                                   title={`certification-${currentCertificationIndex}`}
-                                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex].url)}&embedded=true`}
+                                  src={`${certifications[currentCertificationIndex].url}#toolbar=0&navpanes=0&scrollbar=0`}
                                   style={{
                                     width: "100%",
                                     height: "300px",
                                     border: "none",
                                     borderRadius: "10px",
                                     boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                                    pointerEvents: "none",
                                   }}
                                 />
                                 
@@ -1788,13 +1785,12 @@ const Profile = () => {
                                 >
                                   <iframe
                                     title="next-certification"
-                                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(certifications[currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0].url)}&embedded=true`}
+                                    src={`${certifications[currentCertificationIndex < certifications.length - 1 ? currentCertificationIndex + 1 : 0].url}#toolbar=0&navpanes=0&scrollbar=0`}
                                     style={{
                                       width: "100%",
                                       height: "200px",
                                       border: "none",
                                       borderRadius: "8px",
-                                      pointerEvents: "none",
                                     }}
                                   />
                                   <p className="primary mt-2" style={{ fontSize: "12px", textAlign: "center" }}>
