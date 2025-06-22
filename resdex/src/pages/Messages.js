@@ -53,7 +53,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
       const loadMessages = async () => {
         try {
           setLoading(true);
-          const serverUrl = 'https://www.resdex.ca' || 'http://localhost:3000'
+          const serverUrl = 'https://resdex.onrender.com';
           const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`);
           if (response.ok) {
             const serverMessages = await response.json();
@@ -139,31 +139,12 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
       
       setSending(true);
       const messageData = {
-        id: Date.now().toString(),
         text: message.trim(),
         senderId: currentUser.uid,
         senderName: currentUser.displayName || currentUser.fullName || currentUser.email,
         timestamp: new Date().toISOString(),
         chatId: chatId
       };
-      
-      try {
-        // Save message to Firestore via server API
-        const serverUrl = 'https://www.resdex.ca' || 'http://localhost:3000'
-        const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(messageData)
-        });
-        
-        if (!response.ok) {
-          console.error('Failed to save message to database');
-        }
-      } catch (error) {
-        console.error('Error saving message:', error);
-      }
       
       setMessages(prev => [...prev, messageData]);
       socket.emit('message', messageData);
