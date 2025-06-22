@@ -118,7 +118,7 @@ const Login = () => {
         <div className="row d-flex justify-content-center">
           <div
             className="col-md-5 box"
-            style={{ maxWidth: "420px", paddingBlock: "20px" }}
+            style={{ maxWidth: "500px", paddingBlock: "20px" }}
           >
             <div
               className="row d-flex justify-content-center"

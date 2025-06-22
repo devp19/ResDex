@@ -178,8 +178,8 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="container fade-in" style={{ marginTop: "70px" }}>
-        <p className='primary center top monarque' style={{ fontSize: '25px', marginBottom: '30px' }}>Proud Partners</p>
+      <div className="container fade-in" style={{ marginTop: "20px" }}>
+        <p className='primary center text-muted top ' style={{ fontSize: '18px', marginBottom: '30px' }}>Proud Partners</p>
         <div className="row d-flex justify-content-center fade-in">
           <div
             className="scroller box "
@@ -318,7 +318,8 @@ const Home = () => {
       </div>
 
       <div className="horizontal-line" style={{ marginTop: "90px" }}></div>
-      <div className="testimonials-section">
+
+      <div className="testimonials-section" style={{ marginTop: "30px" }}>
         <div className="container">
           <div
             className="row justify-content-center d-flex display fade-in"
