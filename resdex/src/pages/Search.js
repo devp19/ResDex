@@ -84,25 +84,23 @@ const Search = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const query = params.get('q');
-    const type = params.get('type');
+    const query = params.get("q");
+    const type = params.get("type");
 
     if (query) {
       setSearchTerm(query);
-      
-      let newSearchType = { value: 'users', label: 'Users' };
-      if (type === 'papers') {
-        newSearchType = { value: 'papers', label: 'Papers' };
-      } else if (type === 'universities') {
-        newSearchType = { value: 'universities', label: 'Universities' };
+
+      let newSearchType = { value: "users", label: "Users" };
+      if (type === "papers") {
+        newSearchType = { value: "papers", label: "Papers" };
+      } else if (type === "universities") {
+        newSearchType = { value: "universities", label: "Universities" };
       }
       setSearchType(newSearchType);
-      
+
       handleSearch(query, newSearchType.value);
     }
   }, [location.search]);
-
-
 
   // Handle clicking outside to close suggestions
   useEffect(() => {
@@ -208,10 +206,7 @@ const Search = () => {
           console.error("Error fetching from searchIndex:", error);
           setResults([]);
         }
-      } else if (
-        typeToSearch === "universities" &&
-        processedTerm.length >= 2
-      ) {
+      } else if (typeToSearch === "universities" && processedTerm.length >= 2) {
         try {
           const usersRef = collection(db, "users");
           const q = query(
@@ -219,15 +214,14 @@ const Search = () => {
             where("organization", ">=", term),
             where("organization", "<=", term + "\uf8ff")
           );
-          
-          const querySnapshot = await getDocs(q);
-          const results = querySnapshot.docs.map(doc => ({
-            userId: doc.id,
-            ...doc.data()
-          }));
-          
-          setResults(results);
 
+          const querySnapshot = await getDocs(q);
+          const results = querySnapshot.docs.map((doc) => ({
+            userId: doc.id,
+            ...doc.data(),
+          }));
+
+          setResults(results);
         } catch (error) {
           console.error("Error fetching from users collection:", error);
           setResults([]);
@@ -540,7 +534,7 @@ const Search = () => {
                     <a
                       href={`/profile/${result.username}`}
                       className="custom-view"
-                      style={{ textDecoration: 'none' }}
+                      style={{ textDecoration: "none" }}
                     >
                       View Profile ↗︎
                     </a>
