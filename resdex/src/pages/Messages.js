@@ -20,12 +20,29 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
     const typingTimeoutRef = useRef(null);
   
     const scrollToBottom = () => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        const messagesContainer = messagesEndRef.current?.parentElement;
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }, 100);
     };
   
-    useEffect(() => {
-      scrollToBottom();
-    }, [messages]);
+    // const isNearBottom = () => {
+    //   const messagesContainer = messagesEndRef.current?.parentElement;
+    //   if (!messagesContainer) return false;
+      
+    //   const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
+    //   const threshold = 100; // pixels from bottom
+    //   return scrollHeight - scrollTop - clientHeight < threshold;
+    // };
+  
+    // useEffect(() => {
+    //   // Only auto-scroll if user is near bottom or if it's the first load
+    //   if (messages.length > 0 && (isNearBottom() || messages.length === 1)) {
+    //     scrollToBottom();
+    //   }
+    // }, [messages]);
   
     useEffect(() => {
       if (!currentUser || !recipient) {
@@ -85,9 +102,14 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
   
       newSocket.on('message', (messageData) => {
         if(messageData.chatId === chatId) {
-          if (messageData.senderId !== currentUser.uid) {
-            setMessages(prev => [...prev, messageData]);
-          }
+          // Only add the message if it's not already in the messages array
+          setMessages(prev => {
+            const messageExists = prev.some(msg => msg.id === messageData.id);
+            if (!messageExists) {
+              return [...prev, messageData];
+            }
+            return prev;
+          });
           setTypingUsers([]);
         }
       });
@@ -125,10 +147,29 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
         chatId: chatId
       };
       
+      try {
+        // Save message to Firestore via server API
+        const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5001';
+        const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(messageData)
+        });
+        
+        if (!response.ok) {
+          console.error('Failed to save message to database');
+        }
+      } catch (error) {
+        console.error('Error saving message:', error);
+      }
+      
       setMessages(prev => [...prev, messageData]);
       socket.emit('message', messageData);
       setMessage('');
       setSending(false);
+      scrollToBottom();
     };
   
     const handleKeyPress = (e) => {
@@ -163,7 +204,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 <h4 className="primary mt-4">{recipient.fullName || 'User'}</h4>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3">
+            <div className="flex-1 overflow-y-auto p-3" style={{ height: '400px', maxHeight: '400px' }}>
                 {loading && <p className="text-center text-gray-500">Loading messages...</p>}
                 {error && <p className="text-center text-red-500">{error}</p>}
                 {!loading && !error && messages.length === 0 && <p className="text-center text-gray-500">No messages yet.</p>}
@@ -177,8 +218,8 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                                 style={{
                                     backgroundColor: isCurrentUser ? '#5b5b5b' : '#2a2a2a',
                                     maxWidth: 'fit-content',
-                                    paddingLeft: '50px',
-                                    paddingRight: '50px',
+                                    paddingLeft: '30px',
+                                    paddingRight: '30px',
                                     paddingTop: '10px',
                                     paddingBottom: '10px',
                                     borderRadius: '20px',
