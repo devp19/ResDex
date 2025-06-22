@@ -145,7 +145,7 @@ const Team = () => {
                 className="col-md-3 d-flex flex-column align-items-center justify-content-center team-card fade-in"
                 style={{ marginBottom: "20px", margin: "20px" }}
               >
-                <div className="profile-pic" >
+                <div className="profile-pic" style={{ height: "135px", width: "135px" }}>
                   <img
                     src={member.image}
                     alt={`Profile of ${member.name}`}
