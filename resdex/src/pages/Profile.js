@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
+import { Tooltip } from "react-tooltip";
 import { auth, db } from "../firebaseConfig";
 import {
   collection,
@@ -25,6 +26,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/dark-transparent.png";
+import ResDexIcon from "../images/logo-icon.png";
 import GoogleSignupModal from "../components/GoogleSignupModal";
 import {
   handleLinkGoogleAccount,
@@ -32,6 +34,40 @@ import {
 } from "../utils/auth";
 
 const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// ResDex Team Member Configuration
+const RESDEX_TEAM_MEMBERS = [
+  "dev", "fenil", "deep", "bhavi", "tirth", "kush", "jay", "darsh"
+];
+
+// ResDex Badge Component
+const ResDexBadge = () => (
+  <>
+    <img
+      src={ResDexIcon}
+      alt="ResDex Member"
+      data-tooltip-id="resdex-badge-tooltip"
+      data-tooltip-content="Team Member"
+      style={{
+        marginLeft: "10px",
+        marginTop: "-5px",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+        width: "25px",
+        height: "25px",
+      }}
+      onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
+      onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+    />
+    <Tooltip 
+      id="resdex-badge-tooltip" 
+      place="top" 
+      effect="solid" 
+      className="z-index-tooltip"
+      style={{fontSize: '12px'}}
+    />
+  </>
+);
 
 const saveProfileToLocalStorage = (username, profileData) => {
   const dataToStore = {
@@ -942,11 +978,11 @@ const Profile = () => {
                           Link your Google Account
                         </button>
                       )}
-                      <button
-                        className="custom-edit"
+                      <button 
+                        className="custom-edit" 
                         onClick={handleModalOpen}
-                        style={{
-                          padding: "10px",
+                        style={{ 
+                          padding: "10px", 
                           borderRadius: "50%",
                           width: "40px",
                           height: "40px",
@@ -974,8 +1010,8 @@ const Profile = () => {
                       <button
                         className="custom-edit"
                         onClick={handleShareModalOpen}
-                        style={{
-                          padding: "10px",
+                        style={{ 
+                          padding: "10px", 
                           borderRadius: "50%",
                           width: "40px",
                           height: "40px",
@@ -1066,24 +1102,7 @@ const Profile = () => {
               <div className="col-md">
                 <h1 className="primary mt-4">
                   {profileUser.fullName}
-                  {(username === "dev" ||
-                    username === "fenil" ||
-                    username === "deep" ||
-                    username === "rishi" ||
-                    username === "bhavi") && (
-                    <svg
-                      style={{ marginLeft: "20px" }}
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="black"
-                      className="bi bi-patch-check-fill"
-                      viewBox="0 0 16 16"
-                      title="Verified user"
-                    >
-                      <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708" />
-                    </svg>
-                  )}
+                  {RESDEX_TEAM_MEMBERS.includes(username) && <ResDexBadge />}
                 </h1>
               </div>
 
@@ -1199,11 +1218,11 @@ const Profile = () => {
                       <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z" />
                     </svg>
                     {interests.split(", ").map((interest, index) => (
-                      <span
-                        key={index}
+                      <span 
+                        key={index} 
                         className="interest-pill"
                         onClick={() => handleTagClick(interest)}
-                        style={{
+                        style={{ 
                           cursor: "pointer",
                           transition: "all 0.2s ease",
                         }}
@@ -1358,7 +1377,7 @@ const Profile = () => {
                                             onClick={() =>
                                               handleTagClick(topic)
                                             }
-                                            style={{
+                                            style={{ 
                                               cursor: "pointer",
                                               transition: "all 0.2s ease",
                                             }}
@@ -1796,19 +1815,19 @@ const Profile = () => {
         >
           <div className="text-center">
             <p className="primary mb-3">Share this profile with others</p>
-
+            
             {/* QR Code Section */}
             <div className="mb-3">
-              <div
-                style={{
-                  display: "inline-block",
-                  padding: "15px",
-                  backgroundColor: "white",
+              <div 
+                style={{ 
+                  display: "inline-block", 
+                  padding: "15px", 
+                  backgroundColor: "white", 
                   borderRadius: "10px",
                   boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                 }}
               >
-                <QRCodeSVG
+                <QRCodeSVG 
                   value={window.location.href}
                   size={150}
                   level="H"
