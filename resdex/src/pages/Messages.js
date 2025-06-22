@@ -170,9 +170,15 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 
                 {messages.map((msg, index) => (
                     <div key={index} className={`mb-3 flex ${msg.senderId === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`inline-block p-2 rounded-lg max-w-[70%] text-sm ${msg.senderId === currentUser.uid ? 'bg-gray-800 text-white' : 'bg-amber-800 text-white'}`}>
+                        <div 
+                            className="inline-block p-3 rounded-full text-sm custom-read text-white"
+                            style={{
+                                backgroundColor: msg.senderId === currentUser.uid ? '#1f2937' : '#92400e',
+                                maxWidth: 'fit-content'
+                            }}
+                        >
                             <p className="break-words m-0">{msg.text}</p>
-                            <p className={`text-xs mt-1 opacity-70 m-0 text-${msg.senderId === currentUser.uid ? 'right' : 'left'}`}>
+                            <p className={`text-xs mt-1 opacity-70 m-0 text-${msg.senderId === currentUser.uid ? 'right' : 'left'}`} style={{ fontSize: "10px" }}>
                                 {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                             </p>
                         </div>
