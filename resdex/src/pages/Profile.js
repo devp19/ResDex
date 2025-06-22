@@ -22,6 +22,7 @@ import Select from "react-select";
 import Carousel from "react-bootstrap/Carousel";
 import blank from "../images/empty-pic.webp";
 import { canadianUniversities } from "../Orgs/canadianUniversities";
+import { interestTags } from "../Orgs/interestTags";
 import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/dark-transparent.png";
@@ -142,16 +143,7 @@ const Profile = () => {
     setShowChat(true);
   };
 
-  const interestOptions = [
-    { value: "Technology", label: "Technology" },
-    { value: "Healthcare", label: "Healthcare" },
-    { value: "Finance", label: "Finance" },
-    { value: "Construction", label: "Construction" },
-    { value: "Education", label: "Education" },
-    { value: "Hospitality", label: "Hospitality" },
-    { value: "Law", label: "Law" },
-    { value: "Arts", label: "Arts" },
-  ];
+  const interestOptions = interestTags.map(tag => ({ value: tag, label: tag }));
 
   useEffect(() => {
     if (profileUser) {
