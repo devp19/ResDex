@@ -54,7 +54,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
       const loadMessages = async () => {
         try {
           setLoading(true);
-          const serverUrl = 'https://resdex.onrender.com';
+          const serverUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://resdex.onrender.com';
           const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`);
           if (response.ok) {
             const serverMessages = await response.json();
@@ -75,7 +75,7 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
     useEffect(() => {
       if (!chatId || !currentUser) return;
   
-      const serverUrl = process.env.REACT_APP_SERVER_URL || 'https://resdex.onrender.com';
+      const serverUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://resdex.onrender.com';
       const newSocket = io(serverUrl, {
         transports: ['websocket', 'polling'],
         timeout: 20000,
@@ -103,15 +103,25 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
   
       newSocket.on('message', (messageData) => {
         if(messageData.chatId === chatId) {
+          console.log('📨 Received message via WebSocket:', messageData);
           // Only add the message if it's not already in the messages array
           setMessages(prev => {
-            const messageExists = prev.some(msg => msg.id === messageData.id);
+            const messageExists = prev.some(msg => 
+              msg.id === messageData.id || 
+              (msg.text === messageData.text && 
+               msg.senderId === messageData.senderId && 
+               Math.abs(new Date(msg.timestamp) - new Date(messageData.timestamp)) < 1000)
+            );
             if (!messageExists) {
+              console.log('✅ Adding new message to chat');
               return [...prev, messageData];
+            } else {
+              console.log('⚠️ Message already exists, skipping');
             }
             return prev;
           });
           setTypingUsers([]);
+          scrollToBottom();
         }
       });
   

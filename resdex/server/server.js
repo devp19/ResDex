@@ -114,28 +114,49 @@ io.on('connection', (socket) => {
 
       // First, let's check the current chat document to see what's in it
       const chatDoc = await chatRef.get();
-      console.log('📄 Current chat document before update:', chatDoc.exists() ? chatDoc.data() : 'Document does not exist');
+      console.log('📄 Current chat document before update:', chatDoc.exists ? chatDoc.data() : 'Document does not exist');
+
+      if (!chatDoc.exists) {
+        console.log('⚠️ Chat document does not exist, creating it...');
+        // Create the chat document if it doesn't exist
+        await chatRef.set({
+          participants: [senderId], // This will be updated when we know both participants
+          createdAt: new Date().toISOString(),
+          lastMessage: null
+        });
+        console.log('✅ Chat document created');
+      }
 
       // Save message to Firestore
-      await messagesRef.add(messageData);
-      console.log('💾 Message saved to subcollection');
+      console.log('💾 Saving message to subcollection...');
+      const messageDoc = await messagesRef.add(messageData);
+      console.log('✅ Message saved to subcollection with ID:', messageDoc.id);
+      
+      // Add the message ID to the message data for the broadcast
+      const messageWithId = {
+        ...messageData,
+        id: messageDoc.id
+      };
       
       // Update only the last message on the chat document (don't overwrite participants)
+      console.log('🔄 Updating chat document with lastMessage...');
       await chatRef.update({
         lastMessage: { text, timestamp, senderId }
       });
-      console.log('🔄 Chat document updated with lastMessage');
+      console.log('✅ Chat document updated with lastMessage');
 
       // Let's check the chat document after the update
       const updatedChatDoc = await chatRef.get();
       console.log('📄 Chat document after update:', updatedChatDoc.data());
 
-      // Broadcast message to all users in the chat room
-      io.to(chatId).emit('message', messageData);
+      // Broadcast message to all users in the chat room (including the sender)
+      io.to(chatId).emit('message', messageWithId);
       
       console.log(`💬 Message delivered to chat ${chatId}: "${text}"`);
     } catch (error) {
       console.error('❌ Error handling message:', error);
+      console.error('❌ Error details:', error.message);
+      console.error('❌ Error stack:', error.stack);
       socket.emit('error', { message: 'Failed to send message' });
     }
   });
