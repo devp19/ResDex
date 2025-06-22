@@ -17,6 +17,8 @@ import ReleaseDocs from './pages/ReleaseDocs';
 import ReleaseInfo from './pages/ReleaseInfo';
 import V101 from './Releases/V101';
 import Notifications from './pages/Notifications';
+import Messages from './pages/Messages';
+import PrivateRoute from './pages/privateroute';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -29,6 +31,8 @@ function ScrollToTop() {
 }
 
 function App() {
+  const [searchResults, setSearchResults] = useState([]);
+
   // const [accessCode, setAccessCode] = useState('');
   // const [hasAccess, setHasAccess] = useState(false);
 
@@ -78,6 +82,13 @@ function App() {
             <Route path="/recovery" element={<Recovery />} />
             <Route path="/team" element={<Team />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/messages" 
+              element={
+                <PrivateRoute>
+                  <Messages />
+                </PrivateRoute>
+              } 
+            />
             <Route path="/search" element={<Search />} />
             <Route path="/success" element={<Success />} />
             <Route path="/create" element={<Create />} />

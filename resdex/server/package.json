@@ -13,7 +13,8 @@
     "cors": "^2.8.5",
     "multer": "^1.4.5-lts.1",
     "aws-sdk": "^2.1450.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "firebase-admin": "^11.11.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

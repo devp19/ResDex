@@ -5,6 +5,23 @@ const multer = require('multer');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin
+let serviceAccount;
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+  // For deployment, parse the credentials from the environment variable
+  serviceAccount = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+} else {
+  // For local development, read the file
+  serviceAccount = require('./serviceAccountKey.json');
+}
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
 
 const app = express();
 const server = http.createServer(app);
@@ -52,8 +69,8 @@ app.use(express.json());
 const upload = multer();
 
 // In-memory storage for messages (no MongoDB)
-const messages = new Map(); // chatId -> array of messages
-const chats = new Map(); // chatId -> chat info
+// const messages = new Map(); // chatId -> array of messages - REPLACED WITH FIRESTORE
+// const chats = new Map(); // chatId -> chat info - REPLACED WITH FIRESTORE
 const activeUsers = new Map(); // socketId -> user info
 
 // Socket.IO connection handling for real-time messaging
@@ -87,17 +104,23 @@ io.on('connection', (socket) => {
   });
 
   // Handle new message
-  socket.on('message', (messageData) => {
+  socket.on('message', async (messageData) => {
     try {
       console.log('📨 Received message:', messageData);
-      const { chatId, text, senderId, senderName } = messageData;
+      const { chatId, text, senderId, senderName, timestamp } = messageData;
       
-      // Store message in memory
-      if (!messages.has(chatId)) {
-        messages.set(chatId, []);
-      }
-      messages.get(chatId).push(messageData);
+      const chatRef = db.collection('chats').doc(chatId);
+      const messagesRef = chatRef.collection('messages');
+
+      // Save message to Firestore
+      await messagesRef.add(messageData);
       
+      // Update the last message on the chat document
+      await chatRef.set({
+        lastMessage: { text, timestamp, senderId },
+        participants: chatId.split('_'),
+      }, { merge: true });
+
       // Broadcast message to all users in the chat room
       io.to(chatId).emit('message', messageData);
       
@@ -148,7 +171,10 @@ app.get('/api/chats/:chatId/messages', async (req, res) => {
   try {
     const { chatId } = req.params;
     
-    const chatMessages = messages.get(chatId) || [];
+    const messagesRef = db.collection('chats').doc(chatId).collection('messages');
+    const snapshot = await messagesRef.orderBy('timestamp').get();
+    
+    const chatMessages = snapshot.docs.map(doc => doc.data());
     
     console.log(`📚 Loaded ${chatMessages.length} messages for chat: ${chatId}`);
     res.json(chatMessages);
@@ -164,17 +190,10 @@ app.post('/api/chats', async (req, res) => {
     const { user1Id, user2Id } = req.body;
     const chatId = [user1Id, user2Id].sort().join('_');
     
-    // Create or find existing chat for private one-on-one conversation
-    if (!chats.has(chatId)) {
-      chats.set(chatId, {
-        chatId,
-        user1Id,
-        user2Id,
-        createdAt: new Date()
-      });
-    }
+    // This endpoint is now primarily for generating a chatId on the client if needed,
+    // as chat documents are created/updated on message events.
     
-    console.log(`💬 Chat created/found: ${chatId}`);
+    console.log(`💬 Chat ID generated/retrieved: ${chatId}`);
     res.json({ chatId, success: true });
   } catch (error) {
     console.error('❌ Error creating chat:', error);
@@ -182,8 +201,8 @@ app.post('/api/chats', async (req, res) => {
   }
 });
 
-// Get all chats for a user
-app.get('/api/users/:userId/chats', async (req, res) => {
+// Get all chats for a user - This endpoint is no longer needed as useChats handles it.
+/* app.get('/api/users/:userId/chats', async (req, res) => {
   try {
     const { userId } = req.params;
     
@@ -197,7 +216,7 @@ app.get('/api/users/:userId/chats', async (req, res) => {
     console.error('❌ Error fetching user chats:', error);
     res.status(500).json({ error: 'Failed to fetch chats' });
   }
-});
+}); */
 
 // Existing AWS S3 functionality
 const s3 = new AWS.S3({
