@@ -124,12 +124,9 @@ const Profile = () => {
 
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
-  const [editedCertificationTitle, setEditedCertificationTitle] = useState("");
-  const [editedCertificationDescription, setEditedCertificationDescription] = useState("");
   const [requestSent, setRequestSent] = useState(false);
 
   const [editedTags, setEditedTags] = useState([]);
-  const [editedCertificationTags, setEditedCertificationTags] = useState([]);
 
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [followersList, setFollowersList] = useState([]);
@@ -494,40 +491,7 @@ const Profile = () => {
       return;
     }
     setCertificationToRemove(certification);
-    setEditedCertificationTitle(certification.title);
-    setEditedCertificationDescription(certification.description);
-    setEditedCertificationTags(
-      certification.topics
-        ? certification.topics.map((topic) => ({ value: topic, label: topic }))
-        : []
-    );
     setShowRemoveModal(true);
-  };
-
-  const saveCertificationChanges = async () => {
-    if (!certificationToRemove) return;
-    try {
-      const userDocRef = doc(db, "users", currentUser.uid);
-      const updatedCertifications = certifications.map((cert) =>
-        cert.url === certificationToRemove.url
-          ? {
-              ...cert,
-              title: editedCertificationTitle,
-              description: editedCertificationDescription,
-              topics: editedCertificationTags.map((tag) => tag.value),
-            }
-          : cert
-      );
-      await updateDoc(userDocRef, { certifications: updatedCertifications });
-      setCertifications(updatedCertifications);
-      console.log("Successfully updated certification in Firestore");
-    } catch (error) {
-      console.error("Error updating certification:", error);
-      alert("Failed to update certification. Please try again.");
-    } finally {
-      setShowRemoveModal(false);
-      setCertificationToRemove(null);
-    }
   };
 
   const confirmRemoveCertification = async () => {
@@ -1110,7 +1074,7 @@ const Profile = () => {
                               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                             />
                           </svg>
-                          Conect Google Account
+                          Connect Google Account
                         </button>
                       )}
                       <button 
@@ -1442,7 +1406,7 @@ const Profile = () => {
                 <div className="col-md-12 box">
                   <div className="row" style={{ marginTop: "-10px" }}>
                     <div className="col-md d-flex align-items-center">
-                      <h4 className="primary">Completed Research</h4>
+                      <h4 className="primary">Shared Research</h4>
                     </div>
 
                     <div
@@ -1814,7 +1778,7 @@ const Profile = () => {
                                   className="custom"
                                   onClick={() => handleEditCertification(certifications[currentCertificationIndex])}
                                 >
-                                  Edit Certification
+                                  Remove
                                 </button>
                               )}
                             </div>
@@ -2187,73 +2151,88 @@ const Profile = () => {
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
           closeButton
         >
-          <Modal.Title style={{ color: "black" }}>Edit Document</Modal.Title>
+          <Modal.Title style={{ color: "black" }}>
+            {certificationToRemove ? "Remove Certification" : "Edit Document"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
         >
-          <Form
-            style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
-          >
-            <Form.Group className="mb-3" controlId="formDocumentTitle">
-              <Form.Label className="primary">Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter new title"
-                value={certificationToRemove ? editedCertificationTitle : editedTitle}
-                onChange={(e) => certificationToRemove ? setEditedCertificationTitle(e.target.value) : setEditedTitle(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formDocumentDescription">
-              <Form.Label className="primary">Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                maxLength={150}
-                placeholder="Enter new description"
-                value={certificationToRemove ? editedCertificationDescription : editedDescription}
-                onChange={(e) => certificationToRemove ? setEditedCertificationDescription(e.target.value) : setEditedDescription(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formDocumentTags">
-              <Form.Label className="primary">Related Topic</Form.Label>
-              <Select
-                isMulti
-                name="tags"
-                options={interestOptions}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={certificationToRemove ? editedCertificationTags : editedTags}
-                onChange={(selected) => {
-                  if (selected.length <= 3) {
-                    if (certificationToRemove) {
-                      setEditedCertificationTags(selected);
-                    } else {
+          {certificationToRemove ? (
+            <div className="text-center">
+              <p className="primary">
+                Are you sure you want to remove the certification "{certificationToRemove.title}"?
+              </p>
+              <p className="text-muted" style={{ fontSize: "14px" }}>
+                This action cannot be undone. The certification will be permanently deleted.
+              </p>
+            </div>
+          ) : (
+            <Form
+              style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
+            >
+              <Form.Group className="mb-3" controlId="formDocumentTitle">
+                <Form.Label className="primary">Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter new title"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formDocumentDescription">
+                <Form.Label className="primary">Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  maxLength={150}
+                  placeholder="Enter new description"
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formDocumentTags">
+                <Form.Label className="primary">Related Topic</Form.Label>
+                <Select
+                  isMulti
+                  name="tags"
+                  options={interestOptions}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={editedTags}
+                  onChange={(selected) => {
+                    if (selected.length <= 3) {
                       setEditedTags(selected);
                     }
-                  }
-                }}
-                isOptionDisabled={() => (certificationToRemove ? editedCertificationTags : editedTags).length >= 3}
-                placeholder="Select a topic!"
-                styles={customStyles}
-              />
-            </Form.Group>
-          </Form>
+                  }}
+                  isOptionDisabled={() => editedTags.length >= 3}
+                  placeholder="Select a topic!"
+                  styles={customStyles}
+                />
+              </Form.Group>
+            </Form>
+          )}
         </Modal.Body>
         <Modal.Footer
           style={{ background: "#e5e3df", borderBottom: "1px solid white" }}
         >
-          <Button className="custom-view" onClick={certificationToRemove ? confirmRemoveCertification : confirmRemove}>
-            Remove
+          <Button className="custom-view" onClick={() => setShowRemoveModal(false)}>
+            Cancel
           </Button>
-          <div className="ms-auto">
-            {/* <Button onClick={() => setShowRemoveModal(false)} className="me-2 custom-view">
-        Cancel
-      </Button> */}
-            <Button className="custom-view" onClick={certificationToRemove ? saveCertificationChanges : saveChanges}>
-              Save Changes
+          {certificationToRemove ? (
+            <Button className="custom-view" onClick={confirmRemoveCertification}>
+              Confirm Delete
             </Button>
-          </div>
+          ) : (
+            <>
+              <Button className="custom-view" onClick={confirmRemove}>
+                Remove
+              </Button>
+              <Button className="custom-view" onClick={saveChanges}>
+                Save Changes
+              </Button>
+            </>
+          )}
         </Modal.Footer>
       </Modal>
 

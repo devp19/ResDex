@@ -4,20 +4,10 @@ import { db } from "../firebaseConfig";
 import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import Logo from "../images/dark-transparent.png";
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_UPLOADS_PER_DAY = 10;
-
-const interestOptions = [
-  { value: "Technology", label: "Technology" },
-  { value: "Healthcare", label: "Healthcare" },
-  { value: "Finance", label: "Finance" },
-  { value: "Construction", label: "Construction" },
-  { value: "Engineering", label: "Engineering" },
-];
 
 const CertificationUpload = ({ user, onUploadComplete }) => {
   const [loading, setLoading] = useState(false);
@@ -25,9 +15,7 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
   const [showErrorModal, setErrorModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [selectedTopics, setSelectedTopics] = useState([]);
   const navigate = useNavigate();
 
   const handleUploadCertificationClick = () => {
@@ -100,9 +88,7 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
         url: workerUrl,
         objectKey: result.objectKey,
         title: title,
-        description: description,
         uploadDate: new Date().toISOString(),
-        topics: selectedTopics.map((topic) => topic.value),
         userUID: user.uid,
       };
 
@@ -126,10 +112,8 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
       }
 
       setTitle("");
-      setDescription("");
       setSelectedFile(null);
       setErrorMessage("");
-      setSelectedTopics([]);
       window.location.reload();
     } catch (error) {
       console.error("Error uploading certification: ", error);
@@ -158,35 +142,6 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
       borderRadius: "5px",
       textAlign: "center",
     },
-  };
-
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      color: state.isSelected ? "white" : "black",
-      backgroundColor: state.isSelected ? "rgba(189,197,209,.3)" : "white",
-      "&:hover": {
-        backgroundColor: "rgba(189,197,209,.3)",
-      },
-    }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: "black",
-      padding: "5px",
-      borderRadius: "5px",
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: "white",
-    }),
-    multiValueRemove: (provided) => ({
-      ...provided,
-      color: "white",
-      ":hover": {
-        backgroundColor: "black",
-        color: "white",
-      },
-    }),
   };
 
   return (
@@ -242,39 +197,6 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3 pt-3">
-              <Form.Label style={{ color: "black" }}>Description</Form.Label>
-              <Form.Control
-                maxLength="300"
-                as="textarea"
-                rows={3}
-                placeholder="Enter certification description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3 pt-3">
-              <Form.Label style={{ color: "black" }}>
-                Relevant Topics
-              </Form.Label>
-              <Select
-                isMulti
-                name="topics"
-                options={interestOptions}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={selectedTopics}
-                onChange={(selected) => {
-                  if (selected.length <= 3) {
-                    setSelectedTopics(selected);
-                  }
-                }}
-                isOptionDisabled={() => selectedTopics.length >= 3}
-                placeholder="Select up to 3 topics"
-                styles={customStyles}
               />
             </Form.Group>
           </Form>

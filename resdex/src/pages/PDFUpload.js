@@ -263,7 +263,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
         >
           <div className="text-center">
             <p className="primary mb-4">
-              Choose how you'd like to add your research:
+              Choose how you would like to add your research:
             </p>
 
             <div className="d-grid gap-3">
@@ -288,7 +288,7 @@ const PDFUpload = ({ user, onUploadComplete }) => {
                   <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5" />
                   <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1" />
                 </svg>
-                Create Document
+                Create Document (Beta)
               </button>
 
               <button
