@@ -749,8 +749,8 @@ border-top: 1px solid white;
 }
 
 .indicator {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #8a8a8a;
   border: none;
@@ -759,11 +759,13 @@ border-top: 1px solid white;
   display: inline-block;
   vertical-align: middle;
   flex-shrink: 0;
+  flex-grow: 0;
+  min-width: 3px;
+  min-height: 3px;
 }
 
 .indicator.active {
-  background: #2a2a2a;
-  transform: scale(1.2);
+  background: #333;
 }
 
 .indicator:hover {
@@ -1065,8 +1067,8 @@ button {
 }
 
 .indicator {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #8a8a8a;
   border: none;
@@ -1075,6 +1077,9 @@ button {
   display: inline-block;
   vertical-align: middle;
   flex-shrink: 0;
+  flex-grow: 0;
+  min-width: 3px;
+  min-height: 3px;
 }
 
 .indicator.active {
