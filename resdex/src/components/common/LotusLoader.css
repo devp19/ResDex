@@ -1,0 +1,74 @@
+.lotus-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(229, 227, 223, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.lotus-container {
+  text-align: center;
+}
+
+.lotus-svg {
+  width: 120px;
+  height: 120px;
+}
+
+.lotus-petal {
+  fill: none;
+  stroke: #4a4a4a;
+  stroke-width: 2;
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
+  animation: draw-petal 0.8s ease-in-out forwards;
+}
+
+/* Stagger the animation delays for a spiral effect */
+.lotus-svg .lotus-petal:nth-of-type(1) { animation-delay: 0s; }
+.lotus-svg .lotus-petal:nth-of-type(2) { animation-delay: 0.15s; }
+.lotus-svg .lotus-petal:nth-of-type(3) { animation-delay: 0.3s; }
+.lotus-svg .lotus-petal:nth-of-type(4) { animation-delay: 0.45s; }
+.lotus-svg .lotus-petal:nth-of-type(5) { animation-delay: 0.6s; }
+.lotus-svg .lotus-petal:nth-of-type(6) { animation-delay: 0.75s; }
+.lotus-svg .lotus-petal:nth-of-type(7) { animation-delay: 0.9s; }
+.lotus-svg .lotus-petal:nth-of-type(8) { animation-delay: 1.05s; }
+
+.lotus-center {
+  fill: #4a4a4a;
+  opacity: 0;
+  animation: fade-in-center 0.5s ease-in forwards 1.85s; /* Delay until last petal finishes */
+}
+
+.loading-text {
+  margin-top: 20px;
+  color: #4a4a4a;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 18px;
+  opacity: 0;
+  animation: fade-in-text 1s ease-in forwards 0.5s;
+}
+
+@keyframes draw-petal {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade-in-center {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-text {
+  to {
+    opacity: 1;
+  }
+} 
