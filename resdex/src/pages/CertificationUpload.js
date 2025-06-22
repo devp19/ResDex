@@ -23,7 +23,6 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showErrorModal, setErrorModal] = useState(false);
-  const [showUploadOptionsModal, setShowUploadOptionsModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -32,16 +31,6 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
   const navigate = useNavigate();
 
   const handleUploadCertificationClick = () => {
-    setShowUploadOptionsModal(true);
-  };
-
-  const handleCreateDocument = () => {
-    setShowUploadOptionsModal(false);
-    navigate("/create");
-  };
-
-  const handleImportDocument = () => {
-    setShowUploadOptionsModal(false);
     document.getElementById("certificationInput").click();
   };
 
@@ -217,104 +206,15 @@ const CertificationUpload = ({ user, onUploadComplete }) => {
             width="16"
             height="16"
             fill="white"
-            className="bi bi-file-earmark-plus-fill"
+            className="bi bi-upload"
             viewBox="0 0 16 16"
           >
-            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0" />
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
           </svg>
-          Add Certification
+          Import Certification
         </button>
       </div>
-
-      {/* Upload Options Modal */}
-      <Modal
-        show={showUploadOptionsModal}
-        onHide={() => setShowUploadOptionsModal(false)}
-        centered
-        size="md"
-      >
-        <Modal.Header
-          style={{
-            background: "#e5e3df",
-            borderBottom: "1px solid white",
-          }}
-          closeButton
-        >
-          <Modal.Title className="primary">
-            <div className="row justify-content-left">
-              <img
-                src={Logo}
-                style={{ maxWidth: "70px", fill: "black" }}
-                alt="resdex-logo"
-              ></img>
-            </div>
-            <div className="row"></div>
-            Add Certification
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body
-          style={{
-            background: "#e5e3df",
-            borderBottom: "1px solid white",
-            padding: "30px",
-          }}
-        >
-          <div className="text-center">
-            <p className="primary mb-4">
-              Choose how you'd like to add your certification:
-            </p>
-
-            <div className="d-grid gap-3">
-              <button
-                className="custom-view"
-                onClick={handleCreateDocument}
-                style={{
-                  padding: "15px 30px",
-                  fontSize: "16px",
-                  marginBottom: "10px",
-                }}
-              >
-                <svg
-                  style={{ marginRight: "10px" }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  className="bi bi-file-earmark-text"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5" />
-                  <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1" />
-                </svg>
-                Create Document
-              </button>
-
-              <button
-                className="custom-view"
-                onClick={handleImportDocument}
-                style={{
-                  padding: "15px 30px",
-                  fontSize: "16px",
-                }}
-              >
-                <svg
-                  style={{ marginRight: "10px" }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  className="bi bi-upload"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
-                </svg>
-                Import Document
-              </button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
 
       {/* Upload Modal */}
       <Modal
