@@ -19,6 +19,7 @@ import V101 from './Releases/V101';
 import Notifications from './pages/Notifications';
 import Messages from './pages/Messages';
 import PrivateRoute from './pages/privateroute';
+import { Logo } from './components/common';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -30,8 +31,44 @@ function ScrollToTop() {
   return null;
 }
 
+function MobileMessage() {
+  return (
+    <div>
+      <div className="center-container">
+        <div className="text-center">
+          <Logo />
+          <h1 className="primary monarque">ResDex</h1>
+          <p className="primary mt-3">Check out ResDex on a larger screen!</p>
+          <p className="primary text-muted">Thanks for visiting early!</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [searchResults, setSearchResults] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768); // 768px is typical tablet/mobile breakpoint
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Show mobile message if screen is too small
+  if (isMobile) {
+    return <MobileMessage />;
+  }
 
   // const [accessCode, setAccessCode] = useState('');
   // const [hasAccess, setHasAccess] = useState(false);
