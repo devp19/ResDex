@@ -31,6 +31,9 @@ import {
   handleGoogleSignupCompleteFlow,
 } from "../utils/auth";
 
+import Alert from "react-bootstrap/Alert";
+
+
 const Signup = () => {
   // Use the custom animation hook
   useAnimationEffect();
@@ -195,6 +198,9 @@ const Signup = () => {
 
   return (
     <div>
+      <Alert key='secondary' variant='secondary' dismissible className="box fade-in" style={{ marginTop: "10px"}}>
+         <p className="text-muted" style={{ marginBottom: "3px", marginTop: "0px" }}>Note: ResDex is still under-development! Currently, ResDex is optimized for larger-screens. For any questions or feedback, please contact us <a className="text-muted" href="https://resdex.ca/contact">here</a>! Thanks for visiting early!</p>
+        </Alert>
       <div className="container fade-in">
         <div className="row d-flex justify-content-center">
           <div
