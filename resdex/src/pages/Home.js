@@ -99,7 +99,7 @@ const Home = () => {
   return (
     <>
       <Alert key='secondary' variant='secondary' dismissible className="box fade-in" style={{ marginTop: "10px"}}>
-         <p className="text-muted" style={{ marginBottom: "3px", marginTop: "0px" }}>Note: ResDex is still under-development! Currently, ResDex is optimized for larger-screens. For any questions or feedback, please contact us <a className="text-muted" href="https://resdex.ca/contact">here</a>! Thanks for visiting early!</p>
+         <p className="text-muted" style={{ marginBottom: "3px", marginTop: "0px" }}>Note: ResDex is still under-development! For any questions or feedback, please contact us <a className="text-muted" href="https://resdex.ca/contact">here</a>! Thanks for visiting early!</p>
         </Alert>
 
       <div className="center-container fade-in">
