@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "framer-motion": "^12.19.1",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "react-parallax-tilt": "^1.7.298"
   }
 }

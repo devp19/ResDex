@@ -1,8 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { HomeIcon, PencilIcon, MailIcon, CalendarIcon } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -11,6 +13,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Marquee } from "@/components/magicui/marquee";
 import { TextReveal } from "@/components/magicui/text-reveal";
+import { NumberTicker } from "@/components/magicui/number-ticker";
+import dynamic from "next/dynamic";
+import { use3dTilt } from "@/hooks/use3dTilt";
+
+const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -76,12 +83,115 @@ const DATA = {
   },
 };
 
-export default function Home() {
+// Marquee3D review data and components
+const reviews = [
+  {
+    name: "Jack",
+    username: "@jack",
+    body: "I've never seen anything like this before. It's amazing. I love it.",
+    img: "https://avatar.vercel.sh/jack",
+  },
+  {
+    name: "Jill",
+    username: "@jill",
+    body: "I don't know what to say. I'm speechless. This is amazing.",
+    img: "https://avatar.vercel.sh/jill",
+  },
+  {
+    name: "John",
+    username: "@john",
+    body: "I'm at a loss for words. This is amazing. I love it.",
+    img: "https://avatar.vercel.sh/john",
+  },
+];
+
+const firstRow = reviews.slice(0, reviews.length / 2);
+const secondRow = reviews.slice(reviews.length / 2);
+const thirdRow = reviews.slice(0, reviews.length / 2);
+const fourthRow = reviews.slice(reviews.length / 2);
+
+const ReviewCard = ({ img, name, username, body }: { img: string; name: string; username: string; body: string }) => (
+  <figure
+    className={cn(
+      "relative h-full w-fit sm:w-36 cursor-pointer overflow-hidden rounded-xl border p-4",
+      "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+      "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+    )}
+  >
+    <div className="flex flex-row items-center gap-2">
+      <img className="rounded-full" width="32" height="32" alt="" src={img} />
+      <div className="flex flex-col">
+        <figcaption className="text-sm font-medium dark:text-white">{name}</figcaption>
+        <p className="text-xs font-medium dark:text-white/40">{username}</p>
+      </div>
+    </div>
+    <blockquote className="mt-2 text-sm">{body}</blockquote>
+  </figure>
+);
+
+function Marquee3D() {
   return (
-    <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-2xl mx-auto relative">
+    <div className="relative flex h-[32rem] max-w-7xl mx-auto flex-row items-center justify-center gap-4 overflow-hidden [perspective:300px]">
+      <div
+        className="flex flex-row items-center gap-4 w-full"
+        style={{
+          transform:
+            "translateX(-100px) translateY(0px) translateZ(-100px) rotateX(20deg) rotateY(-10deg) rotateZ(20deg)",
+        }}
+      >
+        <Marquee pauseOnHover vertical className="[--duration:20s]">
+          {firstRow.map((review) => (
+            <ReviewCard key={review.username} {...review} />
+          ))}
+        </Marquee>
+        <Marquee reverse pauseOnHover className="[--duration:20s]" vertical>
+          {secondRow.map((review) => (
+            <ReviewCard key={review.username} {...review} />
+          ))}
+        </Marquee>
+        <Marquee reverse pauseOnHover className="[--duration:20s]" vertical>
+          {thirdRow.map((review) => (
+            <ReviewCard key={review.username} {...review} />
+          ))}
+        </Marquee>
+        <Marquee pauseOnHover className="[--duration:20s]" vertical>
+          {fourthRow.map((review) => (
+            <ReviewCard key={review.username} {...review} />
+          ))}
+        </Marquee>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-background"></div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background"></div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
+    </div>
+  );
+}
+
+export default function Home() {
+  const tilt1 = use3dTilt();
+  const tilt2 = use3dTilt();
+  const tilt3 = use3dTilt();
+  const afterHeroRef = useRef<HTMLDivElement>(null);
+  const [showDock, setShowDock] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!afterHeroRef.current) return;
+      const rect = afterHeroRef.current.getBoundingClientRect();
+      // Show dock if the top of the section after hero is above the top of the viewport
+      setShowDock(rect.top < 0);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
       {/* Main content */}
       <div className="w-full flex flex-col items-center justify-center min-h-screen">
-        <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="mb-4 rounded-lg" />
+        <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="mb-4 rounded-xl" />
         <TextAnimate
           animation="fadeIn"
           by="line"
@@ -133,23 +243,100 @@ export default function Home() {
         </div>
       </div>
       {/* Section: Research Made Easy with TextReveal */}
-      <section className="w-full flex flex-col items-start justify-center mt-0 pt-0">
+      <section ref={afterHeroRef} className="w-full flex flex-col items-start justify-center mt-0 pt-0">
         <TextReveal className="title text-left">
-          {`Explore research like never before.`}
+          {`Research is hard. We know. So we made it easier.`}
         </TextReveal>
       </section>
       {/* Section: Research is hard. We know. */}
-      <section className="w-full flex flex-col items-center mt-24 mb-40">
-        <h2 className="title text-center mb-12">Research is hard. We know.</h2>
-        <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl mx-auto">
-          <div className="flex-1 min-h-[220px] rounded-3xl bg-[#faf8f6]" />
-          <div className="flex-1 min-h-[220px] rounded-3xl bg-[#faf8f6]" />
+      <section className="w-full flex flex-col items-center mt-24 mb-64">
+        <h2 className="title-2 text-center mb-12">Built by students, backed by passion.</h2>
+        <div className="flex flex-col md:flex-row gap-8 w-full max-w-7xl mx-auto">
+          {/* First box with custom 3D tilt and glare */}
+          <div className="flex flex-col items-center">
+            <div
+              {...tilt1}
+              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
+            />
+            <div className="w-full mt-4">
+              <h3 className="text-xl font-semibold mb-2 text-left">Credentials</h3>
+              <p className="text-base text-gray-700 text-left max-w-xs">
+                Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.
+              </p>
+            </div>
+          </div>
+          {/* Second box with custom 3D tilt and glare */}
+          <div className="flex flex-col items-center">
+            <div
+              {...tilt2}
+              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
+            />
+            <div className="w-full mt-4">
+              <h3 className="text-xl font-semibold mb-2 text-left">Connections</h3>
+              <p className="text-base text-gray-700 text-left max-w-xs">
+                Connect with peers, mentors, and industry leaders to grow your network and collaborate on impactful research projects.
+              </p>
+            </div>
+          </div>
+          {/* Third box with custom 3D tilt and glare */}
+          <div className="flex flex-col items-center">
+            <div
+              {...tilt3}
+              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
+            />
+            <div className="w-full mt-4">
+              <h3 className="text-xl font-semibold mb-2 text-left">Opportunities</h3>
+              <p className="text-base text-gray-700 text-left max-w-xs">
+                Discover exclusive research opportunities, internships, and events to advance your academic and professional journey.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
-      {/* Dock fixed at the bottom center of the viewport */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+      {/* Section: Join the 1000 students, reshaping the future of research */}
+      <section className="w-full flex flex-col items-center justify-center my-24">
+        <h2 className="title-2 text-center flex flex-wrap items-center justify-center gap-3">
+          <span>Join the <NumberTicker value={1000} className="title-2" />+ students, reshaping the future of research</span>
+        </h2>
+      </section>
+      {/* 3D Marquee Section (MagicUI style) */}
+      <section className="w-full flex flex-col items-center justify-center mb-24">
+        <div className="w-full flex justify-center">
+          <Marquee3D />
+        </div>
+      </section>
+      {/* Dock fixed at the top center of the viewport, fades in after section 2 */}
+      <div
+        className={cn(
+          "fixed top-1 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-700",
+          showDock ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        )}
+        style={{ minWidth: 360 }}
+      >
         <TooltipProvider>
-          <Dock direction="middle" className="bg-[#faf8f6] border border-gray-200/70">
+          <Dock direction="middle" className="backdrop-blur-md bg-white/60 dark:bg-[#18181b]/60 border border-gray-200/70 dark:border-gray-800/70 shadow-lg rounded-2xl px-2 py-1">
+            {/* ResDex logo icon */}
+            <DockIcon>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/"
+                    aria-label="ResDex"
+                    className={cn(
+                      buttonVariants({ variant: "ghost", size: "icon" }),
+                      "size-12 rounded-full"
+                    )}
+                  >
+                    <Image src="/transparent-black.png" alt="ResDex Logo" width={26} height={26} className="rounded-full object-contain" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>ResDex</p>
+                </TooltipContent>
+              </Tooltip>
+            </DockIcon>
+            <Separator orientation="vertical" className="h-full" />
+            {/* Rest of the icons */}
             {DATA.navbar.map((item) => (
               <DockIcon key={item.label}>
                 <Tooltip>
