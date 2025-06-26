@@ -12,10 +12,18 @@ import { Separator } from "@/components/ui/separator";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Marquee } from "@/components/magicui/marquee";
-import { TextReveal } from "@/components/magicui/text-reveal";
+import { TextReveal, TextRevealWithVerticalSlot } from "@/components/magicui/text-reveal";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import dynamic from "next/dynamic";
 import { use3dTilt } from "@/hooks/use3dTilt";
+import { WordRotate } from "@/components/magicui/word-rotate";
+import { VelocityScroll } from "@/components/magicui/scroll-based-velocity";
+import { BentoGrid, BentoCard } from "@/components/magicui/bento-grid";
+import AnimatedBeamMultipleOutputDemo from "@/components/magicui/animated-beam-multiple-outputs";
+import { FileTextIcon, BellIcon, Share2Icon } from "@radix-ui/react-icons";
+import { AnimatedList } from "@/components/magicui/animated-list";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis, Tooltip as RechartsTooltip } from "recharts";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -168,6 +176,334 @@ function Marquee3D() {
   );
 }
 
+// Notification demo data and component
+const notifications = Array.from({ length: 10 }, () => [
+  {
+    name: "Payment received",
+    description: "Magic UI",
+    time: "15m ago",
+    icon: "💸",
+    color: "#00C9A7",
+  },
+  {
+    name: "User signed up",
+    description: "Magic UI",
+    time: "10m ago",
+    icon: "👤",
+    color: "#FFB800",
+  },
+  {
+    name: "New message",
+    description: "Magic UI",
+    time: "5m ago",
+    icon: "💬",
+    color: "#FF3D71",
+  },
+  {
+    name: "New event",
+    description: "Magic UI",
+    time: "2m ago",
+    icon: "🗞️",
+    color: "#1E86FF",
+  },
+]).flat();
+
+interface NotificationProps {
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  time: string;
+  small?: boolean;
+}
+
+const Notification = ({ name, description, icon, color, time, small = false }: NotificationProps) => {
+  return (
+    <figure
+      className={cn(
+        small
+          ? "relative mx-auto min-h-fit w-full max-w-[260px] cursor-pointer overflow-hidden rounded-xl p-2"
+          : "relative mx-auto min-h-fit w-full max-w-[400px] cursor-pointer overflow-hidden rounded-2xl p-4",
+        // animation styles
+        small
+          ? "transition-all duration-200 ease-in-out hover:scale-[102%]"
+          : "transition-all duration-200 ease-in-out hover:scale-[103%]",
+        // light styles
+        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+        // dark styles
+        "transform-gpu dark:bg-transparent dark:backdrop-blur-md dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
+      )}
+    >
+      <div className="flex flex-row items-center gap-3">
+        <div
+          className={small ? "flex size-7 items-center justify-center rounded-xl" : "flex size-10 items-center justify-center rounded-2xl"}
+          style={{ backgroundColor: color }}
+        >
+          <span className={small ? "text-base" : "text-lg"}>{icon}</span>
+        </div>
+        <div className="flex flex-col overflow-hidden">
+          <figcaption className={small ? "flex flex-row items-center whitespace-pre text-[15px] font-medium dark:text-white" : "flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white"}>
+            <span className={small ? "text-xs sm:text-sm" : "text-sm sm:text-lg"}>{name}</span>
+            <span className="mx-1">·</span>
+            <span className={small ? "text-[10px] text-gray-500" : "text-xs text-gray-500"}>{time}</span>
+          </figcaption>
+          <p className={small ? "text-xs font-normal dark:text-white/60" : "text-sm font-normal dark:text-white/60"}>{description}</p>
+        </div>
+      </div>
+    </figure>
+  );
+};
+
+function AnimatedListDemo({ className = "" }) {
+  return (
+    <div className={cn(
+      "relative flex h-[180px] w-full flex-col overflow-hidden p-1 mt-2",
+      className
+    )}>
+      <AnimatedList>
+        {notifications.map((item, idx) => (
+          <Notification {...item} key={idx} small />
+        ))}
+      </AnimatedList>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background"></div>
+    </div>
+  );
+}
+
+// Placeholder Calendar
+const Calendar = ({ className = "" }) => (
+  <div className={`flex items-center justify-center h-full w-full text-center text-neutral-400 ${className}`}>Calendar</div>
+);
+
+const files = [
+  {
+    name: "bitcoin.pdf",
+    body: "Bitcoin is a cryptocurrency invented in 2008 by an unknown person or group of people using the name Satoshi Nakamoto.",
+  },
+  {
+    name: "finances.xlsx",
+    body: "A spreadsheet or worksheet is a file made of rows and columns that help sort data, arrange data easily, and calculate numerical data.",
+  },
+  {
+    name: "logo.svg",
+    body: "Scalable Vector Graphics is an Extensible Markup Language-based vector image format for two-dimensional graphics with support for interactivity and animation.",
+  },
+  {
+    name: "keys.gpg",
+    body: "GPG keys are used to encrypt and decrypt email, files, directories, and whole disk partitions and to authenticate messages.",
+  },
+  {
+    name: "seed.txt",
+    body: "A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover Bitcoin funds on-chain.",
+  },
+];
+
+const features = [
+  {
+    Icon: FileTextIcon,
+    name: "Save your files",
+    description: "We automatically save your files as you type.",
+    href: "#",
+    cta: "Learn more",
+    className: "col-span-3 lg:col-span-1",
+    background: (
+      <Marquee
+        pauseOnHover={false}
+        className="absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] "
+      >
+        {files.map((f, idx) => (
+          <figure
+            key={idx}
+            className={cn(
+              "relative w-32 cursor-pointer overflow-hidden rounded-xl border p-4",
+              "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+              "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+              "transform-gpu blur-[1px] transition-all duration-300 ease-out hover:blur-none",
+            )}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-col">
+                <figcaption className="text-sm font-medium dark:text-white ">{f.name}</figcaption>
+              </div>
+            </div>
+            <blockquote className="mt-2 text-xs">{f.body}</blockquote>
+          </figure>
+        ))}
+      </Marquee>
+    ),
+  },
+  {
+    Icon: BellIcon,
+    name: "Notifications",
+    description: "Get notified when something happens.",
+    href: "#",
+    cta: "Learn more",
+    className: "col-span-3 lg:col-span-2",
+    background: (
+      <AnimatedListDemo className="absolute right-2 top-4 h-[300px] w-full scale-75 border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90" />
+    ),
+  },
+  {
+    Icon: Share2Icon,
+    name: "Integrations",
+    description: "Supports 100+ integrations and counting.",
+    href: "#",
+    cta: "Learn more",
+    className: "col-span-3 lg:col-span-2",
+    background: (
+      <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
+    ),
+  },
+  {
+    Icon: CalendarIcon,
+    name: "Calendar",
+    description: "Use the calendar to filter your files by date.",
+    className: "col-span-3 lg:col-span-1",
+    href: "#",
+    cta: "Learn more",
+    background: (
+      <Calendar className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] group-hover:scale-90" />
+    ),
+  },
+];
+
+// Chart Card Demo (inline, since Card and Chart components are not present, use a styled div as a placeholder)
+const chartData = [
+  { year: "2020", positions: 271816, applicants: 400000 },
+  { year: "2021", positions: 298850, applicants: 600000 },
+  { year: "2022", positions: 315030, applicants: 900000 },
+  { year: "2023", positions: 298850, applicants: 1300000 },
+  { year: "2024", positions: 298850, applicants: 1900000 },
+  { year: "2025", positions: 500000, applicants: 2700000 },
+];
+
+// Custom tooltip for the AreaChart
+function CustomChartTooltip(props: any) {
+  const { active, payload, label } = props;
+  if (!active || !payload || !payload.length) return null;
+  const platform = payload.find((p: any) => p.dataKey === "platform");
+  const coldEmail = payload.find((p: any) => p.dataKey === "coldEmail");
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white/90 px-4 py-2 shadow-xl text-sm text-gray-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-gray-100">
+      <div className="font-semibold mb-1">{label}</div>
+      <div className="flex flex-col gap-1">
+        {platform && (
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f5f5f5', border: '1px solid #e5e5e5' }} />
+            <span>Via ResDex:</span>
+            <span className="font-bold">{platform.value}</span>
+          </div>
+        )}
+        {coldEmail && (
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#e5e5e5', border: '1px solid #bdbdbd' }} />
+            <span>Cold Email:</span>
+            <span className="font-bold">{coldEmail.value}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ChartCard() {
+  return (
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-6 w-full max-w-md flex flex-col">
+      <div className="mb-2">
+        <TextAnimate
+          animation="fadeIn"
+          by="line"
+          as="div"
+          className="text-lg font-semibold"
+        >
+          {`Research Positions vs. Applicants`}
+        </TextAnimate>
+        <TextAnimate
+          animation="fadeIn"
+          by="word"
+          as="div"
+          className="text-gray-500 text-sm"
+          delay={0.2}
+        >
+          {`2020 - 2025`}
+        </TextAnimate>
+      </div>
+      <div className="flex-1 flex items-center justify-center min-h-[220px]">
+        <AreaChart
+          width={320}
+          height={160}
+          data={chartData}
+          margin={{ left: 12, right: 12 }}
+        >
+          <CartesianGrid vertical={false} stroke="#ececec" />
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+          />
+          <RechartsTooltip content={({ active, payload, label }: any) => {
+            if (!active || !payload || !payload.length) return null;
+            const positions = payload.find((p: any) => p.dataKey === "positions");
+            const applicants = payload.find((p: any) => p.dataKey === "applicants");
+            return (
+              <div className="rounded-xl border border-gray-200 bg-white/90 px-4 py-2 shadow-xl text-sm text-gray-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-gray-100">
+                <div className="font-semibold mb-1">{label}</div>
+                <div className="flex flex-col gap-1">
+                  {positions && (
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#bdbdbd', border: '1px solid #bdbdbd' }} />
+                      <span>Positions:</span>
+                      <span className="font-bold">{positions.value.toLocaleString()}+</span>
+                    </div>
+                  )}
+                  {applicants && (
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f5f5f5', border: '1px solid #e5e5e5' }} />
+                      <span>Applicants:</span>
+                      <span className="font-bold">{applicants.value.toLocaleString()}+</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          }} />
+          <Area
+            dataKey="positions"
+            name="Positions"
+            type="natural"
+            fill="#bdbdbd"
+            fillOpacity={0.8}
+            stroke="#bdbdbd"
+            stackId="a"
+          />
+          <Area
+            dataKey="applicants"
+            name="Applicants"
+            type="natural"
+            fill="#f5f5f5"
+            fillOpacity={0.8}
+            stroke="#f5f5f5"
+            stackId="a"
+          />
+        </AreaChart>
+      </div>
+      <div className="mt-4">
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              No. of Applicants up 675% since 2020<TrendingUp className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-2 leading-none text-gray-400">
+              2020 - Present
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const tilt1 = use3dTilt();
   const tilt2 = use3dTilt();
@@ -191,7 +527,9 @@ export default function Home() {
     <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
       {/* Main content */}
       <div className="w-full flex flex-col items-center justify-center min-h-screen">
-        <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="mb-4 rounded-xl" />
+        <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
+          <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
+        </Tilt>
         <TextAnimate
           animation="fadeIn"
           by="line"
@@ -207,7 +545,7 @@ export default function Home() {
           className="description mt-4"
           delay={0.5}
         >
-          {`ResDex helps you explore, connect, and stay updated with the latest in research and academia.`}
+          {`Explore, connect, and stay updated with the latest in research and academia.`}
         </TextAnimate>
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
@@ -218,7 +556,7 @@ export default function Home() {
         <div className="supporting mt-20 mb-2 text-center">Used by students at</div>
         {/* Marquee with repeating university logos */}
         <div className="relative w-full mt-4 flex items-center justify-center overflow-hidden">
-          <Marquee pauseOnHover className="[--gap:3rem] py-2">
+          <Marquee pauseOnHover={false} className="[--gap:3rem] py-2">
             {Array(3).fill([
               { src: "/McMaster.png", alt: "McMaster University" },
               { src: "/TMU.png", alt: "Toronto Metropolitan University" },
@@ -226,7 +564,7 @@ export default function Home() {
               { src: "/UOFT.png", alt: "University of Toronto" },
               { src: "/UOttawa.png", alt: "University of Ottawa" },
             ]).flat().map((logo, i) => (
-              <Image
+          <Image
                 key={i}
                 src={logo.src}
                 alt={logo.alt}
@@ -244,54 +582,66 @@ export default function Home() {
       </div>
       {/* Section: Research Made Easy with TextReveal */}
       <section ref={afterHeroRef} className="w-full flex flex-col items-start justify-center mt-0 pt-0">
-        <TextReveal className="title text-left">
-          {`Research is hard. We know. So we made it easier.`}
-        </TextReveal>
+        <TextRevealWithVerticalSlot
+          className="title text-left"
+          slotWords={["papers", "positions", "experience", "assistants"]}
+        >
+          {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
+        </TextRevealWithVerticalSlot>
       </section>
       {/* Section: Research is hard. We know. */}
       <section className="w-full flex flex-col items-center mt-24 mb-64">
-        <h2 className="title-2 text-center mb-12">Built by students, backed by passion.</h2>
-        <div className="flex flex-col md:flex-row gap-8 w-full max-w-7xl mx-auto">
-          {/* First box with custom 3D tilt and glare */}
-          <div className="flex flex-col items-center">
-            <div
-              {...tilt1}
-              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
-            />
-            <div className="w-full mt-4">
-              <h3 className="text-xl font-semibold mb-2 text-left">Credentials</h3>
-              <p className="text-base text-gray-700 text-left max-w-xs">
-                Build your research credentials with a dynamic portfolio and industry-ready courses to enhance your skills.
-              </p>
-            </div>
+        <TextAnimate
+          animation="fadeIn"
+          by="line"
+          as="h2"
+          className="title-2 text-center mb-12"
+        >
+          {`Built by students, backed by passion.`}
+        </TextAnimate>
+        <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
+          <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
+            <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="w-full flex justify-center">
+              <ChartCard />
+            </Tilt>
           </div>
-          {/* Second box with custom 3D tilt and glare */}
-          <div className="flex flex-col items-center">
-            <div
-              {...tilt2}
-              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
-            />
-            <div className="w-full mt-4">
-              <h3 className="text-xl font-semibold mb-2 text-left">Connections</h3>
-              <p className="text-base text-gray-700 text-left max-w-xs">
-                Connect with peers, mentors, and industry leaders to grow your network and collaborate on impactful research projects.
-              </p>
+          <div className="w-full md:w-1/2 flex flex-col justify-center gap-6">
+            <div className="flex flex-row items-center gap-4">
+              <span className="text-xs text-gray-500 mr-2">Acceptance Rate</span>
+              <span className="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <NumberTicker value={95} startValue={18.5} decimalPlaces={1} direction="down" className="whitespace-pre-wrap tracking-tighter" />%
+                <TrendingDown className="h-5 w-5 text-black dark:text-white" />
+              </span>
             </div>
-          </div>
-          {/* Third box with custom 3D tilt and glare */}
-          <div className="flex flex-col items-center">
-            <div
-              {...tilt3}
-              className="min-h-[320px] h-[340px] w-[340px] rounded-3xl bg-[#faf8f6] flex flex-col items-center justify-center p-8 group transition-transform duration-300 cursor-pointer relative overflow-hidden glare-box"
-            />
-            <div className="w-full mt-4">
-              <h3 className="text-xl font-semibold mb-2 text-left">Opportunities</h3>
-              <p className="text-base text-gray-700 text-left max-w-xs">
-                Discover exclusive research opportunities, internships, and events to advance your academic and professional journey.
-              </p>
-            </div>
+            <TextAnimate
+              animation="fadeIn"
+              by="word"
+              as="p"
+              className="max-w-2xl text-left text-base text-gray-700"
+              delay={0.4}
+            >
+              {`As students, we know how frustrating it is to cold-email countless professors just to get a shot at research. With AI and emerging fields driving explosive growth in research, competition has never been tougher—and acceptance rates are shrinking. That's why we built a student-led platform to make research more accessible. Everything you need to find opportunities, showcase your work, and build your research portfolio—all in one place.`}
+            </TextAnimate>
           </div>
         </div>
+      </section>
+      {/* Scroll-based velocity text animation */}
+      <div className="w-full flex flex-col items-center justify-center mb-40 relative overflow-hidden">
+        <VelocityScroll numRows={2} defaultVelocity={5}>
+          Research is a journey. Let your curiosity set the pace.
+        </VelocityScroll>
+        {/* Gradient fade on left/right */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
+      </div>
+      {/* MagicUI BentoGrid Section */}
+      <section className="w-full flex flex-col items-center justify-center my-24">
+        <h2 className="title-2 text-center mb-16">From idea to creation. We handle it all</h2>
+        <BentoGrid>
+          {features.map((feature, idx) => (
+            <BentoCard key={idx} {...feature} />
+          ))}
+        </BentoGrid>
       </section>
       {/* Section: Join the 1000 students, reshaping the future of research */}
       <section className="w-full flex flex-col items-center justify-center my-24">

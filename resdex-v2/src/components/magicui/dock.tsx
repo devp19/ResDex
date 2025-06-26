@@ -73,9 +73,9 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
           "group transition-all duration-300 group-hover:scale-105",
           dockVariants({ className }),
           {
-            "items-start": direction === "top",
-            "items-center": direction === "middle",
-            "items-end": direction === "bottom",
+          "items-start": direction === "top",
+          "items-center": direction === "middle",
+          "items-end": direction === "bottom",
           }
         )}
       >
