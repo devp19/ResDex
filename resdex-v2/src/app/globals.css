@@ -41,6 +41,24 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 :root {
@@ -121,8 +139,6 @@
   }
 }
 
-
-
 @font-face {
   font-family: 'Neue';
   src: url('../../public/fonts/NeueHaasDisplayMediu.woff') format('woff');
@@ -144,10 +160,54 @@
 }
 
 .description {
-  color: #a7a7a7;
-  font-size: 1rem;
+  color: #757575;
+  font-size: 1.1rem;
   font-weight: 400;
   line-height: 1.5;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+  text-rendering: optimizeLegibility;
+}
+
+.supporting {
+  color: #a0a0a0;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-wrap: balance;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: 'Monarque';
+  src: url('/fonts/Monarque-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+.monarque {
+  font-family: 'Monarque', serif;
+  font-style: italic;
+  color: #181818;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+  text-rendering: optimizeLegibility;
+}
+
+.regular {
+  font-family: 'monarque';
+  color: #181818;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   text-align: center;
   text-wrap: balance;
