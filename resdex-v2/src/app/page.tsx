@@ -20,10 +20,11 @@ import { WordRotate } from "@/components/magicui/word-rotate";
 import { VelocityScroll } from "@/components/magicui/scroll-based-velocity";
 import { BentoGrid, BentoCard } from "@/components/magicui/bento-grid";
 import AnimatedBeamMultipleOutputDemo from "@/components/magicui/animated-beam-multiple-outputs";
-import { FileTextIcon, BellIcon, Share2Icon } from "@radix-ui/react-icons";
+import { FileTextIcon, Share2Icon } from "@radix-ui/react-icons";
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip as RechartsTooltip } from "recharts";
+import { Users } from "lucide-react";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -179,31 +180,49 @@ function Marquee3D() {
 // Notification demo data and component
 const notifications = Array.from({ length: 10 }, () => [
   {
-    name: "Payment received",
-    description: "Magic UI",
+    name: "New follow request!",
+    description: "Tirth Patel sent you a follow request!",
     time: "15m ago",
-    icon: "💸",
+    icon: (
+      <img
+        src="https://github.com/impateltirth.png"
+        alt="Dev Patel"
+        className="w-6 h-6 rounded-full"
+      />
+    ),
     color: "#00C9A7",
   },
   {
-    name: "User signed up",
-    description: "Magic UI",
+    name: "New Comment",
+    description: "Aaryan Bhavsar commented!",
     time: "10m ago",
     icon: "👤",
     color: "#FFB800",
   },
   {
-    name: "New message",
-    description: "Magic UI",
+    name: "Hey! How are you?",
+    description: "Dev Patel sent you a message",
     time: "5m ago",
-    icon: "💬",
+    icon: (
+      <img
+        src="https://github.com/devp19.png"
+        alt="Dev Patel"
+        className="w-6 h-6 rounded-full"
+      />
+    ),
     color: "#FF3D71",
   },
   {
-    name: "New event",
-    description: "Magic UI",
+    name: "Loves your paper!",
+    description: "Fenil Shah liked your paper",
     time: "2m ago",
-    icon: "🗞️",
+    icon: (
+      <img
+        src="https://github.com/Fshah05.png"
+        alt="Fenil Shah"
+        className="w-6 h-6 rounded-full"
+      />
+    ),
     color: "#1E86FF",
   },
 ]).flat();
@@ -211,7 +230,7 @@ const notifications = Array.from({ length: 10 }, () => [
 interface NotificationProps {
   name: string;
   description: string;
-  icon: string;
+  icon: string | React.ReactNode;
   color: string;
   time: string;
   small?: boolean;
@@ -239,7 +258,11 @@ const Notification = ({ name, description, icon, color, time, small = false }: N
           className={small ? "flex size-7 items-center justify-center rounded-xl" : "flex size-10 items-center justify-center rounded-2xl"}
           style={{ backgroundColor: color }}
         >
-          <span className={small ? "text-base" : "text-lg"}>{icon}</span>
+          {typeof icon === "string" ? (
+            <span className={small ? "text-base" : "text-lg"}>{icon}</span>
+          ) : (
+            icon
+          )}
         </div>
         <div className="flex flex-col overflow-hidden">
           <figcaption className={small ? "flex flex-row items-center whitespace-pre text-[15px] font-medium dark:text-white" : "flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white"}>
@@ -277,32 +300,32 @@ const Calendar = ({ className = "" }) => (
 
 const files = [
   {
-    name: "bitcoin.pdf",
-    body: "Bitcoin is a cryptocurrency invented in 2008 by an unknown person or group of people using the name Satoshi Nakamoto.",
+    name: "quantum-computing.pdf",
+    body: "Quantum computing is a field of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data.",
   },
   {
-    name: "finances.xlsx",
-    body: "A spreadsheet or worksheet is a file made of rows and columns that help sort data, arrange data easily, and calculate numerical data.",
+    name: "large-language-models.pdf",
+    body: "Large language models are a type of machine learning model that are trained on large amounts of text data. They are used to generate text, translate text, and answer questions.",
   },
   {
-    name: "logo.svg",
-    body: "Scalable Vector Graphics is an Extensible Markup Language-based vector image format for two-dimensional graphics with support for interactivity and animation.",
+    name: "ai-in-research.pdf",
+    body: "AI is being used in research to help with tasks such as literature review, data analysis, and writing.",
   },
   {
-    name: "keys.gpg",
-    body: "GPG keys are used to encrypt and decrypt email, files, directories, and whole disk partitions and to authenticate messages.",
+    name: "cell-phone-networks.pdf",
+    body: "Cell phone networks are a type of wireless network that are used to communicate between devices.",
   },
   {
-    name: "seed.txt",
-    body: "A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover Bitcoin funds on-chain.",
+    name: "psychology.pdf",
+    body: "Psychology is the study of the mind and behavior. It is a science that seeks to understand how people think, feel, and behave.",
   },
 ];
 
 const features = [
   {
     Icon: FileTextIcon,
-    name: "Save your files",
-    description: "We automatically save your files as you type.",
+    name: "Create",
+    description: "Let your ideas come to life. Create your own paper through our builder or import one directly into your profile.",
     href: "#",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-1",
@@ -333,9 +356,9 @@ const features = [
     ),
   },
   {
-    Icon: BellIcon,
-    name: "Notifications",
-    description: "Get notified when something happens.",
+    Icon: Users,
+    name: "Connect",
+    description: "Collaborate with other students and professors to get your research done. We're building a community of researchers.",
     href: "#",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
@@ -408,7 +431,7 @@ function CustomChartTooltip(props: any) {
 
 function ChartCard() {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-6 w-full max-w-md flex flex-col">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 p-6 w-full max-w-md flex flex-col">
       <div className="mb-2">
         <TextAnimate
           animation="fadeIn"
@@ -450,18 +473,18 @@ function ChartCard() {
               <div className="rounded-xl border border-gray-200 bg-white/90 px-4 py-2 shadow-xl text-sm text-gray-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-gray-100">
                 <div className="font-semibold mb-1">{label}</div>
                 <div className="flex flex-col gap-1">
-                  {positions && (
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#bdbdbd', border: '1px solid #bdbdbd' }} />
-                      <span>Positions:</span>
-                      <span className="font-bold">{positions.value.toLocaleString()}+</span>
-                    </div>
-                  )}
                   {applicants && (
                     <div className="flex items-center gap-2">
                       <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f5f5f5', border: '1px solid #e5e5e5' }} />
                       <span>Applicants:</span>
                       <span className="font-bold">{applicants.value.toLocaleString()}+</span>
+                    </div>
+                  )}
+                  {positions && (
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#bdbdbd', border: '1px solid #bdbdbd' }} />
+                      <span>Positions:</span>
+                      <span className="font-bold">{positions.value.toLocaleString()}+</span>
                     </div>
                   )}
                 </div>
@@ -581,7 +604,7 @@ export default function Home() {
         </div>
       </div>
       {/* Section: Research Made Easy with TextReveal */}
-      <section ref={afterHeroRef} className="w-full flex flex-col items-start justify-center mt-0 pt-0">
+      <section ref={afterHeroRef} className="w-full flex flex-col items-center text-center justify-center mt-0 pt-0">
         <TextRevealWithVerticalSlot
           className="title text-left"
           slotWords={["papers", "positions", "experience", "assistants"]}
@@ -589,6 +612,24 @@ export default function Home() {
           {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
         </TextRevealWithVerticalSlot>
       </section>
+      {/* MagicUI BentoGrid Section */}
+      <section className="w-full flex flex-col items-center justify-center my-24">
+        <h2 className="title-2 text-center mb-16">From idea to creation. We handle it all.</h2>
+        <BentoGrid>
+          {features.map((feature, idx) => (
+            <BentoCard key={idx} {...feature} />
+          ))}
+        </BentoGrid>
+      </section>
+      {/* Scroll-based velocity text animation */}
+      <div className="w-full flex flex-col items-center justify-center mb-40 relative overflow-hidden">
+        <VelocityScroll numRows={2} defaultVelocity={5}>
+          Research is a journey. Let your curiosity set the pace.
+        </VelocityScroll>
+        {/* Gradient fade on left/right */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
+      </div>
       {/* Section: Research is hard. We know. */}
       <section className="w-full flex flex-col items-center mt-24 mb-64">
         <TextAnimate
@@ -624,24 +665,6 @@ export default function Home() {
             </TextAnimate>
           </div>
         </div>
-      </section>
-      {/* Scroll-based velocity text animation */}
-      <div className="w-full flex flex-col items-center justify-center mb-40 relative overflow-hidden">
-        <VelocityScroll numRows={2} defaultVelocity={5}>
-          Research is a journey. Let your curiosity set the pace.
-        </VelocityScroll>
-        {/* Gradient fade on left/right */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
-      </div>
-      {/* MagicUI BentoGrid Section */}
-      <section className="w-full flex flex-col items-center justify-center my-24">
-        <h2 className="title-2 text-center mb-16">From idea to creation. We handle it all</h2>
-        <BentoGrid>
-          {features.map((feature, idx) => (
-            <BentoCard key={idx} {...feature} />
-          ))}
-        </BentoGrid>
       </section>
       {/* Section: Join the 1000 students, reshaping the future of research */}
       <section className="w-full flex flex-col items-center justify-center my-24">
