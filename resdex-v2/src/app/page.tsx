@@ -29,6 +29,8 @@ import { Ripple } from "@/components/magicui/ripple";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Footer7 } from "@/components/footer7";
 import { FaInstagram, FaDiscord } from "react-icons/fa";
+import { signOut, onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "./firebaseConfig";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -545,6 +547,7 @@ export default function Home() {
   const tilt3 = use3dTilt();
   const afterHeroRef = useRef<HTMLDivElement>(null);
   const [showDock, setShowDock] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -556,6 +559,13 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -619,22 +629,54 @@ export default function Home() {
       <section ref={afterHeroRef} className="w-full flex flex-col items-center text-center justify-center mt-0 pt-0">
         <TextRevealWithVerticalSlot
           className="title text-left"
-          slotWords={["papers", "positions", "experience", "assistants"]}
+          slotWords={["papers", "assistants", "positions", "experience"]}
         >
           {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
         </TextRevealWithVerticalSlot>
       </section>
       {/* MagicUI BentoGrid Section */}
       <section className="w-full flex flex-col items-center justify-center my-24">
-        <h2 className="title-2 text-center mb-16">From idea to creation. We handle it all.</h2>
+        <TextAnimate
+          animation="fadeIn"
+          by="word"
+          as="h2"
+          className="title-2 text-center mb-16"
+          duration={0.8}
+        >
+          {`From idea to creation. We handle it all.`}
+        </TextAnimate>
         <BentoGrid>
           {features.map((feature, idx) => (
-            <BentoCard key={idx} {...feature} />
+            <BentoCard
+              key={idx}
+              {...feature}
+              name={
+                <TextAnimate
+                  animation="slideUp"
+                  by="word"
+                  as="span"
+                  className="text-xl font-semibold text-neutral-700 dark:text-neutral-300"
+                >
+                  {feature.name}
+                </TextAnimate>
+              }
+              description={
+                <TextAnimate
+                  animation="slideUp"
+                  by="word"
+                  as="span"
+                  className="max-w-lg text-neutral-400"
+                  delay={0.2}
+                >
+                  {feature.description}
+                </TextAnimate>
+              }
+            />
           ))}
         </BentoGrid>
       </section>
       {/* Scroll-based velocity text animation */}
-      <div className="w-full flex flex-col items-center justify-center mb-40 relative overflow-hidden">
+      <div className="w-full flex flex-col items-center justify-center mb-40 mt-20 relative overflow-hidden">
         <VelocityScroll numRows={2} defaultVelocity={5}>
           Research is a journey. Let your curiosity set the pace.
         </VelocityScroll>
@@ -815,7 +857,47 @@ export default function Home() {
                 </Tooltip>
               </DockIcon>
             ))}
+            {/* Login/Logout Button */}
             <Separator orientation="vertical" className="h-full py-2" />
+            <DockIcon>
+              {currentUser ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      aria-label="Sign Out"
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "size-12 rounded-full"
+                      )}
+                      onClick={async () => { await signOut(auth); }}
+                    >
+                      <span className="font-semibold">Sign Out</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Sign Out</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/login"
+                      aria-label="Login"
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "size-12 rounded-full"
+                      )}
+                    >
+                      <span className="font-semibold">Login</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Login</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </DockIcon>
           </Dock>
         </TooltipProvider>
       </div>

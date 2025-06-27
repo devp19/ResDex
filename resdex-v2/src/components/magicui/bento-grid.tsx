@@ -10,11 +10,11 @@ interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
-  name: string;
+  name: React.ReactNode;
   className: string;
   background: ReactNode;
   Icon: React.ElementType;
-  description: string;
+  description: React.ReactNode;
   href: string;
   cta: string;
 }
@@ -44,7 +44,6 @@ const BentoCard = ({
   ...props
 }: BentoCardProps) => (
   <div
-    key={name}
     className={cn(
       "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
       // light styles
