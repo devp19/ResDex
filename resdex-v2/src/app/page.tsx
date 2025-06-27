@@ -24,7 +24,11 @@ import { FileTextIcon, Share2Icon } from "@radix-ui/react-icons";
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip as RechartsTooltip } from "recharts";
-import { Users } from "lucide-react";
+import { Users, School, BrainCircuit } from "lucide-react";
+import { Ripple } from "@/components/magicui/ripple";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Footer7 } from "@/components/footer7";
+import { FaInstagram, FaDiscord } from "react-icons/fa";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -325,7 +329,7 @@ const features = [
   {
     Icon: FileTextIcon,
     name: "Create",
-    description: "Let your ideas come to life. Create your own paper through our builder or import one directly into your profile.",
+    description: "Let your ideas come to life right in your profile.",
     href: "#",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-1",
@@ -367,25 +371,25 @@ const features = [
     ),
   },
   {
-    Icon: Share2Icon,
-    name: "Integrations",
-    description: "Supports 100+ integrations and counting.",
+    Icon: School,
+    name: "Affiliations",
+    description: "Supports organization portals to find your next research opportunity.",
     href: "#",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
+      <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out filter grayscale [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
     ),
   },
   {
-    Icon: CalendarIcon,
-    name: "Calendar",
-    description: "Use the calendar to filter your files by date.",
+    Icon: BrainCircuit,
+    name: "Brainwave",
+    description: "The ResDex way of blog-posting. Share your thoughts and ideas with the world.",
     className: "col-span-3 lg:col-span-1",
     href: "#",
     cta: "Learn more",
     background: (
-      <Calendar className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] group-hover:scale-90" />
+      <Ripple className="absolute inset-0" mainCircleSize={120} mainCircleOpacity={0.12} />
     ),
   },
 ];
@@ -527,6 +531,14 @@ function ChartCard() {
   );
 }
 
+// Custom social links for Footer7 with X icon
+const footerSocialLinks = [
+  { icon: <FaInstagram className="size-5" />, href: "#", label: "Instagram" },
+  { icon: <FaDiscord className="size-5" />, href: "#", label: "Discord" },
+  { icon: <Icons.x className="size-5" />, href: "#", label: "X" },
+  { icon: <Icons.linkedin className="size-5" />, href: "#", label: "LinkedIn" },
+];
+
 export default function Home() {
   const tilt1 = use3dTilt();
   const tilt2 = use3dTilt();
@@ -631,7 +643,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
       </div>
       {/* Section: Research is hard. We know. */}
-      <section className="w-full flex flex-col items-center mt-24 mb-64">
+      <section className="w-full flex flex-col items-center mt-12 mb-64">
         <TextAnimate
           animation="fadeIn"
           by="line"
@@ -663,19 +675,69 @@ export default function Home() {
             >
               {`As students, we know how frustrating it is to cold-email countless professors just to get a shot at research. With AI and emerging fields driving explosive growth in research, competition has never been tougher—and acceptance rates are shrinking. That's why we built a student-led platform to make research more accessible. Everything you need to find opportunities, showcase your work, and build your research portfolio—all in one place.`}
             </TextAnimate>
+            <div className="flex flex-col sm:flex-row gap-4 mt-8">
+              <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
+                <span className="text-white group-hover:text-black">Join our Student Team</span>
+              </InteractiveHoverButton>
+              <InteractiveHoverButton className="bg-white text-black border-black">Read More</InteractiveHoverButton>
+            </div>
           </div>
         </div>
       </section>
       {/* Section: Join the 1000 students, reshaping the future of research */}
-      <section className="w-full flex flex-col items-center justify-center my-24">
+      <section className="w-full flex flex-col items-center justify-center my-12">
         <h2 className="title-2 text-center flex flex-wrap items-center justify-center gap-3">
-          <span>Join the <NumberTicker value={1000} className="title-2" />+ students, reshaping the future of research</span>
+          <span>Join the <NumberTicker startValue={500} value={1000} className="title-2" />+ students, reshaping the future of research</span>
         </h2>
       </section>
       {/* 3D Marquee Section (MagicUI style) */}
       <section className="w-full flex flex-col items-center justify-center mb-24">
         <div className="w-full flex justify-center">
           <Marquee3D />
+        </div>
+      </section>
+      {/* FAQ Section */}
+      <section className="w-full flex flex-col items-center justify-center my-24">
+        <TextAnimate animation="fadeIn" by="line" as="h2" className="title-2 text-center mb-10">Frequently Asked Questions</TextAnimate>
+        <div className="w-full max-w-2xl mx-auto">
+          <Accordion type="single" collapsible className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 shadow-lg">
+            <AccordionItem value="item-1" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What is ResDex?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                ResDex is a platform for students to discover, apply to, and manage research opportunities. We connect students with professors and research groups, making research more accessible and transparent.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">I'm a student. How can I help?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                <>We're always looking for students to help us build the platform. If you're interested, please check out our <Link href="/careers" className="text-blue-500">careers page</Link> to become a student ambassador.</>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What's next for ResDex?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                We're just getting started! Our vision is to transition ResDex into a full-fledged global research hub—where students, professors, and organizations can connect, share, and discover research in one place. Upcoming features include daily research digests, article and preprint postings, collaborative tools, and more. We want ResDex to be your all-in-one platform for everything research, from discovery to publication and beyond.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">Is ResDex free to use?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                Yes! ResDex is free for everyone. We believe in making research accessible to everyone.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is ResDex different from traditional research portals or job boards?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                ResDex is built by students, for students. Unlike traditional job boards or research portals, ResDex focuses on the unique needs of student researchers—offering verified research opportunities, a modern portfolio builder, direct faculty connections, and a supportive community. We combine discovery, application, and networking in one place, making research more accessible, transparent, and student-friendly.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5" className="px-6 py-4">
+              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is my data protected on ResDex?</TextAnimate></AccordionTrigger>
+              <AccordionContent>
+                Your privacy and security are our top priorities. ResDex uses industry-standard encryption and best practices to protect your data. We never sell your information, and you have full control over your profile and what you share. For more details, see our Privacy Policy.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
       {/* Dock fixed at the top center of the viewport, fades in after section 2 */}
@@ -757,6 +819,16 @@ export default function Home() {
           </Dock>
         </TooltipProvider>
       </div>
+      {/* Footer7 with TextAnimate on all content */}
+      <Footer7
+        logo={{
+          url: "/",
+          src: "/beige-logo.png",
+          alt: "ResDex Logo",
+          title: "ResDex"
+        }}
+        socialLinks={footerSocialLinks}
+      />
     </div>
   );
 }
