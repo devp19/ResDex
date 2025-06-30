@@ -4,9 +4,9 @@ import Image from "next/image";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, RefObject } from "react";
 import Link from "next/link";
-import { HomeIcon, PencilIcon, MailIcon, CalendarIcon } from "lucide-react";
+import { HomeIcon, PencilIcon, MailIcon, CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { buttonVariants } from "@/components/ui/button";
@@ -29,8 +29,9 @@ import { Ripple } from "@/components/magicui/ripple";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Footer7 } from "@/components/footer7";
 import { FaInstagram, FaDiscord } from "react-icons/fa";
-import { signOut, onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "./firebaseConfig";
+import { signOut, onAuthStateChanged, User, linkWithPopup, unlink, GoogleAuthProvider } from "firebase/auth";
+import { auth, db } from "./firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 import {
   Navbar,
   NavBody,
@@ -43,6 +44,18 @@ import {
   NavbarButton
 } from "@/components/ui/navbar";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -561,6 +574,37 @@ export default function Home() {
   const [showDock, setShowDock] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loginHovered, setLoginHovered] = useState(false);
+  const [loginMobileHovered, setLoginMobileHovered] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [userDoc, setUserDoc] = useState<any>(null);
+  const avatarUrl = userDoc?.profilePicture || currentUser?.photoURL || "/beige-logo.png";
+  const isGoogleLinked = currentUser?.providerData?.some((p) => p.providerId === "google.com");
+  const [dropdownHover, setDropdownHover] = useState<number | null>(null);
+  const [hoverBgStyle, setHoverBgStyle] = useState<{ top: number; height: number } | null>(null);
+  const dropdownOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [signedOutAnim, setSignedOutAnim] = useState(false);
+  // Dropdown auto-close on mouse leave
+  const closeDropdownTimeout = useRef<NodeJS.Timeout | null>(null);
+  const handleDropdownMouseLeave = () => {
+    closeDropdownTimeout.current = setTimeout(() => setDropdownOpen(false), 120);
+  };
+  const handleDropdownMouseEnter = () => {
+    if (closeDropdownTimeout.current) {
+      clearTimeout(closeDropdownTimeout.current);
+      closeDropdownTimeout.current = null;
+    }
+  };
+
+  // User info for dropdown
+  const fullName = userDoc?.fullName || currentUser?.displayName || "";
+  let username = userDoc?.username;
+  if (!username && currentUser?.email) {
+    username = currentUser.email.split("@")[0];
+  }
+  username = username ? `@${username}` : "";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -581,6 +625,23 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!currentUser) {
+      setUserDoc(null);
+      return;
+    }
+    const fetchUserDoc = async () => {
+      const ref = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        setUserDoc(snap.data());
+      } else {
+        setUserDoc(null);
+      }
+    };
+    fetchUserDoc();
+  }, [currentUser]);
+
   // Example navigation items
   const navItems = [
     { name: "Home", link: "/" },
@@ -588,256 +649,585 @@ export default function Home() {
     { name: "Contact", link: "/contact" },
   ];
 
+  async function handleLinkGoogle() {
+    try {
+      await linkWithPopup(auth.currentUser!, new GoogleAuthProvider());
+      alert("Google account linked successfully!");
+    } catch (e) {
+      alert("Failed to link Google account: " + (e instanceof Error ? e.message : e));
+    }
+  }
+
+  async function handleUnlinkGoogle() {
+    try {
+      await unlink(auth.currentUser!, "google.com");
+      alert("Google account unlinked successfully!");
+    } catch (e) {
+      alert("Failed to unlink Google account: " + (e instanceof Error ? e.message : e));
+    }
+  }
+
+  // Reset confirmSignOut when dropdown closes
+  useEffect(() => {
+    if (!dropdownOpen) setConfirmSignOut(false);
+    if (!dropdownOpen) setSignedOutAnim(false);
+  }, [dropdownOpen]);
+
+  // Dropdown options array for easier mapping
+  const dropdownOptions = [
+    {
+      label: "Settings",
+      onClick: isGoogleLinked ? handleUnlinkGoogle : handleLinkGoogle,
+    },
+    {
+      label: signedOutAnim ? "Signed out!" : confirmSignOut ? "Confirm Sign out" : "Sign out",
+      onClick: async () => {
+        if (signedOutAnim) return;
+        if (confirmSignOut) {
+          setSignedOutAnim(true);
+          setTimeout(async () => {
+            setDropdownOpen(false);
+            setSignedOutAnim(false);
+            await signOut(auth);
+          }, 1000);
+        } else {
+          setConfirmSignOut(true);
+        }
+      },
+      isSignOut: true,
+    },
+  ];
+
+  // Update hover background position/size on hover
+  useEffect(() => {
+    if (dropdownHover === null || !dropdownOptionRefs.current[dropdownHover]) {
+      setHoverBgStyle(null);
+      return;
+    }
+    const el = dropdownOptionRefs.current[dropdownHover];
+    if (el) {
+      const parent = el.parentElement;
+      if (parent) {
+        const parentRect = parent.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
+        setHoverBgStyle({
+          top: rect.top - parentRect.top,
+          height: rect.height,
+        });
+      }
+    }
+  }, [dropdownHover, dropdownOpen]);
+
   return (
-    <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
-      {/* Navbar at the very top of the page */}
-      <Navbar>
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={navItems} />
-          <Link href="/login" passHref legacyBehavior>
-            <ShimmerButton type="button" className="px-6 py-2 rounded-full">Login</ShimmerButton>
-          </Link>
-        </NavBody>
-        <MobileNav visible={mobileOpen}>
-          <MobileNavHeader>
+    <>
+      <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
+        {/* Navbar at the very top of the page */}
+        <Navbar>
+          <NavBody>
             <NavbarLogo />
-            <MobileNavToggle isOpen={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)} />
-          </MobileNavHeader>
-          <MobileNavMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)}>
-            {navItems.map((item) => (
-              <a key={item.name} href={item.link} onClick={() => setMobileOpen(false)} className="py-2 text-lg block">
-                {item.name}
-              </a>
-            ))}
-            <Link href="/login" passHref legacyBehavior>
-              <ShimmerButton type="button" className="mt-4 w-full rounded-full">Login</ShimmerButton>
-            </Link>
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
-      {/* Main content */}
-      <div className="w-full flex flex-col items-center justify-center min-h-screen">
-        <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
-          <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
-        </Tilt>
-        <TextAnimate
-          animation="fadeIn"
-          by="line"
-          as="h1"
-          className="title text-center"
-        >
-          {`Rediscover the world of research.`}
-        </TextAnimate>
-        <TextAnimate
-          animation="fadeIn"
-          by="line"
-          as="p"
-          className="description mt-4"
-          delay={0.5}
-        >
-          {`Explore, connect, and stay updated with the latest in research and academia.`}
-        </TextAnimate>
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-            <span className="text-white group-hover:text-black">Join the waitlist</span>
-          </InteractiveHoverButton>
-          <InteractiveHoverButton className="bg-white text-black border-black">Learn more</InteractiveHoverButton>
+            <NavItems items={navItems} />
+            <div className="flex items-center gap-2">
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    className="flex items-center gap-2 focus:outline-none rounded-full transition-colors duration-150 hover:bg-gray-200/60 dark:hover:bg-neutral-800/60 cursor-pointer px-2 py-1"
+                    onClick={() => setDropdownOpen((v) => !v)}
+                  >
+                    <img
+                      src={avatarUrl}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-neutral-700"
+                    />
+                    <ChevronDownIcon
+                      className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : "rotate-0"}`}
+                      size={20}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute right-0 mt-5 w-56 rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md shadow-lg border border-gray-200 dark:border-neutral-800 z-50 overflow-hidden p-2"
+                        style={{ position: 'absolute' }}
+                        onMouseLeave={handleDropdownMouseLeave}
+                        onMouseEnter={handleDropdownMouseEnter}
+                      >
+                        {/* User info at top of dropdown */}
+                        <div className="px-4 pt-2 pb-3 border-b border-gray-200 dark:border-neutral-800 mb-1">
+                          <div className="font-semibold text-base text-black dark:text-white truncate">{fullName}</div>
+                          <div className="text-xs text-neutral-500 dark:text-neutral-400 opacity-80 truncate mt-0.5">{username}</div>
+                        </div>
+                        {/* Sliding hover background */}
+                        <AnimatePresence>
+                          {hoverBgStyle && (
+                            <motion.div
+                              layoutId="dropdown-hovered"
+                              className="absolute left-0 w-full rounded-full bg-gray-300 dark:bg-neutral-800 z-0"
+                              style={{
+                                top: hoverBgStyle.top + 4,
+                                height: hoverBgStyle.height - 8,
+                                left: 4,
+                                width: 'calc(100% - 8px)',
+                              }}
+                              initial={{ opacity: 0.7 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            />
+                          )}
+                        </AnimatePresence>
+                        {dropdownOptions.map((option, idx) => (
+                          <motion.button
+                            key={option.label + '-' + idx}
+                            ref={el => { dropdownOptionRefs.current[idx] = el; }}
+                            className={
+                              `w-full text-left px-4 py-3.5 text-sm font-medium transition-colors relative cursor-pointer rounded-full ` +
+                              (option.isSignOut && (confirmSignOut || signedOutAnim)
+                                ? (
+                                    (dropdownHover === idx || signedOutAnim
+                                      ? 'bg-[#2a2a2a] text-white'
+                                      : 'bg-[#2a2a2a] text-neutral-600 dark:text-neutral-300')
+                                  )
+                                : 'bg-transparent text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white')
+                            }
+                            onClick={option.onClick}
+                            onMouseEnter={() => setDropdownHover(idx)}
+                            onMouseLeave={() => setDropdownHover(null)}
+                            layout
+                            animate={option.isSignOut && (confirmSignOut || signedOutAnim) ? { scale: 1.04 } : { scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            disabled={signedOutAnim}
+                          >
+                            <span className="relative z-10 flex items-center gap-2">
+                              {option.label}
+                              {signedOutAnim && option.isSignOut && (
+                                <svg className="inline-block ml-1 w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                              )}
+                            </span>
+                          </motion.button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
+                    <AlertDialogContent className="rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Sign out</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to sign out?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => { setShowSignOutDialog(false); await signOut(auth); }}
+                        >
+                          Sign out
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              ) : (
+                <React.Fragment>
+                  <div
+                    className="relative group px-4 py-2"
+                    onMouseEnter={() => setLoginHovered(true)}
+                    onMouseLeave={() => setLoginHovered(false)}
+                  >
+                    <Link href="/login" className="relative z-10 text-sm text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors">
+                      Login
+                    </Link>
+                  </div>
+                  <AnimatePresence>
+                    {showDock && (
+                      <motion.div
+                        key="join-for-free-desktop"
+                        initial={{ x: -32, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -32, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        style={{ display: 'inline-block' }}
+                      >
+                        <Link href="/signup">
+                          <ShimmerButton type="button" className="px-5 py-2 rounded-full text-sm">Join for free</ShimmerButton>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
+              )}
+            </div>
+          </NavBody>
+          <MobileNav visible={mobileOpen}>
+            <MobileNavHeader>
+              <NavbarLogo />
+              <MobileNavToggle isOpen={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)} />
+            </MobileNavHeader>
+            <MobileNavMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)}>
+              {navItems.map((item) => (
+                <a key={item.name} href={item.link} onClick={() => setMobileOpen(false)} className="py-2 text-lg block">
+                  {item.name}
+                </a>
+              ))}
+              <div className="flex items-center gap-2">
+                {currentUser ? (
+                  <div className="relative">
+                    <button
+                      className="flex items-center gap-2 w-full focus:outline-none rounded-full transition-colors duration-150 hover:bg-gray-200/60 dark:hover:bg-neutral-800/60 cursor-pointer px-2 py-1"
+                      onClick={() => setDropdownOpen((v) => !v)}
+                    >
+                      <img
+                        src={avatarUrl}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-neutral-700"
+                      />
+                      <ChevronDownIcon
+                        className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : "rotate-0"}`}
+                        size={20}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {dropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.18 }}
+                          className="absolute right-0 mt-5 w-56 rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md shadow-lg border border-gray-200 dark:border-neutral-800 z-50 overflow-hidden p-2"
+                          style={{ position: 'absolute' }}
+                          onMouseLeave={handleDropdownMouseLeave}
+                          onMouseEnter={handleDropdownMouseEnter}
+                        >
+                          {/* User info at top of dropdown */}
+                          <div className="px-4 pt-2 pb-3 border-b border-gray-200 dark:border-neutral-800 mb-1">
+                            <div className="font-semibold text-base text-black dark:text-white truncate">{fullName}</div>
+                            <div className="text-xs text-neutral-500 dark:text-neutral-400 opacity-80 truncate mt-0.5">{username}</div>
+                          </div>
+                          {/* Sliding hover background */}
+                          <AnimatePresence>
+                            {hoverBgStyle && (
+                              <motion.div
+                                layoutId="dropdown-hovered"
+                                className="absolute left-0 w-full rounded-full bg-gray-300 dark:bg-neutral-800 z-0"
+                                style={{
+                                  top: hoverBgStyle.top + 4,
+                                  height: hoverBgStyle.height - 8,
+                                  left: 4,
+                                  width: 'calc(100% - 8px)',
+                                }}
+                                initial={{ opacity: 0.7 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                              />
+                            )}
+                          </AnimatePresence>
+                          {dropdownOptions.map((option, idx) => (
+                            <motion.button
+                              key={option.label + '-' + idx}
+                              ref={el => { dropdownOptionRefs.current[idx] = el; }}
+                              className={
+                                `w-full text-left px-4 py-3.5 text-sm font-medium transition-colors relative cursor-pointer rounded-full ` +
+                                (option.isSignOut && (confirmSignOut || signedOutAnim)
+                                  ? (
+                                      (dropdownHover === idx || signedOutAnim
+                                        ? 'bg-[#2a2a2a] text-white'
+                                        : 'bg-[#2a2a2a] text-neutral-600 dark:text-neutral-300')
+                                    )
+                                  : 'bg-transparent text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white')
+                              }
+                              onClick={option.onClick}
+                              onMouseEnter={() => setDropdownHover(idx)}
+                              onMouseLeave={() => setDropdownHover(null)}
+                              layout
+                              animate={option.isSignOut && (confirmSignOut || signedOutAnim) ? { scale: 1.04 } : { scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            >
+                              <span className="relative z-10">{option.label}</span>
+                            </motion.button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
+                      <AlertDialogContent className="rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Sign out</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to sign out?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={async () => { setShowSignOutDialog(false); await signOut(auth); }}
+                          >
+                            Sign out
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                ) : (
+                  <React.Fragment>
+                    <div
+                      className="relative group py-2 text-lg block"
+                      onMouseEnter={() => setLoginMobileHovered(true)}
+                      onMouseLeave={() => setLoginMobileHovered(false)}
+                    >
+                      <Link href="/login" className="relative z-10 text-lg text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors block">
+                        Login
+                      </Link>
+                    </div>
+                    <AnimatePresence>
+                      {showDock && (
+                        <motion.div
+                          key="join-for-free-mobile"
+                          initial={{ x: -32, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          exit={{ x: -32, opacity: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          style={{ display: 'inline-block' }}
+                        >
+                          <Link href="/signup">
+                            <ShimmerButton type="button" className="px-5 py-2 rounded-full text-lg">Join for free</ShimmerButton>
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                )}
+              </div>
+            </MobileNavMenu>
+          </MobileNav>
+        </Navbar>
+        {/* Main content */}
+        <div className="w-full flex flex-col items-center justify-center min-h-screen">
+          <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
+            <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
+          </Tilt>
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="h1"
+            className="title text-center"
+          >
+            {`Rediscover the world of research.`}
+          </TextAnimate>
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="p"
+            className="description mt-4"
+            delay={0.5}
+          >
+            {`Explore, connect, and stay updated with the latest in research and academia.`}
+          </TextAnimate>
+          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
+              <span className="text-white group-hover:text-black">Join the waitlist</span>
+            </InteractiveHoverButton>
+            <InteractiveHoverButton className="bg-white text-black border-black">Learn more</InteractiveHoverButton>
+          </div>
+          <div className="supporting mt-20 mb-2 text-center">Used by students at</div>
+          {/* Marquee with repeating university logos */}
+          <div className="relative w-full mt-4 flex items-center justify-center overflow-hidden">
+            <Marquee pauseOnHover={false} className="[--gap:3rem] py-2">
+              {Array(3).fill([
+                { src: "/McMaster.png", alt: "McMaster University" },
+                { src: "/TMU.png", alt: "Toronto Metropolitan University" },
+                { src: "/Laurier.png", alt: "Wilfrid Laurier University" },
+                { src: "/UOFT.png", alt: "University of Toronto" },
+                { src: "/UOttawa.png", alt: "University of Ottawa" },
+              ]).flat().map((logo, i) => (
+            <Image
+                  key={i}
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={96}
+                  height={96}
+                  className="rounded-lg mx-6 object-contain"
+                  draggable={false}
+                />
+              ))}
+            </Marquee>
+            {/* Gradient fade on left/right */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background" />
+          </div>
         </div>
-        <div className="supporting mt-20 mb-2 text-center">Used by students at</div>
-        {/* Marquee with repeating university logos */}
-        <div className="relative w-full mt-4 flex items-center justify-center overflow-hidden">
-          <Marquee pauseOnHover={false} className="[--gap:3rem] py-2">
-            {Array(3).fill([
-              { src: "/McMaster.png", alt: "McMaster University" },
-              { src: "/TMU.png", alt: "Toronto Metropolitan University" },
-              { src: "/Laurier.png", alt: "Wilfrid Laurier University" },
-              { src: "/UOFT.png", alt: "University of Toronto" },
-              { src: "/UOttawa.png", alt: "University of Ottawa" },
-            ]).flat().map((logo, i) => (
-          <Image
-                key={i}
-                src={logo.src}
-                alt={logo.alt}
-                width={96}
-                height={96}
-                className="rounded-lg mx-6 object-contain"
-                draggable={false}
+        {/* Section: Research Made Easy with TextReveal */}
+        <section ref={afterHeroRef} className="w-full flex flex-col items-center text-center justify-center mt-0 pt-0">
+          <TextRevealWithVerticalSlot
+            className="title text-left"
+            slotWords={["papers", "assistants", "positions", "experience"]}
+          >
+            {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
+          </TextRevealWithVerticalSlot>
+        </section>
+        {/* MagicUI BentoGrid Section */}
+        <section className="w-full flex flex-col items-center justify-center my-24">
+          <TextAnimate
+            animation="fadeIn"
+            by="word"
+            as="h2"
+            className="title-2 text-center mb-16"
+            duration={0.8}
+          >
+            {`From idea to creation. We handle it all.`}
+          </TextAnimate>
+          <BentoGrid>
+            {features.map((feature, idx) => (
+              <BentoCard
+                key={idx}
+                {...feature}
+                name={
+                  <TextAnimate
+                    animation="slideUp"
+                    by="word"
+                    as="span"
+                    className="text-xl font-semibold text-neutral-700 dark:text-neutral-300"
+                  >
+                    {feature.name}
+                  </TextAnimate>
+                }
+                description={
+                  <TextAnimate
+                    animation="slideUp"
+                    by="word"
+                    as="span"
+                    className="max-w-lg text-neutral-400"
+                    delay={0.2}
+                  >
+                    {feature.description}
+                  </TextAnimate>
+                }
               />
             ))}
-          </Marquee>
+          </BentoGrid>
+        </section>
+        {/* Scroll-based velocity text animation */}
+        <div className="w-full flex flex-col items-center justify-center mb-40 mt-20 relative overflow-hidden">
+          <VelocityScroll numRows={2} defaultVelocity={5}>
+            Research is a journey. Let your curiosity set the pace.
+          </VelocityScroll>
           {/* Gradient fade on left/right */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
         </div>
-      </div>
-      {/* Section: Research Made Easy with TextReveal */}
-      <section ref={afterHeroRef} className="w-full flex flex-col items-center text-center justify-center mt-0 pt-0">
-        <TextRevealWithVerticalSlot
-          className="title text-left"
-          slotWords={["papers", "assistants", "positions", "experience"]}
-        >
-          {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
-        </TextRevealWithVerticalSlot>
-      </section>
-      {/* MagicUI BentoGrid Section */}
-      <section className="w-full flex flex-col items-center justify-center my-24">
-        <TextAnimate
-          animation="fadeIn"
-          by="word"
-          as="h2"
-          className="title-2 text-center mb-16"
-          duration={0.8}
-        >
-          {`From idea to creation. We handle it all.`}
-        </TextAnimate>
-        <BentoGrid>
-          {features.map((feature, idx) => (
-            <BentoCard
-              key={idx}
-              {...feature}
-              name={
-                <TextAnimate
-                  animation="slideUp"
-                  by="word"
-                  as="span"
-                  className="text-xl font-semibold text-neutral-700 dark:text-neutral-300"
-                >
-                  {feature.name}
-                </TextAnimate>
-              }
-              description={
-                <TextAnimate
-                  animation="slideUp"
-                  by="word"
-                  as="span"
-                  className="max-w-lg text-neutral-400"
-                  delay={0.2}
-                >
-                  {feature.description}
-                </TextAnimate>
-              }
-            />
-          ))}
-        </BentoGrid>
-      </section>
-      {/* Scroll-based velocity text animation */}
-      <div className="w-full flex flex-col items-center justify-center mb-40 mt-20 relative overflow-hidden">
-        <VelocityScroll numRows={2} defaultVelocity={5}>
-          Research is a journey. Let your curiosity set the pace.
-        </VelocityScroll>
-        {/* Gradient fade on left/right */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
-      </div>
-      {/* Section: Research is hard. We know. */}
-      <section className="w-full flex flex-col items-center mt-12 mb-64">
-        <TextAnimate
-          animation="fadeIn"
-          by="line"
-          as="h2"
-          className="title-2 text-center mb-12"
-        >
-          {`Built by students, backed by passion.`}
-        </TextAnimate>
-        <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
-          <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
-            <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="w-full flex justify-center">
-              <ChartCard />
-            </Tilt>
-          </div>
-          <div className="w-full md:w-1/2 flex flex-col justify-center gap-6">
-            <div className="flex flex-row items-center gap-4">
-              <span className="text-xs text-gray-500 mr-2">Acceptance Rate</span>
-              <span className="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <NumberTicker value={95} startValue={18.5} decimalPlaces={1} direction="down" className="whitespace-pre-wrap tracking-tighter" />%
-                <TrendingDown className="h-5 w-5 text-black dark:text-white" />
-              </span>
+        {/* Section: Research is hard. We know. */}
+        <section className="w-full flex flex-col items-center mt-12 mb-64">
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="h2"
+            className="title-2 text-center mb-12"
+          >
+            {`Built by students, backed by passion.`}
+          </TextAnimate>
+          <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
+            <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
+              <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="w-full flex justify-center">
+                <ChartCard />
+              </Tilt>
             </div>
-            <TextAnimate
-              animation="fadeIn"
-              by="word"
-              as="p"
-              className="max-w-2xl text-left text-base text-gray-700"
-              delay={0.4}
-            >
-              {`As students, we know how frustrating it is to cold-email countless professors just to get a shot at research. With AI and emerging fields driving explosive growth in research, competition has never been tougher—and acceptance rates are shrinking. That's why we built a student-led platform to make research more accessible. Everything you need to find opportunities, showcase your work, and build your research portfolio—all in one place.`}
-            </TextAnimate>
-            <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-                <span className="text-white group-hover:text-black">Join our Student Team</span>
-              </InteractiveHoverButton>
-              <InteractiveHoverButton className="bg-white text-black border-black">Read More</InteractiveHoverButton>
+            <div className="w-full md:w-1/2 flex flex-col justify-center gap-6">
+              <div className="flex flex-row items-center gap-4">
+                <span className="text-xs text-gray-500 mr-2">Acceptance Rate</span>
+                <span className="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <NumberTicker value={95} startValue={18.5} decimalPlaces={1} direction="down" className="whitespace-pre-wrap tracking-tighter" />%
+                  <TrendingDown className="h-5 w-5 text-black dark:text-white" />
+                </span>
+              </div>
+              <TextAnimate
+                animation="fadeIn"
+                by="word"
+                as="p"
+                className="max-w-2xl text-left text-base text-gray-700"
+                delay={0.4}
+              >
+                {`As students, we know how frustrating it is to cold-email countless professors just to get a shot at research. With AI and emerging fields driving explosive growth in research, competition has never been tougher—and acceptance rates are shrinking. That's why we built a student-led platform to make research more accessible. Everything you need to find opportunities, showcase your work, and build your research portfolio—all in one place.`}
+              </TextAnimate>
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
+                  <span className="text-white group-hover:text-black">Join our Student Team</span>
+                </InteractiveHoverButton>
+                <InteractiveHoverButton className="bg-white text-black border-black">Read More</InteractiveHoverButton>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-      {/* Section: Join the 1000 students, reshaping the future of research */}
-      <section className="w-full flex flex-col items-center justify-center my-12">
-        <h2 className="title-2 text-center flex flex-wrap items-center justify-center gap-3">
-          <span>Join the <NumberTicker startValue={500} value={1000} className="title-2" />+ students, reshaping the future of research</span>
-        </h2>
-      </section>
-      {/* 3D Marquee Section (MagicUI style) */}
-      <section className="w-full flex flex-col items-center justify-center mb-24">
-        <div className="w-full flex justify-center">
-          <Marquee3D />
-        </div>
-      </section>
-      {/* FAQ Section */}
-      <section className="w-full flex flex-col items-center justify-center my-24">
-        <TextAnimate animation="fadeIn" by="line" as="h2" className="title-2 text-center mb-10">Frequently Asked Questions</TextAnimate>
-        <div className="w-full max-w-2xl mx-auto">
-          <Accordion type="single" collapsible className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 shadow-lg">
-            <AccordionItem value="item-1" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What is ResDex?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                ResDex is a platform for students to discover, apply to, and manage research opportunities. We connect students with professors and research groups, making research more accessible and transparent.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">I'm a student. How can I help?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                <>We're always looking for students to help us build the platform. If you're interested, please check out our <Link href="/careers" className="text-blue-500">careers page</Link> to become a student ambassador.</>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-6" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What's next for ResDex?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                We're just getting started! Our vision is to transition ResDex into a full-fledged global research hub—where students, professors, and organizations can connect, share, and discover research in one place. Upcoming features include daily research digests, article and preprint postings, collaborative tools, and more. We want ResDex to be your all-in-one platform for everything research, from discovery to publication and beyond.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">Is ResDex free to use?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                Yes! ResDex is free for everyone. We believe in making research accessible to everyone.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is ResDex different from traditional research portals or job boards?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                ResDex is built by students, for students. Unlike traditional job boards or research portals, ResDex focuses on the unique needs of student researchers—offering verified research opportunities, a modern portfolio builder, direct faculty connections, and a supportive community. We combine discovery, application, and networking in one place, making research more accessible, transparent, and student-friendly.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-5" className="px-6 py-4">
-              <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is my data protected on ResDex?</TextAnimate></AccordionTrigger>
-              <AccordionContent>
-                Your privacy and security are our top priorities. ResDex uses industry-standard encryption and best practices to protect your data. We never sell your information, and you have full control over your profile and what you share. For more details, see our Privacy Policy.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      </section>
-      {/* Footer7 with TextAnimate on all content */}
-      <Footer7
-        logo={{
-          url: "/",
-          src: "/beige-logo.png",
-          alt: "ResDex Logo",
-          title: "ResDex"
-        }}
-        socialLinks={footerSocialLinks}
-      />
-    </div>
+        </section>
+        {/* Section: Join the 1000 students, reshaping the future of research */}
+        <section className="w-full flex flex-col items-center justify-center my-12">
+          <h2 className="title-2 text-center flex flex-wrap items-center justify-center gap-3">
+            <span>Join the <NumberTicker startValue={500} value={1000} className="title-2" />+ students, reshaping the future of research</span>
+          </h2>
+        </section>
+        {/* 3D Marquee Section (MagicUI style) */}
+        <section className="w-full flex flex-col items-center justify-center mb-24">
+          <div className="w-full flex justify-center">
+            <Marquee3D />
+          </div>
+        </section>
+        {/* FAQ Section */}
+        <section className="w-full flex flex-col items-center justify-center my-24">
+          <TextAnimate animation="fadeIn" by="line" as="h2" className="title-2 text-center mb-10">Frequently Asked Questions</TextAnimate>
+          <div className="w-full max-w-2xl mx-auto">
+            <Accordion type="single" collapsible className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 shadow-lg">
+              <AccordionItem value="item-1" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What is ResDex?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  ResDex is a platform for students to discover, apply to, and manage research opportunities. We connect students with professors and research groups, making research more accessible and transparent.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">I'm a student. How can I help?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  <>We're always looking for students to help us build the platform. If you're interested, please check out our <Link href="/careers" className="text-blue-500">careers page</Link> to become a student ambassador.</>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-6" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What's next for ResDex?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  We're just getting started! Our vision is to transition ResDex into a full-fledged global research hub—where students, professors, and organizations can connect, share, and discover research in one place. Upcoming features include daily research digests, article and preprint postings, collaborative tools, and more. We want ResDex to be your all-in-one platform for everything research, from discovery to publication and beyond.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">Is ResDex free to use?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  Yes! ResDex is free for everyone. We believe in making research accessible to everyone.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is ResDex different from traditional research portals or job boards?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  ResDex is built by students, for students. Unlike traditional job boards or research portals, ResDex focuses on the unique needs of student researchers—offering verified research opportunities, a modern portfolio builder, direct faculty connections, and a supportive community. We combine discovery, application, and networking in one place, making research more accessible, transparent, and student-friendly.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-5" className="px-6 py-4">
+                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is my data protected on ResDex?</TextAnimate></AccordionTrigger>
+                <AccordionContent>
+                  Your privacy and security are our top priorities. ResDex uses industry-standard encryption and best practices to protect your data. We never sell your information, and you have full control over your profile and what you share. For more details, see our Privacy Policy.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
+        {/* Footer7 with TextAnimate on all content */}
+        <Footer7
+          logo={{
+            url: "/",
+            src: "/beige-logo.png",
+            alt: "ResDex Logo",
+            title: "ResDex"
+          }}
+          socialLinks={footerSocialLinks}
+        />
+      </div>
+    </>
   );
 }

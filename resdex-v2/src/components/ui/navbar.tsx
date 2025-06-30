@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
+import Image from "next/image";
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -68,7 +69,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <motion.div
       ref={ref}
       // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      className={cn("sticky inset-x-0 top-7 z-40 w-full mt-4", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -102,7 +103,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         minWidth: "800px",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex bg-[rgba(245,245,245,0.85)] dark:bg-[rgba(24,24,27,0.85)] backdrop-blur-md",
+        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex bg-[rgba(230,230,230,0.85)] dark:bg-[rgba(24,24,27,0.92)] backdrop-blur-md",
         className,
       )}
     >
@@ -133,7 +134,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-gray-100 dark:bg-neutral-800"
+              className="absolute inset-0 h-full w-full rounded-full bg-gray-300 dark:bg-neutral-800"
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -163,7 +164,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-0 py-2 lg:hidden bg-[rgba(245,245,245,0.85)] dark:bg-[rgba(24,24,27,0.85)] backdrop-blur-md",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-0 py-2 lg:hidden bg-[rgba(230,230,230,0.85)] dark:bg-[rgba(24,24,27,0.92)] backdrop-blur-md",
         className,
       )}
     >
@@ -233,13 +234,15 @@ export const NavbarLogo = () => {
       href="#"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
-      <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
+     
+      <Image
+        src="/transparent-black.png"
+        alt="ResDex transparent logo"
         width={30}
         height={30}
+        style={{ objectFit: 'contain' }}
       />
-      <span className="font-medium text-black dark:text-white">Startup</span>
+      {/* <span className="title text-black dark:text-white mt-1" style={{ fontSize: '1.1rem' }}>ResDex</span> */}
     </a>
   );
 };
