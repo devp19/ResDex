@@ -31,6 +31,18 @@ import { Footer7 } from "@/components/footer7";
 import { FaInstagram, FaDiscord } from "react-icons/fa";
 import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "./firebaseConfig";
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  MobileNavHeader,
+  MobileNavMenu,
+  MobileNavToggle,
+  NavbarLogo,
+  NavbarButton
+} from "@/components/ui/navbar";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -548,6 +560,7 @@ export default function Home() {
   const afterHeroRef = useRef<HTMLDivElement>(null);
   const [showDock, setShowDock] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -568,8 +581,41 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  // Example navigation items
+  const navItems = [
+    { name: "Home", link: "/" },
+    { name: "Blog", link: "/blog" },
+    { name: "Contact", link: "/contact" },
+  ];
+
   return (
     <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
+      {/* Navbar at the very top of the page */}
+      <Navbar>
+        <NavBody>
+          <NavbarLogo />
+          <NavItems items={navItems} />
+          <Link href="/login" passHref legacyBehavior>
+            <ShimmerButton type="button" className="px-6 py-2 rounded-full">Login</ShimmerButton>
+          </Link>
+        </NavBody>
+        <MobileNav visible={mobileOpen}>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle isOpen={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)} />
+          </MobileNavHeader>
+          <MobileNavMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)}>
+            {navItems.map((item) => (
+              <a key={item.name} href={item.link} onClick={() => setMobileOpen(false)} className="py-2 text-lg block">
+                {item.name}
+              </a>
+            ))}
+            <Link href="/login" passHref legacyBehavior>
+              <ShimmerButton type="button" className="mt-4 w-full rounded-full">Login</ShimmerButton>
+            </Link>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
       {/* Main content */}
       <div className="w-full flex flex-col items-center justify-center min-h-screen">
         <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
@@ -782,125 +828,6 @@ export default function Home() {
           </Accordion>
         </div>
       </section>
-      {/* Dock fixed at the top center of the viewport, fades in after section 2 */}
-      <div
-        className={cn(
-          "fixed top-1 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-700",
-          showDock ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        )}
-        style={{ minWidth: 360 }}
-      >
-        <TooltipProvider>
-          <Dock direction="middle" className="backdrop-blur-md bg-white/60 dark:bg-[#18181b]/60 border border-gray-200/70 dark:border-gray-800/70 shadow-lg rounded-2xl px-2 py-1">
-            {/* ResDex logo icon */}
-            <DockIcon>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/"
-                    aria-label="ResDex"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full"
-                    )}
-                  >
-                    <Image src="/transparent-black.png" alt="ResDex Logo" width={26} height={26} className="rounded-full object-contain" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>ResDex</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-            <Separator orientation="vertical" className="h-full" />
-            {/* Rest of the icons */}
-            {DATA.navbar.map((item) => (
-              <DockIcon key={item.label}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={item.href}
-                      aria-label={item.label}
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full",
-                      )}
-                    >
-                      <item.icon className="w-full h-full" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{item.label}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </DockIcon>
-            ))}
-            <Separator orientation="vertical" className="h-full" />
-            {Object.entries(DATA.contact.social).map(([name, social]) => (
-              <DockIcon key={name}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={social.url}
-                      aria-label={social.name}
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full",
-                      )}
-                    >
-                      <social.icon className="w-full h-full" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{name}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </DockIcon>
-            ))}
-            {/* Login/Logout Button */}
-            <Separator orientation="vertical" className="h-full py-2" />
-            <DockIcon>
-              {currentUser ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      aria-label="Sign Out"
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full"
-                      )}
-                      onClick={async () => { await signOut(auth); }}
-                    >
-                      <span className="font-semibold">Sign Out</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Sign Out</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/login"
-                      aria-label="Login"
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full"
-                      )}
-                    >
-                      <span className="font-semibold">Login</span>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Login</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </DockIcon>
-          </Dock>
-        </TooltipProvider>
-      </div>
       {/* Footer7 with TextAnimate on all content */}
       <Footer7
         logo={{
