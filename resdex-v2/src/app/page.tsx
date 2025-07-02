@@ -56,6 +56,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { FeaturesSectionDemo } from "@/components/ui/features-section-demo";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -1068,6 +1069,9 @@ export default function Home() {
           >
             {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
           </TextRevealWithVerticalSlot>
+        </section>
+        <section>
+          <FeaturesSectionDemo />
         </section>
         {/* MagicUI BentoGrid Section */}
         <section className="w-full flex flex-col items-center justify-center my-24">
