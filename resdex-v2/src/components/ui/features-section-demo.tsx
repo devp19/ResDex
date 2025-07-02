@@ -11,6 +11,12 @@ import { FileTextIcon } from "@radix-ui/react-icons";
 import { TrendingUp, MessageCircle, Flame, Zap } from "lucide-react";
 import { AnimatedList } from "@/components/magicui/animated-list";
 import { FlaskConical, Atom, Dna, Leaf, Brain, Sun, Syringe, Rocket, Watch, Waves, Bot, BookOpen } from "lucide-react";
+import { useState } from "react";
+import { useOutsideClick } from "@/hooks/use-outside-click";
+import { useId } from "react";
+import { AnimatePresence } from "framer-motion";
+import { TextAnimate } from "@/components/magicui/text-animate";
+import { SmoothCursor } from "./SmoothCursor";
 
 export function FeaturesSectionDemo() {
   const features = [
@@ -23,7 +29,7 @@ export function FeaturesSectionDemo() {
         "col-span-1 lg:col-span-4 border-b lg:border-r dark:border-neutral-800",
     },
     {
-      title: "Short-form content like never before",
+      title: "Short-form content like you've never seen before",
       description:
         "Built for those endless scrollers, ResDex is the new way to scroll.",
       skeleton: <SkeletonTwo />,
@@ -33,7 +39,7 @@ export function FeaturesSectionDemo() {
       title: "Brainwaves of the future",
       description:
         "Whether its a thought or a question, ResDex is the place to share it because your next big discovery is just a click away.",
-      skeleton: <Ripple className="absolute inset-0" mainCircleSize={120} mainCircleOpacity={0.12} />,
+      skeleton: <ExpandableCardDemo />,
       className:
         "col-span-1 lg:col-span-3 lg:border-r  dark:border-neutral-800",
     },
@@ -46,33 +52,47 @@ export function FeaturesSectionDemo() {
     },
   ];
   return (
-    <div className="relative z-20 py-10 lg:py-40 max-w-7xl mx-auto">
-      <div className="px-8">
-        <h4 className="text-3xl lg:text-5xl lg:leading-tight max-w-5xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
-          {`We're building the biggest research hub in the world - and `}
-          <SparklesText colors={{ first: "#E5E3DF", second: "#E5E3DF" }} className="font-medium ml-3 mr-3 inline-block">
-            you're
-          </SparklesText>
-          {` the center of it.`}
-        </h4>
+    <>
+      <SmoothCursor />
+      <div className="relative z-20 py-10 lg:py-40 max-w-7xl mx-auto">
+        <div className="px-8">
+          <motion.h4
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="text-3xl lg:text-5xl lg:leading-tight max-w-5xl mx-auto text-center tracking-tight font-medium text-black dark:text-white"
+          >
+            {`We're building the biggest research hub in the world - and `}
+            <SparklesText colors={{ first: "#E5E3DF", second: "#E5E3DF" }} className="font-medium ml-3 mr-3 inline-block">
+              you're
+            </SparklesText>
+            {` the center of it.`}
+          </motion.h4>
 
-        <p className="text-sm lg:text-base  max-w-2xl  my-4 mx-auto text-neutral-500 text-center font-normal dark:text-neutral-300">
-          From portfolios to short-form research content for those endless scrollers, ResDex is redefining what it means to explore research.
-        </p>
-      </div>
+          <TextAnimate animation="fadeIn" by="line" as="p" className="text-sm lg:text-base  max-w-2xl  my-4 mx-auto text-neutral-500 text-center font-normal dark:text-neutral-300">
+            {`From portfolios to short-form research content for those endless scrollers, ResDex is redefining what it means to explore research.`}
+          </TextAnimate>
+        </div>
 
-      <div className="relative ">
-        <div className="grid grid-cols-1 lg:grid-cols-6 mt-12 xl:border rounded-md dark:border-neutral-800">
-          {features.map((feature) => (
-            <FeatureCard key={feature.title} className={feature.className}>
-              <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureDescription>{feature.description}</FeatureDescription>
-              <div className=" h-full w-full">{feature.skeleton}</div>
-            </FeatureCard>
-          ))}
+        <div className="relative ">
+          <div className="grid grid-cols-1 lg:grid-cols-6 mt-12 xl:border rounded-md dark:border-neutral-800">
+            {features.map((feature) => (
+              <FeatureCard key={feature.title} className={feature.className}>
+                <FeatureTitle>{feature.title}</FeatureTitle>
+                <FeatureDescription>
+                  {feature.description}
+                  {feature.title === "Brainwaves of the future" && (
+                    <span className="block mb-4" />
+                  )}
+                </FeatureDescription>
+                <div className=" h-full w-full">{feature.skeleton}</div>
+              </FeatureCard>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -91,25 +111,38 @@ const FeatureCard = ({
 };
 
 const FeatureTitle = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <p className=" max-w-5xl mx-auto text-left tracking-tight text-black dark:text-white text-xl md:text-2xl md:leading-snug">
-      {children}
-    </p>
-  );
+  if (typeof children === 'string') {
+    return (
+      <TextAnimate animation="fadeIn" by="word" as="p" className="max-w-5xl mx-auto text-left tracking-tight text-black dark:text-white text-xl md:text-2xl md:leading-snug">
+        {children}
+      </TextAnimate>
+    );
+  }
+  return <p className="max-w-5xl mx-auto text-left tracking-tight text-black dark:text-white text-xl md:text-2xl md:leading-snug">{children}</p>;
 };
 
 const FeatureDescription = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <p
-      className={cn(
-        "text-sm md:text-base  max-w-4xl text-left mx-auto",
-        "text-neutral-500 text-center font-normal dark:text-neutral-300",
-        "text-left max-w-sm mx-0 md:text-sm my-2"
-      )}
-    >
-      {children}
-    </p>
-  );
+  if (typeof children === 'string') {
+    return (
+      <TextAnimate
+        animation="fadeIn"
+        by="line"
+        as="p"
+        className={cn(
+          "text-sm md:text-base  max-w-4xl text-left mx-auto",
+          "text-neutral-500 text-center font-normal dark:text-neutral-300",
+          "text-left max-w-sm mx-0 md:text-sm my-2"
+        )}
+      >
+        {children}
+      </TextAnimate>
+    );
+  }
+  return <p className={cn(
+    "text-sm md:text-base  max-w-4xl text-left mx-auto",
+    "text-neutral-500 text-center font-normal dark:text-neutral-300",
+    "text-left max-w-sm mx-0 md:text-sm my-2"
+  )}>{children}</p>;
 };
 
 export const SkeletonOne = () => {
@@ -119,7 +152,7 @@ export const SkeletonOne = () => {
         <div className="flex flex-1 w-full h-full flex-col space-y-2  ">
           {/* Portfolio image */}
           <img
-            src="/portfolioimg.png"
+            src="/profileui.png"
             alt="Portfolio showcase"
             width={800}
             height={800}
@@ -307,12 +340,12 @@ export const Globe = ({ className }: { className?: string }) => {
       height: 600 * 2,
       phi: 0,
       theta: 0,
-      dark: 1,
+      dark: 0,
       diffuse: 1.2,
       mapSamples: 16000,
       mapBrightness: 6,
-      baseColor: [0.3, 0.3, 0.3],
-      markerColor: [0.1, 0.8, 1],
+      baseColor: [0.95, 0.95, 0.95],
+      markerColor: [0.165, 0.165, 0.165],
       glowColor: [1, 1, 1],
       markers: [
         // longitude latitude
@@ -339,4 +372,243 @@ export const Globe = ({ className }: { className?: string }) => {
       className={className}
     />
   );
-}; 
+};
+
+// === ExpandableCardDemo for brainwave feature ===
+export function ExpandableCardDemo() {
+  const [active, setActive] = useState<(typeof cards)[number] | boolean | null>(
+    null
+  );
+  const ref = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const id = useId();
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActive(false);
+      }
+    }
+
+    if (active && typeof active === "object") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active]);
+
+  useOutsideClick(ref, () => setActive(null));
+
+  return (
+    <>
+      <AnimatePresence>
+        {active && typeof active === "object" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 h-full w-full z-10"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {active && typeof active === "object" ? (
+          <div className="fixed inset-0  grid place-items-center z-[100]">
+            <motion.button
+              key={`button-${active.title}-${id}`}
+              layout
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              exit={{
+                opacity: 0,
+                transition: {
+                  duration: 0.05,
+                },
+              }}
+              className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
+              onClick={() => setActive(null)}
+            >
+              <CloseIcon />
+            </motion.button>
+            <motion.div
+              layoutId={`card-${active.title}-${id}`}
+              ref={ref}
+              className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
+            >
+              <motion.div layoutId={`image-${active.title}-${id}`}>
+                <div className="mt-7 flex justify-center">{active.icon}</div>
+              </motion.div>
+
+              <div>
+                <div className="flex justify-between items-start p-4">
+                  <div className="">
+                    <motion.h3
+                      layoutId={`title-${active.title}-${id}`}
+                      className="font-bold text-neutral-700 dark:text-neutral-200"
+                    >
+                      {typeof active.title === 'string' ? (
+                        <TextAnimate animation="fadeIn" by="word" as="span">
+                          {active.title}
+                        </TextAnimate>
+                      ) : active.title}
+                    </motion.h3>
+                    <motion.p
+                      layoutId={`description-${active.description}-${id}`}
+                      className="text-neutral-600 dark:text-neutral-400"
+                    >
+                      {typeof active.description === 'string' ? (
+                        <TextAnimate animation="fadeIn" by="line" as="span">
+                          {active.description}
+                        </TextAnimate>
+                      ) : active.description}
+                    </motion.p>
+                  </div>
+                </div>
+                <div className="pt-4 relative px-4">
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                  >
+                    {typeof active.content === "function"
+                      ? active.content()
+                      : active.content}
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        ) : null}
+      </AnimatePresence>
+      <ul className="max-w-2xl mx-auto w-full gap-4">
+        {cards.map((card, index) => (
+          <React.Fragment key={`card-${card.title}-${id}`}>
+            <motion.div
+              layoutId={`card-${card.title}-${id}`}
+              onClick={() => setActive(card)}
+              className="p-2 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg cursor-pointer"
+            >
+              <div className="flex gap-4 flex-col md:flex-row ">
+                <motion.div layoutId={`image-${card.title}-${id}`}>{card.icon}</motion.div>
+                <div className="">
+                  <motion.h3
+                    layoutId={`title-${card.title}-${id}`}
+                    className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
+                  >
+                    {typeof card.title === 'string' ? (
+                      <TextAnimate animation="fadeIn" by="word" as="span">
+                        {card.title}
+                      </TextAnimate>
+                    ) : card.title}
+                  </motion.h3>
+                  <motion.p
+                    layoutId={`description-${card.description}-${id}`}
+                    className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                  >
+                    {typeof card.description === 'string' ? (
+                      <TextAnimate animation="fadeIn" by="line" as="span">
+                        {card.description}
+                      </TextAnimate>
+                    ) : card.description}
+                  </motion.p>
+                </div>
+              </div>
+              <motion.button
+                layoutId={`button-${card.title}-${id}`}
+                className="px-3 py-1 text-xs rounded-full font-bold bg-gray-100 text-black mt-2 md:mt-0 transition-colors duration-150 hover:bg-[#2a2a2a] hover:text-white cursor-pointer"
+              >
+                {card.ctaText}
+              </motion.button>
+            </motion.div>
+            {index < cards.length - 1 && (
+              <div className="w-full h-px bg-gray-200 my-2" />
+            )}
+          </React.Fragment>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export const CloseIcon = () => {
+  return (
+    <motion.svg
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+      }}
+      exit={{
+        opacity: 0,
+        transition: {
+          duration: 0.05,
+        },
+      }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 text-black"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M18 6l-12 12" />
+      <path d="M6 6l12 12" />
+    </motion.svg>
+  );
+};
+
+const cards = [
+  // Brainwave blog-like card 1
+  {
+    description: "Exploring the impact of AI on creative writing and how neural networks are generating poetry, stories, and more.",
+    title: "The Rise of AI Poets",
+    icon: <Bot className="text-[28px] mx-auto" style={{ color: '#2a2a2a' }} />,
+    ctaText: "Read",
+    ctaLink: "#",
+    content: () => (
+      <p className="text-[11px] md:text-xs lg:text-sm">
+        Artificial intelligence is not just solving equations—it's writing poetry, stories, and even screenplays. This brainwave explores how neural networks are being trained on classic literature and modern prose to generate creative works that blur the line between human and machine authorship. Dive into the world of AI-generated art and discover the future of creative writing.
+      </p>
+    ),
+  },
+  // Brainwave blog-like card 2
+  {
+    description: "A look at how brain-computer interfaces are enabling new forms of communication for people with disabilities.",
+    title: "Mind to Machine: The Future of Communication",
+    icon: <Brain className="text-[28px] mx-auto" style={{ color: '#2a2a2a' }} />,
+    ctaText: "Read",
+    ctaLink: "#",
+    content: () => (
+      <p className="text-[11px] md:text-xs lg:text-sm">
+        Brain-computer interfaces (BCIs) are making it possible for people to communicate and control devices using only their thoughts. This brainwave explores the latest breakthroughs in BCI technology, real-world applications for accessibility, and the ethical questions that arise as the boundary between mind and machine continues to blur.
+      </p>
+    ),
+  },
+  // Brainwave blog-like card 3
+  {
+    description: "How open science and preprint servers are changing the pace and accessibility of research worldwide.",
+    title: "Open Science: The New Research Frontier",
+    icon: <BookOpen className="text-[28px] mx-auto" style={{ color: '#2a2a2a' }} />,
+    ctaText: "Read",
+    ctaLink: "#",
+    content: () => (
+      <p className="text-[11px] md:text-xs lg:text-sm">
+        Open science initiatives and preprint servers are making research more accessible and collaborative than ever before. This brainwave explores the benefits, challenges, and future of open access publishing, and how it's accelerating the pace of discovery for scientists around the globe.
+      </p>
+    ),
+  },
+]; 
