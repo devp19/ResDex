@@ -57,6 +57,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { FeaturesSectionDemo } from "@/components/ui/features-section-demo";
+import { Timeline } from "@/components/ui/timeline";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -1073,49 +1074,8 @@ export default function Home() {
         <section>
           <FeaturesSectionDemo />
         </section>
-        {/* MagicUI BentoGrid Section */}
-        <section className="w-full flex flex-col items-center justify-center my-24">
-          <TextAnimate
-            animation="fadeIn"
-            by="word"
-            as="h2"
-            className="title-2 text-center mb-16"
-            duration={0.8}
-          >
-            {`From idea to creation. We handle it all.`}
-          </TextAnimate>
-          <BentoGrid>
-            {features.map((feature, idx) => (
-              <BentoCard
-                key={idx}
-                {...feature}
-                name={
-                  <TextAnimate
-                    animation="slideUp"
-                    by="word"
-                    as="span"
-                    className="text-xl font-semibold text-neutral-700 dark:text-neutral-300"
-                  >
-                    {feature.name}
-                  </TextAnimate>
-                }
-                description={
-                  <TextAnimate
-                    animation="slideUp"
-                    by="word"
-                    as="span"
-                    className="max-w-lg text-neutral-400"
-                    delay={0.2}
-                  >
-                    {feature.description}
-                  </TextAnimate>
-                }
-              />
-            ))}
-          </BentoGrid>
-        </section>
         {/* Scroll-based velocity text animation */}
-        <div className="w-full flex flex-col items-center justify-center mb-40 mt-20 relative overflow-hidden">
+        <div className="w-full flex flex-col items-center justify-center font-medium mb-40 mt-20 relative overflow-hidden">
           <VelocityScroll numRows={2} defaultVelocity={5}>
             Research is a journey. Let your curiosity set the pace.
           </VelocityScroll>
@@ -1123,8 +1083,36 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
         </div>
+        <Timeline
+          data={[
+            {
+              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Transparency</span>,
+              content: <p className="text-neutral-700 dark:text-neutral-300">We believe in open access to research opportunities. No hidden forms, no closed loops. Everything on ResDex — from positions to profiles — is built to be clear, searchable, and student-first.
+
+</p>,
+            },
+            {
+              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Equity</span>,
+              content: <p className="text-neutral-700 dark:text-neutral-300">Research shouldn’t be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.
+
+</p>,
+            },
+            {
+              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Growth</span>,
+              content: <p className="text-neutral-700 dark:text-neutral-300">ResDex isn’t just about finding a position — it’s about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.
+
+</p>,
+            },
+            {
+              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Collaboration</span>,
+              content: <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it’s students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.
+
+</p>,
+            },
+          ]}
+        />
         {/* Section: Research is hard. We know. */}
-        <section className="w-full flex flex-col items-center mt-12 mb-64">
+        <section className="w-full flex flex-col items-center mt-40 mb-64">
           <TextAnimate
             animation="fadeIn"
             by="line"
@@ -1167,8 +1155,8 @@ export default function Home() {
         </section>
         {/* Section: Join the 1000 students, reshaping the future of research */}
         <section className="w-full flex flex-col items-center justify-center my-12">
-          <h2 className="title-2 text-center flex flex-wrap items-center justify-center gap-3">
-            <span>Join the <NumberTicker startValue={500} value={1000} className="title-2" />+ students, reshaping the future of research</span>
+          <h2 className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
+            <span>Join the <NumberTicker startValue={500} value={1000} className="text-3xl ml-2 mr-2 lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-bold text-black dark:text-white" />+ students, reshaping the future of research</span>
           </h2>
         </section>
         {/* 3D Marquee Section (MagicUI style) */}
