@@ -6,7 +6,7 @@ import { TextAnimate } from "@/components/magicui/text-animate";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import { TrendingDown } from "lucide-react";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
-import { ChartCard } from "../page";
+import { ChartCard } from "@/components/ChartCard";
 import { Navbar, NavBody, NavItems, NavbarLogo } from "@/components/ui/navbar";
 import { Footer7 } from "@/components/footer7";
 import { signOut, onAuthStateChanged, User, linkWithPopup, unlink, GoogleAuthProvider } from "firebase/auth";
