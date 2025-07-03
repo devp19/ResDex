@@ -128,29 +128,59 @@ const DATA = {
 // Marquee3D review data and components
 const reviews = [
   {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
+    name: "Lucas Kim",
+    username: "@lucaskim",
+    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors.",
     img: "https://avatar.vercel.sh/jack",
   },
   {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
+    name: "Priya Singh",
+    username: "@priyasingh",
+    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly.",
     img: "https://avatar.vercel.sh/jill",
   },
   {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
+    name: "Mateo Alvarez",
+    username: "@mateoa",
+    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey.",
     img: "https://avatar.vercel.sh/john",
+  },
+  {
+    name: "Emily Chen",
+    username: "@emchen",
+    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise!",
+    img: "https://avatar.vercel.sh/jack",
+  },
+  {
+    name: "Noah Williams",
+    username: "@noahw",
+    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here.",
+    img: "https://avatar.vercel.sh/jill",
+  },
+  {
+    name: "Sara Müller",
+    username: "@saramuller",
+    body: "Connecting with professors was seamless. I got feedback on my research proposal within days!",
+    img: "https://avatar.vercel.sh/john",
+  },
+  {
+    name: "Omar Farouk",
+    username: "@omarfarouk",
+    body: "The verified opportunities gave me confidence that I was applying to real, quality positions.",
+    img: "https://avatar.vercel.sh/jack",
+  },
+  {
+    name: "Julia Rossi",
+    username: "@juliarossi",
+    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend!",
+    img: "https://avatar.vercel.sh/jill",
   },
 ];
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
-const thirdRow = reviews.slice(0, reviews.length / 2);
-const fourthRow = reviews.slice(reviews.length / 2);
+const firstRow = reviews.slice(0, 2);
+const secondRow = reviews.slice(2, 4);
+const thirdRow = reviews.slice(4, 6);
+const fourthRow = reviews.slice(6, 8);
 
 const ReviewCard = ({ img, name, username, body }: { img: string; name: string; username: string; body: string }) => (
   <figure
