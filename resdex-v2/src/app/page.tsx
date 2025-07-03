@@ -462,7 +462,7 @@ function CustomChartTooltip(props: any) {
   );
 }
 
-function ChartCard() {
+export function ChartCard() {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 p-6 w-full max-w-md flex flex-col">
       <div className="mb-2">
@@ -1093,68 +1093,26 @@ export default function Home() {
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Equity</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">Research shouldn’t be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.
+              content: <p className="text-neutral-700 dark:text-neutral-300">Research shouldn't be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.
 
 </p>,
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Growth</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">ResDex isn’t just about finding a position — it’s about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.
+              content: <p className="text-neutral-700 dark:text-neutral-300">ResDex isn't just about finding a position — it's about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.
 
 </p>,
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Collaboration</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it’s students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.
+              content: <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it's students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.
 
 </p>,
             },
           ]}
         />
-        {/* Section: Research is hard. We know. */}
-        <section className="w-full flex flex-col items-center mt-40 mb-64">
-          <TextAnimate
-            animation="fadeIn"
-            by="line"
-            as="h2"
-            className="title-2 text-center mb-12"
-          >
-            {`Built by students, backed by passion.`}
-          </TextAnimate>
-          <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
-            <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
-              <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="w-full flex justify-center">
-                <ChartCard />
-              </Tilt>
-            </div>
-            <div className="w-full md:w-1/2 flex flex-col justify-center gap-6">
-              <div className="flex flex-row items-center gap-4">
-                <span className="text-xs text-gray-500 mr-2">Acceptance Rate</span>
-                <span className="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <NumberTicker value={95} startValue={18.5} decimalPlaces={1} direction="down" className="whitespace-pre-wrap tracking-tighter" />%
-                  <TrendingDown className="h-5 w-5 text-black dark:text-white" />
-                </span>
-              </div>
-              <TextAnimate
-                animation="fadeIn"
-                by="word"
-                as="p"
-                className="max-w-2xl text-left text-base text-gray-700"
-                delay={0.4}
-              >
-                {`As students, we know how frustrating it is to cold-email countless professors just to get a shot at research. With AI and emerging fields driving explosive growth in research, competition has never been tougher—and acceptance rates are shrinking. That's why we built a student-led platform to make research more accessible. Everything you need to find opportunities, showcase your work, and build your research portfolio—all in one place.`}
-              </TextAnimate>
-              <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-                  <span className="text-white group-hover:text-black">Join our Student Team</span>
-                </InteractiveHoverButton>
-                <InteractiveHoverButton className="bg-white text-black border-black">Read More</InteractiveHoverButton>
-              </div>
-            </div>
-          </div>
-        </section>
         {/* Section: Join the 1000 students, reshaping the future of research */}
-        <section className="w-full flex flex-col items-center justify-center my-12">
+        <section className="w-full flex flex-col items-center justify-center mt-20 my-12">
           <h2 className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
             <span>Join the <NumberTicker startValue={500} value={1000} className="text-3xl ml-2 mr-2 lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-bold text-black dark:text-white" />+ students, reshaping the future of research</span>
           </h2>
@@ -1167,39 +1125,44 @@ export default function Home() {
         </section>
         {/* FAQ Section */}
         <section className="w-full flex flex-col items-center justify-center my-24">
-          <TextAnimate animation="fadeIn" by="line" as="h2" className="title-2 text-center mb-10">Frequently Asked Questions</TextAnimate>
+          <TextAnimate animation="fadeIn" by="line" as="h2" className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white mb-10">Frequently Asked Questions</TextAnimate>
           <div className="w-full max-w-2xl mx-auto">
-            <Accordion type="single" collapsible className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 shadow-lg">
+            <Accordion type="single" collapsible className="">
               <AccordionItem value="item-1" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What is ResDex?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
                   ResDex is a platform for students to discover, apply to, and manage research opportunities. We connect students with professors and research groups, making research more accessible and transparent.
                 </AccordionContent>
               </AccordionItem>
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
               <AccordionItem value="item-2" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">I'm a student. How can I help?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
                   <>We're always looking for students to help us build the platform. If you're interested, please check out our <Link href="/careers" className="text-blue-500">careers page</Link> to become a student ambassador.</>
                 </AccordionContent>
               </AccordionItem>
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
               <AccordionItem value="item-6" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What's next for ResDex?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
                   We're just getting started! Our vision is to transition ResDex into a full-fledged global research hub—where students, professors, and organizations can connect, share, and discover research in one place. Upcoming features include daily research digests, article and preprint postings, collaborative tools, and more. We want ResDex to be your all-in-one platform for everything research, from discovery to publication and beyond.
                 </AccordionContent>
               </AccordionItem>
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
               <AccordionItem value="item-3" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">Is ResDex free to use?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
                   Yes! ResDex is free for everyone. We believe in making research accessible to everyone.
                 </AccordionContent>
               </AccordionItem>
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
               <AccordionItem value="item-4" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is ResDex different from traditional research portals or job boards?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
                   ResDex is built by students, for students. Unlike traditional job boards or research portals, ResDex focuses on the unique needs of student researchers—offering verified research opportunities, a modern portfolio builder, direct faculty connections, and a supportive community. We combine discovery, application, and networking in one place, making research more accessible, transparent, and student-friendly.
                 </AccordionContent>
               </AccordionItem>
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
               <AccordionItem value="item-5" className="px-6 py-4">
                 <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is my data protected on ResDex?</TextAnimate></AccordionTrigger>
                 <AccordionContent>
@@ -1217,7 +1180,35 @@ export default function Home() {
             alt: "ResDex Logo",
             title: "ResDex"
           }}
-          socialLinks={footerSocialLinks}
+          sections={[
+            {
+              title: "Product",
+              links: [
+                { name: "Overview", href: "#" },
+                { name: "Pricing", href: "#" },
+                { name: "Marketplace", href: "#" },
+                { name: "Features", href: "#" },
+              ],
+            },
+            {
+              title: "Company",
+              links: [
+                { name: "About", href: "/about" },
+                { name: "Team", href: "#" },
+                { name: "Blog", href: "#" },
+                { name: "Careers", href: "#" },
+              ],
+            },
+            {
+              title: "Resources",
+              links: [
+                { name: "Help", href: "#" },
+                { name: "Sales", href: "#" },
+                { name: "Advertise", href: "#" },
+                { name: "Privacy", href: "#" },
+              ],
+            },
+          ]}
         />
       </div>
     </>
