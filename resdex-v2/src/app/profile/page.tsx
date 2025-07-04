@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Briefcase, Tag, Search as SearchIcon } from "lucide-react";
+import { Briefcase, Tag, Search as SearchIcon, TrendingUp } from "lucide-react";
+import { ChartCard } from "@/components/ChartCard";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -91,22 +92,27 @@ export default function ProfilePage() {
       <Navbar>
         <NavBody>
           <div className="flex items-center w-full">
-            <NavbarLogo />
-            <div className="relative ml-6 w-[320px]">
-              <Input
-                type="text"
-                placeholder="Search"
-                className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
-                style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
-              />
-              <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+            {/* Left group: Logo + Search */}
+            <div className="flex items-center gap-6 min-w-0">
+              <NavbarLogo />
+              <div className="relative w-full max-w-xs">
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
+                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
+                />
+                <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+              </div>
             </div>
+            {/* Spacer */}
             <div className="flex-grow" />
-            <NavItems items={navItems} />
+            {/* Nav items on the right */}
+            <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
           </div>
         </NavBody>
       </Navbar>
-      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 mt-8">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
           {/* Main Profile Card */}
@@ -198,20 +204,45 @@ export default function ProfilePage() {
         {/* Sidebar: People Also Viewed */}
         <div className="flex flex-col gap-6">
           <div className="bg-white rounded-xl p-6 min-h-[300px] flex flex-col">
+            <div className="flex items-center gap-2 text-lg font-semibold text-neutral-800 mb-4">
+              Trending Topics
+              <TrendingUp className="w-5 h-5 text-gray-400" />
+            </div>
+            <ul className="flex flex-col">
+              <li className="py-2">
+                <div className="font-medium text-gray-800">AI & Machine Learning</div>
+                <div className="text-xs text-gray-500 mt-1">1842 related posts in the past day</div>
+              </li>
+              <div className="h-px bg-gray-200 my-2 w-full" />
+              <li className="py-2">
+                <div className="font-medium text-gray-800">Product Management</div>
+                <div className="text-xs text-gray-500 mt-1">1275 related posts in the past day</div>
+              </li>
+              <div className="h-px bg-gray-200 my-2 w-full" />
+              <li className="py-2">
+                <div className="font-medium text-gray-800">Cloud Computing</div>
+                <div className="text-xs text-gray-500 mt-1">968 related posts in the past day</div>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-xl p-6 mt-2">
             <div className="text-lg font-semibold text-neutral-800 mb-4">Recommended for you</div>
             {/* List of recommended profiles */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col">
               {recommendedProfiles.map((profile, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                    <Image src={profile.avatar} alt={profile.name} width={40} height={40} style={{ objectFit: "cover", width: "100%", height: "100%" }} unoptimized />
+                <React.Fragment key={i}>
+                  <div className="flex items-center gap-3 py-2">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                      <Image src={profile.avatar} alt={profile.name} width={40} height={40} style={{ objectFit: "cover", width: "100%", height: "100%" }} unoptimized />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-neutral-800 truncate">{profile.name}</div>
+                      <div className="text-xs text-neutral-500 truncate">{profile.title}</div>
+                    </div>
+                    <button className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap">Visit</button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-neutral-800 truncate">{profile.name}</div>
-                    <div className="text-xs text-neutral-500 truncate">{profile.title}</div>
-                  </div>
-                  <button className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap">Visit</button>
-                </div>
+                  {i < recommendedProfiles.length - 1 && <div className="h-px bg-gray-200 my-2 w-full" />}
+                </React.Fragment>
               ))}
             </div>
           </div>
