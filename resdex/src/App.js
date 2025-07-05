@@ -20,6 +20,7 @@ import Notifications from './pages/Notifications';
 import Messages from './pages/Messages';
 import PrivateRoute from './pages/privateroute';
 import { Logo } from './components/common';
+import DailyDigest from './pages/DailyDigest';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -133,6 +134,7 @@ function App() {
             <Route path="/releasedocs" element={<ReleaseDocs />} />
             <Route path="/releasedocs/:versionId" element={<ReleaseInfo />} />
             <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/daily-digest" element={<DailyDigest />} />
           </Routes>
           <Footer />
         </>
