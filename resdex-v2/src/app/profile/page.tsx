@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Briefcase, Tag, Search as SearchIcon, TrendingUp } from "lucide-react";
+import { Briefcase, Tag, Search as SearchIcon, TrendingUp, Sparkles } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
 import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
 import PaginationWithSecondaryButton from "@/components/customized/pagination/pagination-03";
 import BlogCard from "@/components/customized/card/blog-card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -215,7 +216,7 @@ export default function ProfilePage() {
           <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
             {/* Banner */}
             <div
-              className="w-full h-40 rounded-t-3xl"
+              className="w-full h-40 rounded-t-xl"
               style={{ background: gradient }}
             />
             {/* Avatar - left-aligned and overlapping banner & info */}
@@ -244,7 +245,17 @@ export default function ProfilePage() {
               <div className="flex flex-col items-start w-full mt-20 ml-12 pr-25 pb-8">
                 {/* Name and Follow button row */}
                 <div className="flex w-full items-center mb-2">
-                  <div className="text-3xl font-bold text-neutral-800 flex-1">Cathie Woods</div>
+                  <div className="text-3xl font-bold text-neutral-800 flex-1 flex items-center gap-2">
+                    Cathie Woods
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-flex items-center">
+                          <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
+                    </Tooltip>
+                  </div>
                   <AnimatedSubscribeButton
                     className="ml-20 rounded-full px-8 py-3 border transition-colors duration-200"
                     style={{ background: subscribed ? '#2a2a2a' : '#2a2a2a', color: subscribed ? '#fff' : '#fff', border: 'none' }}
@@ -399,6 +410,34 @@ export default function ProfilePage() {
               <li className="py-2">
                 <div className="font-medium text-gray-800">Cloud Computing</div>
                 <div className="text-xs text-gray-500 mt-1">968 related posts in the past day</div>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-xl p-6 mt-2 border border-gray-200">
+            <div className="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
+              Matched opportunities
+              <Briefcase className="w-5 h-5 text-gray-300" />
+            </div>
+            <ul className="flex flex-col gap-4">
+              <li className="flex flex-col">
+                <span className="font-medium text-gray-800">Research Assistant - AI in Healthcare</span>
+                <span className="text-xs text-gray-500">Dr. Emily Zhang, Stanford AI Lab</span>
+                <span className="text-sm text-gray-600 mt-5">Work on predictive models for patient outcomes using real-world hospital data.</span>
+                <button className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap mt-3">Explore</button>
+              </li>
+              <div className="h-px bg-gray-200 my-2 w-full" />
+              <li className="flex flex-col">
+                <span className="font-medium text-gray-800">Data Science Intern - Renewable Energy</span>
+                <span className="text-xs text-gray-500">Prof. Michael Lee, MIT Energy Initiative</span>
+                <span className="text-sm text-gray-600 mt-5">Analyze and visualize large-scale energy grid data to optimize renewable integration.</span>
+                <button className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap mt-3">Explore</button>
+              </li>
+              <div className="h-px bg-gray-200 my-2 w-full" />
+              <li className="flex flex-col">
+                <span className="font-medium text-gray-800">Lab Assistant - Genomics & CRISPR</span>
+                <span className="text-xs text-gray-500">Dr. Priya Nair, Broad Institute</span>
+                <span className="text-sm text-gray-600 mt-5">Support gene editing experiments and data analysis in a leading genomics lab.</span>
+                <button className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap mt-3">Explore</button>
               </li>
             </ul>
           </div>
