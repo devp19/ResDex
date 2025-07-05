@@ -9,19 +9,115 @@ import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe
 import ColorThief from "colorthief";
 import { Briefcase, Tag, Search as SearchIcon, TrendingUp } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
+import { Tabs } from "@/components/ui/tabs";
+import CardPost from "@/components/customized/card/card-06";
+import PaginationWithSecondaryButton from "@/components/customized/pagination/pagination-03";
+import BlogCard from "@/components/customized/card/blog-card";
 
 const navItems = [
   { name: "Home", link: "/" },
-  { name: "My Network", link: "/network" },
+  { name: "Network", link: "/network" },
   { name: "Jobs", link: "/jobs" },
   { name: "Messaging", link: "/messaging" },
 ];
+
+// Responsive hook for small screens
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const check = () => setIsSmall(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isSmall;
+}
 
 export default function ProfilePage() {
   const [subscribed, setSubscribed] = useState(false);
   const [gradient, setGradient] = useState("linear-gradient(to right, #fbe6b2, #f6b47b)");
   const imgRef = useRef<HTMLImageElement>(null);
   const profileImgSrc = "/jess-avatar.jpeg";
+
+  // Posts data and pagination state
+  const [page, setPage] = useState(1);
+  const posts = [
+    <CardPost
+      key={0}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="AI in Healthcare"
+      content="Our latest research explores how machine learning models can predict patient outcomes and personalize treatment plans. #AI #Healthcare #Research"
+      hashtags={["#AI", "#Healthcare", "#Research"]}
+    />,
+    <CardPost
+      key={1}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Quantum Computing Breakthrough"
+      content="We achieved a new milestone in quantum error correction, paving the way for more reliable quantum computers. #QuantumComputing #Innovation"
+      hashtags={["#QuantumComputing", "#Innovation"]}
+    />,
+    <CardPost
+      key={2}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Renewable Energy Storage"
+      content="Our team developed a new battery technology that increases storage capacity for solar and wind energy. #Renewables #EnergyStorage"
+      hashtags={["#Renewables", "#EnergyStorage"]}
+    />,
+    <CardPost
+      key={3}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Blockchain for Scientific Data Integrity"
+      content="Exploring how blockchain technology can ensure the integrity and reproducibility of scientific research data. #Blockchain #Science #DataIntegrity"
+      hashtags={["#Blockchain", "#Science", "#DataIntegrity"]}
+    />,
+    <CardPost
+      key={4}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="CRISPR and the Future of Gene Editing"
+      content="A review of recent advances in CRISPR technology and its implications for medicine and agriculture. #CRISPR #GeneEditing #Biotech"
+      hashtags={["#CRISPR", "#GeneEditing", "#Biotech"]}
+    />,
+    <CardPost
+      key={5}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Climate Modeling with AI"
+      content="How artificial intelligence is improving the accuracy of climate models and predictions. #ClimateChange #AI #Modeling"
+      hashtags={["#ClimateChange", "#AI", "#Modeling"]}
+    />
+  ];
+  const isSmallScreen = useIsSmallScreen();
+  const postsPerPage = isSmallScreen ? 1 : 2;
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const start = (page - 1) * postsPerPage;
+  const end = start + postsPerPage;
+
+  const postsTabContent = (
+    <div className="w-full h-full p-4 text-lg">
+      <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Research Papers</h2>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        {posts.slice(start, end)}
+      </div>
+      <div className="flex justify-center">
+        <PaginationWithSecondaryButton
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+        />
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (imgRef.current && imgRef.current.complete) {
@@ -87,7 +183,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8">
+    <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
       {/* Navbar */}
       <Navbar>
         <NavBody>
@@ -116,7 +212,7 @@ export default function ProfilePage() {
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
           {/* Main Profile Card */}
-          <div className="w-full bg-white rounded-3xl overflow-hidden flex flex-col" style={{ minHeight: 420 }}>
+          <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
             {/* Banner */}
             <div
               className="w-full h-40 rounded-t-3xl"
@@ -197,13 +293,94 @@ export default function ProfilePage() {
             </div>
           </div>
           {/* Posts Section Placeholder */}
-          <div className="bg-white rounded-xl min-h-[200px] flex items-center justify-center">
-            <span className="text-gray-400">Posts Section</span>
+          <div className="bg-white rounded-xl min-h-[800px] flex flex-col p-6 w-full overflow-x-auto border border-gray-200">
+            <Tabs
+              tabs={[
+                {
+                  title: "Research",
+                  value: "posts",
+                  content: postsTabContent,
+                },
+                {
+                  title: "Blogs",
+                  value: "blogs",
+                  content: (
+                    <div className="w-full h-full p-4 text-lg">
+                      <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Blogs</h2>
+                      <div className="relative">
+                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="The Future of AI in Everyday Life"
+                            excerpt="Exploring how artificial intelligence is shaping our daily routines, from smart assistants to personalized recommendations."
+                            author="Cathie Woods"
+                            date="May 2024"
+                            link="https://example.com/ai-in-everyday-life"
+                          />
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="5 Breakthroughs in Renewable Energy"
+                            excerpt="A look at the most exciting advancements in solar, wind, and battery technology this year."
+                            author="Cathie Woods"
+                            date="April 2024"
+                            link="https://example.com/renewable-energy-breakthroughs"
+                          />
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="How Quantum Computing Will Change Research"
+                            excerpt="Quantum computers are set to revolutionize data analysis and scientific discovery. Here's what you need to know."
+                            author="Cathie Woods"
+                            date="March 2024"
+                            link="https://example.com/quantum-computing-research"
+                          />
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="The Ethics of AI: What Researchers Need to Know"
+                            excerpt="A discussion on the ethical considerations and responsibilities of AI researchers in 2024."
+                            author="Cathie Woods"
+                            date="February 2024"
+                            link="https://example.com/ethics-of-ai"
+                          />
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="Data Visualization Best Practices for Scientists"
+                            excerpt="Tips and tools for creating clear, impactful data visualizations in scientific publications."
+                            author="Cathie Woods"
+                            date="January 2024"
+                            link="https://example.com/data-visualization"
+                          />
+                          <BlogCard
+                            avatar="/jess-avatar.jpeg"
+                            title="Open Science: Sharing Research for Greater Impact"
+                            excerpt="How open access and data sharing are transforming the research landscape."
+                            author="Cathie Woods"
+                            date="December 2023"
+                            link="https://example.com/open-science"
+                          />
+                        </div>
+                        {/* Fade-out effect at the bottom */}
+                        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent" />
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Certifications",
+                  value: "certifications",
+                  content: (
+                    <div className="w-full h-full p-4 text-lg">
+                      <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Certifications</h2>
+                      <p className="text-gray-700">No certifications yet.</p>
+                    </div>
+                  ),
+                },
+              ]}
+            />
           </div>
         </div>
         {/* Sidebar: People Also Viewed */}
         <div className="flex flex-col gap-6">
-          <div className="bg-white rounded-xl p-6 min-h-[300px] flex flex-col">
+          <div className="bg-white rounded-xl p-6 min-h-[300px] flex flex-col border border-gray-200">
             <div className="flex items-center gap-2 text-lg font-semibold text-neutral-800 mb-4">
               Trending Topics
               <TrendingUp className="w-5 h-5 text-gray-400" />
@@ -225,7 +402,7 @@ export default function ProfilePage() {
               </li>
             </ul>
           </div>
-          <div className="bg-white rounded-xl p-6 mt-2">
+          <div className="bg-white rounded-xl p-6 mt-2 border border-gray-200">
             <div className="text-lg font-semibold text-neutral-800 mb-4">Recommended for you</div>
             {/* List of recommended profiles */}
             <div className="flex flex-col">
