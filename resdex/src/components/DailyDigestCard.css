@@ -1,0 +1,612 @@
+.digest-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.digest-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.digest-card:hover::before {
+  transform: scaleX(1);
+}
+
+.digest-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  transform: scale(1.05);
+}
+
+/* AI / ML */
+.tag-ai {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Space / Physics */
+.tag-space {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+/* Biology / Health */
+.tag-bio {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* Quantum */
+.tag-quantum {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* Economics */
+.tag-economics {
+  background-color: #fef7cd;
+  color: #a16207;
+}
+
+/* Materials / Chemistry */
+.tag-materials {
+  background-color: #e0f2fe;
+  color: #0c4a6e;
+}
+
+/* Mathematics */
+.tag-math {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Cybersecurity */
+.tag-security {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Computer Vision */
+.tag-vision {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+/* Robotics */
+.tag-robotics {
+  background-color: #fdf4ff;
+  color: #a21caf;
+}
+
+/* Software Engineering */
+.tag-software {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+/* Applied Physics */
+.tag-physics {
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+/* Chemistry / Physics */
+.tag-chemistry {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+
+/* Computational Physics */
+.tag-comp-physics {
+  background-color: #f0f9ff;
+  color: #0c4a6e;
+}
+
+/* Fluid Dynamics */
+.tag-fluid {
+  background-color: #f0fdfa;
+  color: #0f766e;
+}
+
+/* Optics / Photonics */
+.tag-optics {
+  background-color: #fef7ff;
+  color: #7c2d12;
+}
+
+/* Plasma Physics */
+.tag-plasma {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+/* Social Physics */
+.tag-social {
+  background-color: #f0fdf4;
+  color: #14532d;
+}
+
+/* Statistics */
+.tag-stats {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Finance */
+.tag-finance {
+  background-color: #fefce8;
+  color: #92400e;
+}
+
+/* Theoretical Physics */
+.tag-theoretical {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Nuclear Physics */
+.tag-nuclear {
+  background-color: #fef2f2;
+  color: #7f1d1d;
+}
+
+/* Gravitation / Cosmology */
+.tag-cosmology {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Computer Architecture */
+.tag-architecture {
+  background-color: #f0f9ff;
+  color: #1e40af;
+}
+
+/* Computational Complexity */
+.tag-complexity {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Computational Engineering */
+.tag-comp-eng {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+/* Computational Geometry */
+.tag-geometry {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+/* Computational Linguistics */
+.tag-linguistics {
+  background-color: #fdf4ff;
+  color: #a21caf;
+}
+
+/* Cryptography / Security */
+.tag-crypto {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Computers / Society */
+.tag-society {
+  background-color: #f0fdf4;
+  color: #14532d;
+}
+
+/* Databases */
+.tag-databases {
+  background-color: #f0f9ff;
+  color: #0c4a6e;
+}
+
+/* Distributed Computing */
+.tag-distributed {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Digital Libraries */
+.tag-libraries {
+  background-color: #fef7ff;
+  color: #7c2d12;
+}
+
+/* Discrete Mathematics */
+.tag-discrete {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Data Structures */
+.tag-structures {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+/* Emerging Technologies */
+.tag-emerging {
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+/* Formal Languages */
+.tag-languages {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+/* General Literature */
+.tag-literature {
+  background-color: #f8fafc;
+  color: #475569;
+}
+
+/* Graphics */
+.tag-graphics {
+  background-color: #fdf4ff;
+  color: #a21caf;
+}
+
+/* Computer Science / Game Theory */
+.tag-game-theory {
+  background-color: #fef7cd;
+  color: #a16207;
+}
+
+/* Human-Computer Interaction */
+.tag-hci {
+  background-color: #f0fdf4;
+  color: #14532d;
+}
+
+/* Information Retrieval */
+.tag-ir {
+  background-color: #f0f9ff;
+  color: #0c4a6e;
+}
+
+/* Information Theory */
+.tag-info-theory {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Logic in Computer Science */
+.tag-logic {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Multiagent Systems */
+.tag-agents {
+  background-color: #fdf4ff;
+  color: #7c2d12;
+}
+
+/* Multimedia */
+.tag-multimedia {
+  background-color: #fef7ff;
+  color: #a21caf;
+}
+
+/* Mathematical Software */
+.tag-math-software {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+/* Numerical Analysis */
+.tag-numerical {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Neural Computing */
+.tag-neural {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Networking */
+.tag-networking {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+/* Other Computer Science */
+.tag-other-cs {
+  background-color: #f8fafc;
+  color: #64748b;
+}
+
+/* Operating Systems */
+.tag-os {
+  background-color: #f0f9ff;
+  color: #0c4a6e;
+}
+
+/* Performance */
+.tag-performance {
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+/* Programming Languages */
+.tag-programming {
+  background-color: #f0fdf4;
+  color: #14532d;
+}
+
+/* Symbolic Computation */
+.tag-symbolic {
+  background-color: #fdf4ff;
+  color: #7c2d12;
+}
+
+/* Sound */
+.tag-sound {
+  background-color: #fef7ff;
+  color: #a21caf;
+}
+
+/* Social Information */
+.tag-social-info {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+/* Systems / Control */
+.tag-systems {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Default tag */
+.tag-default {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.source-badge {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.card-title {
+  margin: 0;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+
+.card-title a {
+  color: #111827;
+  text-decoration: none;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.card-title a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #2563eb;
+  transition: width 0.3s ease;
+}
+
+.card-title a:hover::after {
+  width: 100%;
+}
+
+.card-title a:hover {
+  color: #2563eb;
+}
+
+.card-summary {
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+.card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.author {
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.date {
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.read-more {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.read-more::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.read-more:hover::before {
+  left: 100%;
+}
+
+.read-more:hover {
+  color: #1d4ed8;
+  transform: translateX(2px);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .digest-card {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .digest-card::before {
+    background: linear-gradient(90deg, #60a5fa, #93c5fd);
+  }
+  
+  .digest-card:hover {
+    border-color: #4b5563;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  .card-title a {
+    color: #f9fafb;
+  }
+  
+  .card-title a::after {
+    background: #60a5fa;
+  }
+  
+  .card-title a:hover {
+    color: #60a5fa;
+  }
+  
+  .card-summary {
+    color: #d1d5db;
+  }
+  
+  .card-footer {
+    border-top-color: #374151;
+  }
+  
+  .card-meta {
+    color: #9ca3af;
+  }
+  
+  .date {
+    color: #6b7280;
+  }
+  
+  .read-more {
+    color: #60a5fa;
+  }
+  
+  .read-more:hover {
+    color: #93c5fd;
+  }
+  
+  .source-badge {
+    color: #9ca3af;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .digest-card {
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .card-title a {
+    font-size: 1rem;
+  }
+  
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .card-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+} 

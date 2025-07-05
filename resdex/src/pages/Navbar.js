@@ -82,6 +82,14 @@ const Navbar = () => {
 </NavLink>
           </li>
           <li className="nav-item">
+            <NavLink exact to="/daily-digest" className="nav-link" activeClassName="active" data-tooltip-id="nav-tooltip"
+              data-tooltip-content="Daily Digest">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="primary" className="bi bi-newspaper" viewBox="0 0 16 16">
+                <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm2-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2zm1 2h10v2H3V4zm0 3h10v2H3V7zm0 3h10v2H3v-2z"/>
+              </svg>
+            </NavLink>
+          </li>
+          <li className="nav-item">
             <NavLink exact to="/notifications" className="nav-link" activeClassName="active" data-tooltip-id="nav-tooltip"
               data-tooltip-content="Notifications">
             

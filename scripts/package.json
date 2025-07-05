@@ -1,0 +1,23 @@
+{
+  "name": "resdex-research-digest-script",
+  "version": "1.0.0",
+  "description": "Standalone research digest script for ResDex",
+  "main": "researchDigest.js",
+  "scripts": {
+    "start": "node researchDigest.js",
+    "test": "node researchDigest.js 3 2 false",
+    "digest": "node researchDigest.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "xml2js": "^0.6.2",
+    "rss-parser": "^3.13.0",
+    "firebase-admin": "^11.11.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": ["research", "digest", "arxiv", "sciencedaily", "firebase"],
+  "author": "ResDex Team",
+  "license": "MIT"
+} 
