@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Briefcase, Tag, Search as SearchIcon, TrendingUp, Sparkles } from "lucide-react";
+import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
 import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
@@ -424,22 +424,20 @@ export default function ProfilePage() {
                   <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.fellow_count || "6,476"}</span> fellows</div>
                   <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.contribution_count || "500+"}</span> contributions</div>
                 </div>
-                {/* Organization section */}
-                <div className="mb-2 flex items-center gap-2">
-                  <Briefcase size={16} className="text-neutral-500" />
-                  <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">{profile?.organization || "Google"}</span>
-                </div>
-                {/* Interests section */}
-                <div className="mb-4 flex items-center gap-2">
-                  <Tag size={16} className="text-neutral-500" />
-                  <div className="flex gap-2 flex-wrap">
-                    {(profile?.interests && profile.interests.length > 0
-                      ? profile.interests
-                      : ["Automation", "AI", "Finance", "Web Development"]
-                    ).map((interest: string, index: number) => (
+                {/* Organization and Interests on same line */}
+                <div className="mb-4 flex items-center gap-2 flex-wrap">
+                  <Building size={18} className="text-neutral-500" />
+                  <span className="font-medium text-gray-800 text-base">{profile?.organization || "Google"}</span>
+                  <Tag size={16} className="text-neutral-500 ml-6" />
+                  {profile?.interests && profile.interests.length > 0 ? (
+                    profile.interests.map((interest: string, index: number) => (
                       <span key={index} className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">{interest}</span>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    isOwnProfile ? (
+                      <span className="italic text-neutral-400 text-sm ml-2">No interests added...</span>
+                    ) : null
+                  )}
                 </div>
               </div>
             </div>
@@ -531,11 +529,14 @@ export default function ProfilePage() {
           </div>
           {/* Edit Bio Modal */}
           <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent
+              style={{ maxHeight: 620, minWidth: 360, overflowY: 'auto' }}
+              className="!p-6"
+            >
               <AlertDialogHeader>
                 <AlertDialogTitle>Edit Profile</AlertDialogTitle>
               </AlertDialogHeader>
-              <label className="block text-sm font-medium text-neutral-700 mb-1 mt-2">About</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-1 mt-1">About</label>
               <textarea
                 className="w-full border border-gray-300 rounded-lg p-3 text-base min-h-[60px] focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
                 value={aboutDraft}
@@ -546,8 +547,8 @@ export default function ProfilePage() {
                 rows={2}
                 placeholder="e.g. Chief Technology Officer at Google"
               />
-              <div className="text-right text-xs text-neutral-400 mt-1 mb-2">{aboutDraft.length}/90</div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Location</label>
+              <div className="text-right text-xs text-neutral-400">{aboutDraft.length}/90</div>
+              <label className="block text-sm font-medium text-neutral-700">Location</label>
               <input
                 className="w-full border border-gray-300 rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
                 value={locationDraft}
@@ -560,11 +561,29 @@ export default function ProfilePage() {
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-lg p-2 text-base mb-2 focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
-                placeholder="Type to search interests..."
+                placeholder={interestsDraft.length >= 3 ? "3/3 Selected! Remove to replace." : "Type to search interests..."}
                 value={interestSearch}
                 onChange={e => setInterestSearch(e.target.value)}
                 disabled={interestsDraft.length >= 3}
               />
+              <div className="flex gap-2 mb-2 min-h-[36px]">
+                {interestsDraft.length === 0 ? (
+                  <span className="italic text-neutral-400 text-sm">No interests selected...</span>
+                ) : (
+                  interestsDraft.map(interest => (
+                    <button
+                      key={interest}
+                      type="button"
+                      className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-medium flex items-center gap-1 hover:bg-[#444] transition group"
+                      onClick={() => setInterestsDraft(interestsDraft.filter(i => i !== interest))}
+                      title="Remove"
+                    >
+                      {interest}
+                      <span className="ml-1 text-xs text-white/80 group-hover:text-red-300">×</span>
+                    </button>
+                  ))
+                )}
+              </div>
               {(() => {
                 const search = interestSearch.trim().toLowerCase();
                 const notSelected = INTEREST_OPTIONS.filter(opt => !interestsDraft.includes(opt));
@@ -575,8 +594,8 @@ export default function ProfilePage() {
                 const display = [...matches, ...rest];
                 return (
                   <div
-                    className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-2"
-                    style={{ maxHeight: 96, overflowY: 'auto', minHeight: 40 }}
+                    className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-3"
+                    style={{ maxHeight: 200, overflowY: 'auto', minHeight: 40 }}
                   >
                     {display.map(option => {
                       const selected = interestsDraft.includes(option);
@@ -605,20 +624,7 @@ export default function ProfilePage() {
                   </div>
                 );
               })()}
-              <div className="flex gap-2 mb-2">
-                {interestsDraft.map(interest => (
-                  <button
-                    key={interest}
-                    type="button"
-                    className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-medium flex items-center gap-1 hover:bg-[#444] transition group"
-                    onClick={() => setInterestsDraft(interestsDraft.filter(i => i !== interest))}
-                    title="Remove"
-                  >
-                    {interest}
-                    <span className="ml-1 text-xs text-white/80 group-hover:text-red-300">×</span>
-                  </button>
-                ))}
-              </div>
+              
               <div className="text-right text-xs text-neutral-400 mb-2">
                 {interestsDraft.length}/3 selected
               </div>
@@ -673,7 +679,6 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl p-6 mt-2 border border-gray-200">
             <div className="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
               Matched opportunities
-              <Briefcase className="w-5 h-5 text-gray-300" />
             </div>
             <ul className="flex flex-col gap-4">
               <li className="flex flex-col">
