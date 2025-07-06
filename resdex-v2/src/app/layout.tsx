@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { AuthProvider } from '@/components/auth-provider';
+import NotificationSidebarProvider from '@/components/ui/NotificationSidebarProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <SmoothCursor />
-          {children}
+          <NotificationSidebarProvider>
+            {children}
+          </NotificationSidebarProvider>
         </AuthProvider>
       </body>
     </html>

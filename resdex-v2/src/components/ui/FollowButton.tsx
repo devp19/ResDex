@@ -98,7 +98,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({ userId, onStatusChan
     <button
       onClick={handleFollowAction}
       disabled={isProcessing}
-      className="ml-4 rounded-full px-8 py-3 border bg-green-600 text-white hover:bg-green-700 transition"
+      className="ml-4 rounded-full px-8 py-3 border bg-[#2a2a2a] text-white hover:bg-[#444] transition"
     >
       {isProcessing ? 'Processing...' : 'Following'}
     </button>

@@ -8,11 +8,12 @@ import {
   useMotionValueEvent,
 } from "motion/react";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { Bell } from "lucide-react";
 import { useAuth } from '../auth-provider';
 import { supabase } from '@/lib/supabaseClient';
+import { NotificationSidebarContext } from "./NotificationSidebarProvider";
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -93,11 +94,7 @@ export function NotificationBadge() {
   const { user, isLoading: authLoading } = useAuth();
   const [notificationCount, setNotificationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Log the current auth state for debugging
-  useEffect(() => {
-    console.log('NotificationBadge user:', user?.id || null, 'authLoading:', authLoading);
-  }, [user, authLoading]);
+  const notificationSidebarCtx = useContext(NotificationSidebarContext);
 
   // Fetch notification count when user changes
   useEffect(() => {
@@ -156,14 +153,14 @@ export function NotificationBadge() {
   // If there's no authenticated user, render the bell without a count
   if (!user) {
     return (
-      <a href="/login" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
+      <button type="button" onClick={() => notificationSidebarCtx?.openNotificationSidebar()} className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
         <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white" />
-      </a>
+      </button>
     );
   }
 
   return (
-    <a href="/notifications" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
+    <button type="button" onClick={() => notificationSidebarCtx?.openNotificationSidebar()} className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
       <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white" />
       {isLoading ? (
         <span className="loading-indicator w-[18px] h-[18px] rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse"></span>
@@ -172,7 +169,7 @@ export function NotificationBadge() {
           {notificationCount}
         </span>
       )}
-    </a>
+    </button>
   );
 }
 
