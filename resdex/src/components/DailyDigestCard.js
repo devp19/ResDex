@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './DailyDigestCard.css';
 
 const DailyDigestCard = ({ 
@@ -8,8 +8,10 @@ const DailyDigestCard = ({
   link, 
   author, 
   published, 
-  source 
+  source,
+  aiSummary 
 }) => {
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
   // Function to map category to CSS class
   const getCategoryClass = (category) => {
     const categoryMap = {
@@ -112,6 +114,37 @@ const DailyDigestCard = ({
         <p className="card-summary">
           {summary}
         </p>
+        
+        {/* AI Summary Section */}
+        {aiSummary && (
+          <div className="ai-summary-section">
+            <button
+              className="ai-summary-toggle"
+              onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+              aria-expanded={isSummaryExpanded}
+            >
+              <span className="toggle-icon">
+                {isSummaryExpanded ? '−' : '+'}
+              </span>
+              <span className="toggle-text">
+                {isSummaryExpanded ? 'Hide Summary' : 'Read Summary'}
+              </span>
+              <span className="ai-badge">AI</span>
+            </button>
+            
+            {isSummaryExpanded && (
+              <div className="ai-summary-content">
+                <div className="ai-summary-header">
+                  <span className="ai-icon">🤖</span>
+                  <span className="ai-label">Summarized using AI</span>
+                </div>
+                <p className="ai-summary-text">
+                  {aiSummary}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
         
         <div className="card-footer">
           <div className="card-meta">

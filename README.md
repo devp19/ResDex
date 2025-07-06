@@ -1,31 +1,136 @@
-# ResDex
+# Research Article Summarizer
 
-<!-- ![ResDex Banner](https://github.com/user-attachments/assets/8a7f5869-7c6a-4e1d-a8a4-f40965d0191a) -->
+A Node.js script that extracts and summarizes research articles using unfluff and Hugging Face's Inference API.
 
-___
+## Features
 
-*“Research made easy. A platform tailored for students by students.”*
+- ✅ Fetches research articles from various sources (arXiv, ScienceDaily, Nature, etc.)
+- ✅ Extracts title, author, publication date, and full text using unfluff
+- ✅ Summarizes articles using Hugging Face's facebook/bart-large-cnn model
+- ✅ Limits summaries to 2-3 sentences (~130 max tokens)
+- ✅ Handles invalid URLs and failed downloads gracefully
+- ✅ Outputs clean JSON format
 
-___ 
+## Setup
 
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-https://github.com/user-attachments/assets/0f32af24-bfa7-494b-99e5-dadbe9696ff6
+2. **Get a Hugging Face API token:**
+   - Go to [Hugging Face Settings](https://huggingface.co/settings/tokens)
+   - Create a new token with "read" permissions
+   - Copy the token
 
+3. **Create environment file:**
+   ```bash
+   # Create .env file
+   echo "HUGGING_FACE_TOKEN=your_token_here" > .env
+   ```
 
+## Usage
 
+### Basic Usage
 
+```bash
+node research_summarizer.js
+```
 
-### About
-ResDex is a student-friendly, accessible research paper “publishing” platform that gives students the opportunity to stand out among millions, review and edit papers, and connect with PHD level researchers. Designed to foster a collaborative academic community, ResDex allows users to showcase their research, achievements, and certifications in a dynamic online portfolio. 
+### Custom URLs
 
-By engaging in peer and expert reviews, students can refine their work, gain valuable feedback, and build meaningful connections with academics and professionals in their field.
+Edit the `urls` array in the `main()` function:
 
-___
+```javascript
+const urls = [
+  'https://arxiv.org/abs/2401.00123',
+  'https://www.sciencedaily.com/releases/2024/01/240101123456.htm',
+  'https://www.nature.com/articles/s41586-024-00001-2'
+];
+```
 
-### Objective 
-We understand the difficulty and often timely process of cold-emailing hundreds of professors for research positions. While all is said and done, research itself is a hard industry to really gain experience in. 
+### As a Module
 
-*“That’s where ResDex comes into play.”* 
+```javascript
+const { processArticles } = require('./research_summarizer');
 
- 
-As a research-sharing platform, designed for students by students, we tailored the platform to fit those exact needs. Everything a student needs all on one site to help the user really build a portfolio around their contributions to the world of research.
+const urls = ['https://arxiv.org/abs/2401.00123'];
+const summaries = await processArticles(urls);
+console.log(JSON.stringify(summaries, null, 2));
+```
+
+## Output Format
+
+```json
+[
+  {
+    "title": "Extracted article title",
+    "summary": "2-3 sentence summary of the article content.",
+    "link": "https://original-article-url.com",
+    "published": "2024-01-15",
+    "source": "arXiv"
+  }
+]
+```
+
+## Supported Sources
+
+The script automatically detects and labels articles from:
+- arXiv
+- ScienceDaily
+- Nature
+- Science
+- Cell
+- PNAS
+- JSTOR
+- ResearchGate
+- bioRxiv
+- medRxiv
+- And other domains (will use domain name)
+
+## Error Handling
+
+- Invalid URLs are skipped with warning messages
+- Failed downloads are handled gracefully
+- API rate limits are respected with 1-second delays
+- Timeouts prevent hanging requests
+
+## Dependencies
+
+- `axios`: HTTP requests
+- `unfluff`: Article content extraction
+- `dotenv`: Environment variable management
+
+## Requirements
+
+- Node.js 14.0.0 or higher
+- Hugging Face API token
+- Internet connection
+
+## Example Output
+
+```
+Processing 3 articles...
+
+[1/3] Processing: https://arxiv.org/abs/2401.00123
+Fetching: https://arxiv.org/abs/2401.00123
+  📝 Summarizing...
+  ✅ Completed: Quantum Computing Advances in Machine Learning...
+
+[2/3] Processing: https://www.sciencedaily.com/releases/2024/01/240101123456.htm
+Fetching: https://www.sciencedaily.com/releases/2024/01/240101123456.htm
+  📝 Summarizing...
+  ✅ Completed: New Study Reveals Breakthrough in Renewable Energy...
+
+📊 SUMMARY RESULTS:
+==================================================
+[
+  {
+    "title": "Quantum Computing Advances in Machine Learning",
+    "summary": "Researchers demonstrate significant improvements in quantum machine learning algorithms. The new approach shows 40% better performance on benchmark datasets.",
+    "link": "https://arxiv.org/abs/2401.00123",
+    "published": "2024-01-15",
+    "source": "arXiv"
+  }
+]
+```

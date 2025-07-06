@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
 import DailyDigestCard from '../components/DailyDigestCard';
 import DigestSidebar from '../components/DigestSidebar';
+import { getAISummaries, mergeAISummariesWithArticles, getSummaryStats } from '../services/aiSummaryService';
 import '../App.css';
 import './DailyDigest.css';
 
@@ -321,6 +322,10 @@ export default function DailyDigest() {
   // New state for favorites and expanded categories
   const [favoriteCategories, setFavoriteCategories] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // AI Summary state
+  const [aiSummaries, setAiSummaries] = useState([]);
+  const [summaryStats, setSummaryStats] = useState({ total: 0, withSummaries: 0, percentage: 0 });
 
   useEffect(() => {
     loadDigest();
@@ -387,6 +392,23 @@ export default function DailyDigest() {
       const data = await fetchMultiDisciplinaryDigest();
       setDigest(data);
       
+      // Fetch AI summaries for today's date
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const summaries = await getAISummaries(today);
+        setAiSummaries(summaries);
+        
+        // Calculate summary statistics
+        if (data?.articles) {
+          const mergedArticles = mergeAISummariesWithArticles(data.articles, summaries);
+          const stats = getSummaryStats(mergedArticles);
+          setSummaryStats(stats);
+        }
+      } catch (summaryError) {
+        console.warn('Could not load AI summaries:', summaryError);
+        // Don't fail the entire load if summaries fail
+      }
+      
     } catch (err) {
       console.error('Error loading digest:', err);
       setError(err.message);
@@ -412,17 +434,20 @@ export default function DailyDigest() {
     }
   };
 
-  // Filter articles based on selected category and source
+  // Filter articles based on selected category and source, and merge with AI summaries
   const filteredArticles = useMemo(() => {
     if (!digest?.articles) return [];
     
-    return digest.articles.filter(article => {
+    // Merge AI summaries with articles
+    const articlesWithSummaries = mergeAISummariesWithArticles(digest.articles, aiSummaries);
+    
+    return articlesWithSummaries.filter(article => {
       const categoryMatch = selectedCategory === 'all' || article.tag === selectedCategory;
       const sourceMatch = selectedSource === 'all' || article.source === selectedSource;
       
       return categoryMatch && sourceMatch;
     });
-  }, [digest?.articles, selectedCategory, selectedSource]);
+  }, [digest?.articles, aiSummaries, selectedCategory, selectedSource]);
 
   // Group articles by category for display
   const groupedArticles = useMemo(() => {
@@ -509,6 +534,13 @@ export default function DailyDigest() {
             <p className="header-subtitle">
               Latest research papers across all academic disciplines, curated daily
             </p>
+            {summaryStats.total > 0 && (
+              <div className="summary-stats">
+                <span className="stats-badge">
+                  🤖 {summaryStats.withSummaries} of {summaryStats.total} articles have AI summaries
+                </span>
+              </div>
+            )}
           </div>
           <div className="header-actions">
             <button 
@@ -575,6 +607,7 @@ export default function DailyDigest() {
                                 author={article.author}
                                 published={article.published}
                                 source={article.source}
+                                aiSummary={article.aiSummary}
                               />
                             ))}
                             
@@ -641,6 +674,7 @@ export default function DailyDigest() {
                             author={article.author}
                             published={article.published}
                             source={article.source}
+                            aiSummary={article.aiSummary}
                           />
                         ))}
                         

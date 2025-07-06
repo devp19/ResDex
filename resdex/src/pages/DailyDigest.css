@@ -40,6 +40,23 @@
   line-height: 1.5;
 }
 
+.summary-stats {
+  margin-top: 12px;
+}
+
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
 .header-actions {
   display: flex;
   gap: 12px;
@@ -532,6 +549,11 @@
   
   .header-subtitle {
     color: #9ca3af;
+  }
+  
+  .stats-badge {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
   }
   
   .digest-content {

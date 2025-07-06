@@ -1,13 +1,28 @@
 {
+  "name": "research-summarizer",
+  "version": "1.0.0",
+  "description": "Node.js script to extract and summarize research articles using unfluff and Hugging Face API",
+  "main": "article_summarizer.js",
+  "scripts": {
+    "start": "node article_summarizer.js",
+    "test": "node test_articles.js",
+    "research": "node research_summarizer.js"
+  },
+  "keywords": [
+    "research",
+    "summarization",
+    "articles",
+    "hugging-face",
+    "unfluff"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "axios": "^1.10.0",
-    "firebase-admin": "^13.4.0",
-    "framer-motion": "^12.19.1",
-    "node-fetch": "^3.3.2",
-    "openai": "^5.8.2",
-    "react-hot-toast": "^2.5.2",
-    "react-parallax-tilt": "^1.7.298",
-    "rss-parser": "^3.13.0",
-    "xml2js": "^0.6.2"
+    "axios": "^1.6.0",
+    "unfluff": "^3.2.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

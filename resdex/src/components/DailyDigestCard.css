@@ -609,4 +609,162 @@
     flex-direction: column;
     gap: 4px;
   }
+}
+
+/* AI Summary Styles */
+.ai-summary-section {
+  margin: 16px 0;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
+.ai-summary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.ai-summary-toggle:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.ai-summary-toggle:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.toggle-icon {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #6b7280;
+  min-width: 16px;
+}
+
+.toggle-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.ai-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-summary-content {
+  margin-top: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  animation: slideDown 0.3s ease-out;
+}
+
+.ai-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.ai-icon {
+  font-size: 1.25rem;
+}
+
+.ai-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-summary-text {
+  margin: 0;
+  line-height: 1.6;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support for AI summary */
+@media (prefers-color-scheme: dark) {
+  .ai-summary-section {
+    border-top-color: #374151;
+  }
+  
+  .ai-summary-toggle {
+    border-color: #4b5563;
+    color: #d1d5db;
+  }
+  
+  .ai-summary-toggle:hover {
+    background: #374151;
+    border-color: #6b7280;
+  }
+  
+  .toggle-icon {
+    color: #9ca3af;
+  }
+  
+  .ai-summary-content {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .ai-summary-header {
+    border-bottom-color: #374151;
+  }
+  
+  .ai-label {
+    color: #9ca3af;
+  }
+  
+  .ai-summary-text {
+    color: #d1d5db;
+  }
+}
+
+/* Mobile responsive for AI summary */
+@media (max-width: 768px) {
+  .ai-summary-toggle {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .ai-summary-content {
+    padding: 12px;
+  }
+  
+  .ai-summary-text {
+    font-size: 0.8rem;
+  }
 } 
