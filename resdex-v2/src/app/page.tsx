@@ -6,7 +6,7 @@ import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-b
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import React, { useEffect, useState, useRef, RefObject } from "react";
 import Link from "next/link";
-import { HomeIcon, PencilIcon, MailIcon, CalendarIcon, ChevronDownIcon } from "lucide-react";
+import { HomeIcon, PencilIcon, MailIcon, CalendarIcon, ChevronDownIcon, ChevronDown } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { buttonVariants } from "@/components/ui/button";
@@ -29,9 +29,6 @@ import { Ripple } from "@/components/magicui/ripple";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Footer7 } from "@/components/footer7";
 import { FaInstagram, FaDiscord } from "react-icons/fa";
-import { signOut, onAuthStateChanged, User, linkWithPopup, unlink, GoogleAuthProvider } from "firebase/auth";
-import { auth, db } from "./firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
 import {
   Navbar,
   NavBody,
@@ -58,6 +55,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { FeaturesSectionDemo } from "@/components/ui/features-section-demo";
 import { Timeline } from "@/components/ui/timeline";
+import { Check } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -488,20 +488,19 @@ export default function Home() {
   const tilt3 = use3dTilt();
   const afterHeroRef = useRef<HTMLDivElement>(null);
   const [showDock, setShowDock] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loginHovered, setLoginHovered] = useState(false);
   const [loginMobileHovered, setLoginMobileHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
-  const [userDoc, setUserDoc] = useState<any>(null);
-  const avatarUrl = userDoc?.profilePicture || currentUser?.photoURL || "/beige-logo.png";
-  const isGoogleLinked = currentUser?.providerData?.some((p) => p.providerId === "google.com");
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signoutConfirmed, setSignoutConfirmed] = useState(false);
   const [dropdownHover, setDropdownHover] = useState<number | null>(null);
   const [hoverBgStyle, setHoverBgStyle] = useState<{ top: number; height: number } | null>(null);
   const dropdownOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
-  const [signedOutAnim, setSignedOutAnim] = useState(false);
   // Dropdown auto-close on mouse leave
   const closeDropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const handleDropdownMouseLeave = () => {
@@ -515,11 +514,8 @@ export default function Home() {
   };
 
   // User info for dropdown
-  const fullName = userDoc?.fullName || currentUser?.displayName || "";
-  let username = userDoc?.username;
-  if (!username && currentUser?.email) {
-    username = currentUser.email.split("@")[0];
-  }
+  const fullName = profile?.display_name || profile?.full_name || profile?.username || currentUser?.user_metadata?.full_name || currentUser?.email;
+  let username = profile?.username || currentUser?.user_metadata?.username || currentUser?.email?.split("@")[0];
   username = username ? `@${username}` : "";
 
   useEffect(() => {
@@ -535,28 +531,25 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!currentUser) {
-      setUserDoc(null);
-      return;
-    }
-    const fetchUserDoc = async () => {
-      const ref = doc(db, "users", currentUser.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        setUserDoc(snap.data());
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUser(data.user);
+      if (data.user) {
+        // Fetch profile from DB
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single()
+          .then(({ data: profileData }) => {
+            setProfile(profileData);
+            setLoading(false);
+          });
       } else {
-        setUserDoc(null);
+        setProfile(null);
+        setLoading(false);
       }
-    };
-    fetchUserDoc();
-  }, [currentUser]);
+    });
+  }, []);
 
   // Example navigation items
   const navItems = [
@@ -565,54 +558,29 @@ export default function Home() {
     { name: "Contact", link: "/contact" },
   ];
 
-  async function handleLinkGoogle() {
-    try {
-      await linkWithPopup(auth.currentUser!, new GoogleAuthProvider());
-      alert("Google account linked successfully!");
-    } catch (e) {
-      alert("Failed to link Google account: " + (e instanceof Error ? e.message : e));
-    }
-  }
+  // Sign out handler
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    // Wait for animation before actual sign out
+    setTimeout(async () => {
+      await supabase.auth.signOut();
+      setSigningOut(false);
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+      window.location.reload();
+    }, 900);
+  };
 
-  async function handleUnlinkGoogle() {
-    try {
-      await unlink(auth.currentUser!, "google.com");
-      alert("Google account unlinked successfully!");
-    } catch (e) {
-      alert("Failed to unlink Google account: " + (e instanceof Error ? e.message : e));
-    }
-  }
-
-  // Reset confirmSignOut when dropdown closes
+  // Close dropdown on outside click
   useEffect(() => {
-    if (!dropdownOpen) setConfirmSignOut(false);
-    if (!dropdownOpen) setSignedOutAnim(false);
+    if (!dropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+    }
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
   }, [dropdownOpen]);
-
-  // Dropdown options array for easier mapping
-  const dropdownOptions = [
-    {
-      label: "Settings",
-      onClick: isGoogleLinked ? handleUnlinkGoogle : handleLinkGoogle,
-    },
-    {
-      label: signedOutAnim ? "Signed out!" : confirmSignOut ? "Confirm Sign out" : "Sign out",
-      onClick: async () => {
-        if (signedOutAnim) return;
-        if (confirmSignOut) {
-          setSignedOutAnim(true);
-          setTimeout(async () => {
-            setDropdownOpen(false);
-            setSignedOutAnim(false);
-            await signOut(auth);
-          }, 1000);
-        } else {
-          setConfirmSignOut(true);
-        }
-      },
-      isSignOut: true,
-    },
-  ];
 
   // Update hover background position/size on hover
   useEffect(() => {
@@ -642,139 +610,45 @@ export default function Home() {
           <NavBody>
             <NavbarLogo />
             <NavItems items={navItems} />
-            <div className="flex items-center gap-2">
+            <div className="relative ml-4">
               {currentUser ? (
-                <div className="relative">
-                  <button
-                    className="flex items-center gap-2 focus:outline-none rounded-full transition-colors duration-150 hover:bg-gray-200/60 dark:hover:bg-neutral-800/60 cursor-pointer px-2 py-1"
-                    onClick={() => setDropdownOpen((v) => !v)}
-                  >
-                    <img
-                      src={avatarUrl}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-neutral-700"
-                    />
-                    <ChevronDownIcon
-                      className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : "rotate-0"}`}
-                      size={20}
-                    />
-                  </button>
-                  <AnimatePresence>
-                    {dropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.18 }}
-                        className="absolute right-0 mt-5 w-56 rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md shadow-lg border border-gray-200 dark:border-neutral-800 z-50 overflow-hidden p-2"
-                        style={{ position: 'absolute' }}
-                        onMouseLeave={handleDropdownMouseLeave}
-                        onMouseEnter={handleDropdownMouseEnter}
-                      >
-                        {/* User info at top of dropdown */}
-                        <div className="px-4 pt-2 pb-3 border-b border-gray-200 dark:border-neutral-800 mb-1">
-                          <div className="font-semibold text-base text-black dark:text-white truncate">{fullName}</div>
-                          <div className="text-xs text-neutral-500 dark:text-neutral-400 opacity-80 truncate mt-0.5">{username}</div>
-                        </div>
-                        {/* Sliding hover background */}
-                        <AnimatePresence>
-                          {hoverBgStyle && (
-                            <motion.div
-                              layoutId="dropdown-hovered"
-                              className="absolute left-0 w-full rounded-full bg-gray-300 dark:bg-neutral-800 z-0"
-                              style={{
-                                top: hoverBgStyle.top + 4,
-                                height: hoverBgStyle.height - 8,
-                                left: 4,
-                                width: 'calc(100% - 8px)',
-                              }}
-                              initial={{ opacity: 0.7 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                          )}
-                        </AnimatePresence>
-                        {dropdownOptions.map((option, idx) => (
-                          <motion.button
-                            key={option.label + '-' + idx}
-                            ref={el => { dropdownOptionRefs.current[idx] = el; }}
-                            className={
-                              `w-full text-left px-4 py-3.5 text-sm font-medium transition-colors relative cursor-pointer rounded-full ` +
-                              (option.isSignOut && (confirmSignOut || signedOutAnim)
-                                ? (
-                                    (dropdownHover === idx || signedOutAnim
-                                      ? 'bg-[#2a2a2a] text-white'
-                                      : 'bg-[#2a2a2a] text-neutral-600 dark:text-neutral-300')
-                                  )
-                                : 'bg-transparent text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white')
-                            }
-                            onClick={option.onClick}
-                            onMouseEnter={() => setDropdownHover(idx)}
-                            onMouseLeave={() => setDropdownHover(null)}
-                            layout
-                            animate={option.isSignOut && (confirmSignOut || signedOutAnim) ? { scale: 1.04 } : { scale: 1 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            disabled={signedOutAnim}
-                          >
-                            <span className="relative z-10 flex items-center gap-2">
-                              {option.label}
-                              {signedOutAnim && option.isSignOut && (
-                                <svg className="inline-block ml-1 w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                              )}
-                            </span>
-                          </motion.button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
-                    <AlertDialogContent className="rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Sign out</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to sign out?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => { setShowSignOutDialog(false); await signOut(auth); }}
-                        >
-                          Sign out
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+                <AvatarDropdown
+                  userProfile={profile}
+                  displayName={profile?.display_name || profile?.full_name || profile?.username || currentUser.email}
+                  username={profile?.username || currentUser.email?.split("@")[0]}
+                  avatarUrl={profile?.avatar_url || "/empty-pic.webp"}
+                  onSignOut={handleSignOut}
+                />
               ) : (
-                <React.Fragment>
-                  <div
-                    className="relative group px-4 py-2"
-                    onMouseEnter={() => setLoginHovered(true)}
-                    onMouseLeave={() => setLoginHovered(false)}
-                  >
-                    <Link href="/login" className="relative z-10 text-sm text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors">
-                      Login
-                    </Link>
+                <>
+                  <div className="flex items-center">
+                    <div
+                      className="relative group px-4 py-2"
+                      onMouseEnter={() => setLoginHovered(true)}
+                      onMouseLeave={() => setLoginHovered(false)}
+                    >
+                      <Link href="/login" className="relative z-10 text-sm text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors">
+                        Login
+                      </Link>
+                    </div>
+                    <AnimatePresence>
+                      {showDock && (
+                        <motion.div
+                          key="join-for-free-desktop"
+                          initial={{ x: -32, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          exit={{ x: -32, opacity: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          style={{ display: 'inline-block' }}
+                        >
+                          <Link href="/signup">
+                            <ShimmerButton type="button" className="px-5 py-2 rounded-full text-sm">Join for free</ShimmerButton>
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <AnimatePresence>
-                    {showDock && (
-                      <motion.div
-                        key="join-for-free-desktop"
-                        initial={{ x: -32, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -32, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        style={{ display: 'inline-block' }}
-                      >
-                        <Link href="/signup">
-                          <ShimmerButton type="button" className="px-5 py-2 rounded-full text-sm">Join for free</ShimmerButton>
-                        </Link>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
+                </>
               )}
             </div>
           </NavBody>
@@ -797,7 +671,7 @@ export default function Home() {
                       onClick={() => setDropdownOpen((v) => !v)}
                     >
                       <img
-                        src={avatarUrl}
+                        src={profile?.avatar_url || currentUser?.user_metadata?.avatar_url || "/empty-pic.webp"}
                         alt="Profile"
                         className="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-neutral-700"
                       />
@@ -842,51 +716,9 @@ export default function Home() {
                               />
                             )}
                           </AnimatePresence>
-                          {dropdownOptions.map((option, idx) => (
-                            <motion.button
-                              key={option.label + '-' + idx}
-                              ref={el => { dropdownOptionRefs.current[idx] = el; }}
-                              className={
-                                `w-full text-left px-4 py-3.5 text-sm font-medium transition-colors relative cursor-pointer rounded-full ` +
-                                (option.isSignOut && (confirmSignOut || signedOutAnim)
-                                  ? (
-                                      (dropdownHover === idx || signedOutAnim
-                                        ? 'bg-[#2a2a2a] text-white'
-                                        : 'bg-[#2a2a2a] text-neutral-600 dark:text-neutral-300')
-                                    )
-                                  : 'bg-transparent text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white')
-                              }
-                              onClick={option.onClick}
-                              onMouseEnter={() => setDropdownHover(idx)}
-                              onMouseLeave={() => setDropdownHover(null)}
-                              layout
-                              animate={option.isSignOut && (confirmSignOut || signedOutAnim) ? { scale: 1.04 } : { scale: 1 }}
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            >
-                              <span className="relative z-10">{option.label}</span>
-                            </motion.button>
-                          ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
-                    <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
-                      <AlertDialogContent className="rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Sign out</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to sign out?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={async () => { setShowSignOutDialog(false); await signOut(auth); }}
-                          >
-                            Sign out
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
                   </div>
                 ) : (
                   <React.Fragment>
@@ -977,9 +809,9 @@ export default function Home() {
           </div>
         </div>
         {/* Section: Research Made Easy with TextReveal */}
-        <section ref={afterHeroRef} className="w-full flex flex-col items-center text-center justify-center mt-0 pt-0">
+        <section ref={afterHeroRef} className="w-full text-[5rem] font-normal leading-[1.2] tracking-tight text-[#181818] flex flex-col items-center text-center justify-center mt-0 pt-0">
           <TextRevealWithVerticalSlot
-            className="title text-left"
+            className="text-center text-[5rem] font-normal leading-[1.2] tracking-tight text-[#181818]"
             slotWords={["papers", "assistants", "positions", "experience"]}
           >
             {`Finding research __BLANK__ is hard. We know. So we made it easier.`}

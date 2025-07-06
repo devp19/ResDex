@@ -7,14 +7,14 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles } from "lucide-react";
+import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
 import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
 import PaginationWithSecondaryButton from "@/components/customized/pagination/pagination-03";
 import BlogCard from "@/components/customized/card/blog-card";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import {
@@ -26,6 +26,8 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { AnimatePresence, motion } from "framer-motion";
+import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -85,6 +87,7 @@ export default function ProfilePage() {
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
   const [interestSearch, setInterestSearch] = useState("");
+  const [myProfile, setMyProfile] = useState<any>(null);
 
   // Posts data and pagination state
   const [page, setPage] = useState(1);
@@ -285,6 +288,50 @@ export default function ProfilePage() {
     setEditLoading(false);
   };
 
+  const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signoutConfirmed, setSignoutConfirmed] = useState(false);
+  const avatarUrl = profile?.avatar_url || currentUser?.user_metadata?.avatar_url || "/empty-pic.webp";
+
+  // Sign out handler
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    setTimeout(async () => {
+      await supabase.auth.signOut();
+      setSigningOut(false);
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+      router.push("/");
+    }, 900);
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+    }
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, [dropdownOpen]);
+
+  // Fetch the logged-in user's profile (by id) when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single()
+        .then(({ data }) => setMyProfile(data));
+    } else {
+      setMyProfile(null);
+    }
+  }, [currentUser]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-[#f5f6fa]">
@@ -323,6 +370,25 @@ export default function ProfilePage() {
             <div className="flex-grow" />
             {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
+            {/* Avatar/Login button */}
+            <div className="relative ml-4">
+              {currentUser ? (
+                <AvatarDropdown
+                  userProfile={myProfile}
+                  displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
+                  username={myProfile?.username || currentUser.email?.split("@")[0]}
+                  avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
+                  onSignOut={handleSignOut}
+                />
+              ) : (
+                <button
+                  className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
+                  onClick={() => router.push("/login")}
+                >
+                  Login
+                </button>
+              )}
+            </div>
           </div>
         </NavBody>
       </Navbar>

@@ -163,7 +163,7 @@ const VerticalScrollWordSlot: FC<{ progress: MotionValue<number>; range: [number
           <span
             key={w}
             style={{ display: "block", height: "1.1em" }}
-            className={"text-primary font-semibold"}
+            className={"text-primary font-semibold italic"}
           >
             {w}
           </span>
