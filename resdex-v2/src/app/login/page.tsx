@@ -23,16 +23,16 @@ const reviews = [
 
 const ReviewCard = ({ img, name, university, body }: { img: string; name: string; university: string; body: string }) => (
   <figure className="relative h-full w-fit sm:w-36 cursor-pointer overflow-hidden rounded-xl border p-4 border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05] dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]">
-    <div className="flex flex-row items-center gap-2">
-      <img className="rounded-full" width="32" height="32" alt="" src={img} />
-      <div className="flex flex-col">
+      <div className="flex flex-row items-center gap-2">
+        <img className="rounded-full" width="32" height="32" alt="" src={img} />
+        <div className="flex flex-col">
         <figcaption className="text-sm font-medium dark:text-white">{name}</figcaption>
-        <p className="text-xs font-medium dark:text-white/40">{university}</p>
+          <p className="text-xs font-medium dark:text-white/40">{university}</p>
+        </div>
       </div>
-    </div>
-    <blockquote className="mt-2 text-sm">{body}</blockquote>
-  </figure>
-);
+      <blockquote className="mt-2 text-sm">{body}</blockquote>
+    </figure>
+  );
 
 function MarqueeDemoVertical() {
   return (
