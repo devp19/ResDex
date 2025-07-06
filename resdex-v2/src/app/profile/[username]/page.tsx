@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
+import { FollowButton } from "@/components/ui/FollowButton";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -440,26 +441,8 @@ export default function ProfilePage() {
                     </Tooltip>
                   </div>
                   {/* Show Follow button only if not own profile */}
-                  {!isOwnProfile && (
-                    <AnimatedSubscribeButton
-                      className="ml-4 rounded-full px-8 py-3 border transition-colors duration-200"
-                      style={{ background: subscribed ? '#2a2a2a' : '#2a2a2a', color: subscribed ? '#fff' : '#fff', border: 'none' }}
-                      subscribeStatus={subscribed}
-                      onClick={() => setSubscribed((s) => !s)}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.background = '#fff';
-                        e.currentTarget.style.color = '#2a2a2a';
-                        e.currentTarget.style.border = '1px solid #d1d5db';
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.background = '#2a2a2a';
-                        e.currentTarget.style.color = '#fff';
-                        e.currentTarget.style.border = 'none';
-                      }}
-                    >
-                      <span>Follow</span>
-                      <span>Following</span>
-                    </AnimatedSubscribeButton>
+                  {!isOwnProfile && profile?.id && (
+                    <FollowButton userId={profile.id} />
                   )}
                   {/* Show Edit button only if own profile */}
                   {isOwnProfile && (
@@ -487,7 +470,7 @@ export default function ProfilePage() {
                 </div>
                 {/* Stats row */}
                 <div className="flex gap-6 mb-6">
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.fellow_count || "6,476"}</span> fellows</div>
+                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.followers_count || 0}</span> followers</div>
                   <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.contribution_count || "500+"}</span> contributions</div>
                 </div>
                 {/* Organization and Interests on same line */}
