@@ -163,7 +163,7 @@ export function NotificationBadge() {
   }
 
   return (
-    <a href="/notifications" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition" onClick={fetchNotificationCount}>
+    <a href="/notifications" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
       <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white" />
       {isLoading ? (
         <span className="loading-indicator w-[18px] h-[18px] rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse"></span>
