@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Navbar, NavBody, NavbarLogo, NavItems } from "@/components/ui/navbar";
+import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge } from "@/components/ui/navbar";
 import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
@@ -89,6 +89,7 @@ export default function ProfilePage() {
   const [editSuccess, setEditSuccess] = useState("");
   const [interestSearch, setInterestSearch] = useState("");
   const [myProfile, setMyProfile] = useState<any>(null);
+  const [followingCount, setFollowingCount] = useState<number>(0);
 
   // Posts data and pagination state
   const [page, setPage] = useState(1);
@@ -189,8 +190,16 @@ export default function ProfilePage() {
       if (error || !data) {
         setNotFound(true);
         setProfile(null);
+        setFollowingCount(0);
       } else {
         setProfile(data);
+        // Fetch following count for this user
+        const { count, error: followingError } = await supabase
+          .from("followers")
+          .select("id", { count: "exact", head: true })
+          .eq("follower_id", data.id)
+          .eq("status", "accepted");
+        setFollowingCount(followingError ? 0 : (count || 0));
       }
       setLoading(false);
     }
@@ -352,7 +361,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
       {/* Navbar */}
       <Navbar>
-        <NavBody>
+        <NavBody showNotifications>
           <div className="flex items-center w-full">
             {/* Left group: Logo + Search */}
             <div className="flex items-center gap-6 min-w-0">
@@ -372,7 +381,8 @@ export default function ProfilePage() {
             {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
             {/* Avatar/Login button */}
-            <div className="relative ml-4">
+            <div className="relative ml-4 flex items-center gap-2">
+              {currentUser && <NotificationBadge />}
               {currentUser ? (
                 <AvatarDropdown
                   userProfile={myProfile}
@@ -440,8 +450,8 @@ export default function ProfilePage() {
                       <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
                     </Tooltip>
                   </div>
-                  {/* Show Follow button only if not own profile */}
-                  {!isOwnProfile && profile?.id && (
+                  {/* Show Follow button only if not own profile and user is authenticated */}
+                  {currentUser && !isOwnProfile && profile?.id && (
                     <FollowButton userId={profile.id} />
                   )}
                   {/* Show Edit button only if own profile */}
@@ -471,6 +481,7 @@ export default function ProfilePage() {
                 {/* Stats row */}
                 <div className="flex gap-6 mb-6">
                   <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.followers_count || 0}</span> followers</div>
+                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{followingCount}</span> following</div>
                   <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.contribution_count || "500+"}</span> contributions</div>
                 </div>
                 {/* Organization and Interests on same line */}

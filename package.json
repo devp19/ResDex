@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.50.3",
     "framer-motion": "^12.19.1",
     "react-hot-toast": "^2.5.2",

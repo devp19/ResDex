@@ -8,8 +8,11 @@ import {
   useMotionValueEvent,
 } from "motion/react";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import { Bell } from "lucide-react";
+import { useAuth } from '../auth-provider';
+import { supabase } from '@/lib/supabaseClient';
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -20,6 +23,7 @@ interface NavBodyProps {
   children: React.ReactNode;
   className?: string;
   visible?: boolean;
+  showNotifications?: boolean;
 }
 
 interface NavItemsProps {
@@ -71,19 +75,108 @@ export const Navbar = ({ children, className }: NavbarProps) => {
       // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
       className={cn("sticky inset-x-0 top-7 z-40 w-full mt-4", className)}
     >
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child)
-          ? React.cloneElement(
-              child as React.ReactElement<{ visible?: boolean }>,
-              { visible },
-            )
-          : child,
-      )}
+      <div className="flex items-center justify-between w-full">
+        {React.Children.map(children, (child) =>
+          React.isValidElement(child)
+            ? React.cloneElement(
+                child as React.ReactElement<{ visible?: boolean }>,
+                { visible },
+              )
+            : child,
+        )}
+      </div>
     </motion.div>
   );
 };
 
-export const NavBody = ({ children, className, visible }: NavBodyProps) => {
+export function NotificationBadge() {
+  const { user, isLoading: authLoading } = useAuth();
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Log the current auth state for debugging
+  useEffect(() => {
+    console.log('NotificationBadge user:', user?.id || null, 'authLoading:', authLoading);
+  }, [user, authLoading]);
+
+  // Fetch notification count when user changes
+  useEffect(() => {
+    // Skip if auth is still loading
+    if (authLoading) {
+      console.log('Auth still loading, waiting...');
+      return;
+    }
+    
+    if (!user) {
+      console.log('No authenticated user');
+      setIsLoading(false);
+      return;
+    }
+    
+    console.log('User authenticated, fetching notifications for:', user.id);
+    fetchNotificationCount();
+    
+  }, [user, authLoading]);
+
+  const fetchNotificationCount = async () => {
+    if (!user) return;
+    
+    try {
+      console.log('Fetching notification count for user:', user.id);
+      setIsLoading(true);
+      
+      const { data, error } = await supabase.rpc(
+        'get_notifications_count_for_user',
+        { user_id: user.id }
+      );
+      
+      if (error) {
+        console.error('Error fetching notification count:', error);
+        return;
+      }
+      
+      console.log('Notification count received:', data);
+      setNotificationCount(data);
+    } catch (err) {
+      console.error('Unexpected error fetching notifications:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // If we're still loading auth, show a loading indicator
+  if (authLoading) {
+    return (
+      <div className="notification-icon ml-6 flex items-center gap-1">
+        <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white opacity-50" />
+      </div>
+    );
+  }
+
+  // If there's no authenticated user, render the bell without a count
+  if (!user) {
+    return (
+      <a href="/login" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition">
+        <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white" />
+      </a>
+    );
+  }
+
+  return (
+    <a href="/notifications" className="notification-icon ml-6 flex items-center gap-1 hover:opacity-80 transition" onClick={fetchNotificationCount}>
+      <Bell className="bell-icon w-6 h-6 text-neutral-700 dark:text-white" />
+      {isLoading ? (
+        <span className="loading-indicator w-[18px] h-[18px] rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse"></span>
+      ) : notificationCount > 0 && (
+        <span className="notification-badge bg-[#ff4b4b] text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center text-[12px] font-bold px-2 ml-1">
+          {notificationCount}
+        </span>
+      )}
+    </a>
+  );
+}
+
+export const NavBody = ({ children, className, visible, showNotifications = false }: NavBodyProps) => {
   return (
     <motion.div
       animate={{

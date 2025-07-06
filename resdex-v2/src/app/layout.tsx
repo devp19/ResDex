@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
+import { AuthProvider } from '@/components/auth-provider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SmoothCursor />
-        {children}
+        <AuthProvider>
+          <SmoothCursor />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
