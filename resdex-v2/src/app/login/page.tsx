@@ -1,205 +1,54 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 import { ChevronRightIcon, CheckIcon } from "lucide-react";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { use3dTilt } from "@/hooks/use3dTilt";
 import { Marquee } from "@/components/magicui/marquee";
 
-const ontarioUniversities = [
-  "University of Toronto",
-  "McMaster University",
-  "Western University",
-  "Queen's University",
-  "University of Waterloo",
-  "York University",
-  "Carleton University",
-  "University of Ottawa",
-  "Toronto Metropolitan University",
-  "Wilfrid Laurier University",
-  "Brock University",
-  "Lakehead University",
-  "Trent University",
-  "Ontario Tech University",
-  "Nipissing University",
-  "Algoma University",
-  "Laurentian University",
-  "University of Guelph",
-];
-
 const reviews = [
-  {
-    name: "Emily",
-    university: ontarioUniversities[0],
-    body: "Found my first research project here. Super easy!",
-    img: "https://avatar.vercel.sh/emily",
-  },
-  {
-    name: "James",
-    university: ontarioUniversities[1],
-    body: "Great platform for students. Love the design!",
-    img: "https://avatar.vercel.sh/james",
-  },
-  {
-    name: "Olivia",
-    university: ontarioUniversities[2],
-    body: "I met my mentor through ResDex. Highly recommend!",
-    img: "https://avatar.vercel.sh/olivia",
-  },
-  {
-    name: "Liam",
-    university: ontarioUniversities[3],
-    body: "Easy to use and lots of real opportunities.",
-    img: "https://avatar.vercel.sh/liam",
-  },
-  {
-    name: "Sophia",
-    university: ontarioUniversities[4],
-    body: "The notifications and chat are super helpful.",
-    img: "https://avatar.vercel.sh/sophia",
-  },
-  {
-    name: "Noah",
-    university: ontarioUniversities[5],
-    body: "I found a research group in my field. Thank you!",
-    img: "https://avatar.vercel.sh/noah",
-  },
-  {
-    name: "Grace",
-    university: ontarioUniversities[6],
-    body: "ResDex is a game changer for students.",
-    img: "https://avatar.vercel.sh/grace",
-  },
-  {
-    name: "Ethan",
-    university: ontarioUniversities[7],
-    body: "I love the community and support here.",
-    img: "https://avatar.vercel.sh/ethan",
-  },
+  { name: "Emily", university: "University of Toronto", body: "Found my first research project here. Super easy!", img: "https://avatar.vercel.sh/emily" },
+  { name: "James", university: "McMaster University", body: "Great platform for students. Love the design!", img: "https://avatar.vercel.sh/james" },
+  { name: "Olivia", university: "Western University", body: "I met my mentor through ResDex. Highly recommend!", img: "https://avatar.vercel.sh/olivia" },
+  { name: "Liam", university: "Queen's University", body: "Easy to use and lots of real opportunities.", img: "https://avatar.vercel.sh/liam" },
+  { name: "Sophia", university: "University of Waterloo", body: "The notifications and chat are super helpful.", img: "https://avatar.vercel.sh/sophia" },
+  { name: "Noah", university: "York University", body: "I found a research group in my field. Thank you!", img: "https://avatar.vercel.sh/noah" },
+  { name: "Grace", university: "Carleton University", body: "ResDex is a game changer for students.", img: "https://avatar.vercel.sh/grace" },
+  { name: "Ethan", university: "University of Ottawa", body: "I love the community and support here.", img: "https://avatar.vercel.sh/ethan" },
 ];
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
-
-const ReviewCard = ({
-  img,
-  name,
-  university,
-  body,
-}: {
-  img: string;
-  name: string;
-  university: string;
-  body: string;
-}) => {
-  return (
-    <figure
-      className={cn(
-        "relative h-full w-fit sm:w-36 cursor-pointer overflow-hidden rounded-xl border p-4",
-        // light styles
-        "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-        // dark styles
-        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-      )}
-    >
-      <div className="flex flex-row items-center gap-2">
-        <img className="rounded-full" width="32" height="32" alt="" src={img} />
-        <div className="flex flex-col">
-          <figcaption className="text-sm font-medium dark:text-white">
-            {name}
-          </figcaption>
-          <p className="text-xs font-medium dark:text-white/40">{university}</p>
-        </div>
+const ReviewCard = ({ img, name, university, body }: { img: string; name: string; university: string; body: string }) => (
+  <figure className="relative h-full w-fit sm:w-36 cursor-pointer overflow-hidden rounded-xl border p-4 border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05] dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]">
+    <div className="flex flex-row items-center gap-2">
+      <img className="rounded-full" width="32" height="32" alt="" src={img} />
+      <div className="flex flex-col">
+        <figcaption className="text-sm font-medium dark:text-white">{name}</figcaption>
+        <p className="text-xs font-medium dark:text-white/40">{university}</p>
       </div>
-      <blockquote className="mt-2 text-sm">{body}</blockquote>
-    </figure>
-  );
-};
-
-const marqueeReviews1 = [
-  {
-    name: "Emily",
-    university: ontarioUniversities[0],
-    body: "Found my first research project here. Super easy!",
-    img: "https://avatar.vercel.sh/emily",
-  },
-  {
-    name: "James",
-    university: ontarioUniversities[1],
-    body: "Great platform for students. Love the design!",
-    img: "https://avatar.vercel.sh/james",
-  },
-  {
-    name: "Olivia",
-    university: ontarioUniversities[2],
-    body: "I met my mentor through ResDex. Highly recommend!",
-    img: "https://avatar.vercel.sh/olivia",
-  },
-];
-const marqueeReviews2 = [
-  {
-    name: "Liam",
-    university: ontarioUniversities[3],
-    body: "Easy to use and lots of real opportunities.",
-    img: "https://avatar.vercel.sh/liam",
-  },
-  {
-    name: "Sophia",
-    university: ontarioUniversities[4],
-    body: "The notifications and chat are super helpful.",
-    img: "https://avatar.vercel.sh/sophia",
-  },
-  {
-    name: "Noah",
-    university: ontarioUniversities[5],
-    body: "I found a research group in my field. Thank you!",
-    img: "https://avatar.vercel.sh/noah",
-  },
-];
-const marqueeReviews3 = [
-  {
-    name: "Grace",
-    university: ontarioUniversities[6],
-    body: "ResDex is a game changer for students.",
-    img: "https://avatar.vercel.sh/grace",
-  },
-  {
-    name: "Ethan",
-    university: ontarioUniversities[7],
-    body: "I love the community and support here.",
-    img: "https://avatar.vercel.sh/ethan",
-  },
-  {
-    name: "Mia",
-    university: ontarioUniversities[8],
-    body: "The support team is amazing and always quick to help!",
-    img: "https://avatar.vercel.sh/mia",
-  },
-];
+    </div>
+    <blockquote className="mt-2 text-sm">{body}</blockquote>
+  </figure>
+);
 
 function MarqueeDemoVertical() {
   return (
     <div className="relative flex h-[650px] w-full flex-row items-center justify-center overflow-hidden">
       <Marquee pauseOnHover vertical className="[--duration:20s]">
-        {marqueeReviews1.map((review) => (
+        {reviews.slice(0, 3).map((review) => (
           <ReviewCard key={review.university + '-m1'} {...review} />
         ))}
       </Marquee>
       <Marquee reverse pauseOnHover vertical className="[--duration:20s]">
-        {marqueeReviews2.map((review) => (
+        {reviews.slice(3, 6).map((review) => (
           <ReviewCard key={review.university + '-m2'} {...review} />
         ))}
       </Marquee>
       <Marquee pauseOnHover vertical className="[--duration:20s]">
-        {marqueeReviews3.map((review) => (
+        {reviews.slice(6).map((review) => (
           <ReviewCard key={review.university + '-m3'} {...review} />
         ))}
       </Marquee>
@@ -214,61 +63,33 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
-
   const tiltLogo = use3dTilt();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser && !loginSuccess) {
-        router.replace("/");
-      }
-    });
-    return () => unsubscribe();
-  }, [router, loginSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     setLoginSuccess(false);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setLoginSuccess(true);
-      setTimeout(() => {
-        router.push("/");
-      }, 2500);
-    } catch (err: any) {
-      if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
-        setError("Incorrect Password! Please try again.");
-      } else {
-        setError(err.message || "Login failed");
-      }
-    } finally {
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (signInError) {
+      setError(signInError.message || "Login failed");
       setLoading(false);
+      return;
     }
+    setLoginSuccess(true);
+    setTimeout(() => {
+      router.push("/");
+    }, 1500);
+    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Google login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setUser(null);
+    setError("Google login is not yet set up with Supabase.");
   };
 
   return (
@@ -292,7 +113,7 @@ const LoginPage: React.FC = () => {
         <AnimatedSubscribeButton
           className="w-full max-w-md rounded-full cursor-pointer bg-white border border-black text-black hover:bg-gray-100 transition-colors duration-300 group outline outline-1 outline-gray-300"
           onClick={handleGoogleLogin}
-          disabled={loading}
+          disabled={true}
         >
           <span className="inline-flex items-center group">
             <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -308,7 +129,7 @@ const LoginPage: React.FC = () => {
                 </clipPath>
               </defs>
             </svg>
-            <span className="ml-2">Continue with Google</span>
+            <span className="ml-2">Continue with Google (coming soon)</span>
             <ChevronRightIcon className="ml-2 size-5 transition-transform duration-300 group-hover:translate-x-1" />
           </span>
           <span className="inline-flex items-center">
@@ -365,6 +186,9 @@ const LoginPage: React.FC = () => {
         <p className="mt-8 text-xs text-gray-500 w-full max-w-md text-center">
           By logging in, you agree to ResDex's <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
         </p>
+        <div className="w-full max-w-md flex justify-center mt-4">
+          <a href="/signup" className="text-sm text-neutral-500 hover:text-black underline transition-colors duration-200">Don't have an account? Sign up</a>
+        </div>
       </div>
       {/* Right Side */}
       <div className="hidden lg:flex w-1/2 bg-white items-center justify-center">
