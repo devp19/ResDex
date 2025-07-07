@@ -14,6 +14,8 @@ import CardPost from "@/components/customized/card/card-06";
 import PaginationWithSecondaryButton from "@/components/customized/pagination/pagination-03";
 import BlogCard from "@/components/customized/card/blog-card";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
+import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -209,6 +211,11 @@ export default function ProfilePage() {
           </div>
         </NavBody>
       </Navbar>
+      {/* Profile Stats Card + Org/Interests Card */}
+      <div className="w-full flex justify-center mt-8 mb-8 gap-6">
+        <ProfileStatsCard followers={123} following={45} contributions={19} />
+        <ProfileOrgInterestsCard organization="Google" interests={["Automation", "AI", "Finance", "Web Development"]} />
+      </div>
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
@@ -280,25 +287,10 @@ export default function ProfilePage() {
                 <div className="text-lg text-neutral-600 mb-1">Chief Operating Officer at Google</div>
                 {/* Location */}
                 <div className="text-md text-neutral-400 mb-4">Toronto, Canada</div>
-                {/* Stats row */}
-                <div className="flex gap-6 mb-6">
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">6,476</span> fellows</div>
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">500+</span> contributions</div>
-                </div>
-                {/* Organization section */}
-                <div className="mb-2 flex items-center gap-2">
-                  <Briefcase size={16} className="text-neutral-500" />
-                  <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">Google</span>
-                </div>
-                {/* Interests section */}
-                <div className="mb-4 flex items-center gap-2">
-                  <Tag size={16} className="text-neutral-500" />
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">Automation</span>
-                    <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">AI</span>
-                    <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">Finance</span>
-                    <span className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">Web Development</span>
-                  </div>
+                {/* Stats row replaced with ProfileStatsCard */}
+                <div className="w-full flex justify-center mb-6">
+                  <ProfileStatsCard followers={6476} following={0} contributions={500} />
+                  <ProfileOrgInterestsCard organization="Google" interests={["Automation", "AI", "Finance", "Web Development"]} className="ml-6" />
                 </div>
               </div>
             </div>

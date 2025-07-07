@@ -16,6 +16,11 @@ interface NotificationSidebarProps {
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
+// Utility: Convert string to Title Case
+function toTitleCase(str: string) {
+  return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
+
 export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ open, onClose }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,12 +119,12 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ open, 
         <div className="fixed inset-0 z-40 bg-black/5 backdrop-blur-sm transition-opacity" onClick={onClose} />
       )}
       <div
-        className={`fixed right-0 top-0 bottom-0 h-auto w-[400px] max-w-full z-50 transition-transform duration-300 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-300 dark:outline-zinc-700 bg-[rgba(230,230,230,0.3)] dark:bg-[rgba(24,24,27,0.5)] backdrop-blur-2xl flex flex-col m-4 sm:m-6
+        className={`fixed right-0 top-0 bottom-0 h-auto w-[400px] max-w-full z-50 transition-transform duration-300 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-400/40 dark:outline-zinc-700/40 bg-[rgba(230,230,230,0.18)] dark:bg-[rgba(24,24,27,0.28)] backdrop-blur-2xl flex flex-col m-4 sm:m-6
         ${open ? 'translate-x-0' : 'translate-x-[calc(100%+1.5rem)]'}`}
         style={{ pointerEvents: open ? 'auto' : 'none' }}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-transparent backdrop-blur-xl rounded-t-3xl">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Notifications</h2>
+          <h2 className="text-2xl lg:leading-tight tracking-tight font-medium text-black dark:text-white">Notifications</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
             <X className="w-6 h-6" />
           </button>
@@ -141,13 +146,13 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ open, 
                   glareEnable={false}
                   className="w-full"
                 >
-                  <li className="relative rounded-2xl p-4 flex flex-col border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-300 dark:outline-zinc-700 bg-black/5 dark:bg-white/5 hover:bg-black/[.025] dark:hover:bg-white/10 transition-colors">
+                  <li className="relative rounded-2xl p-4 flex flex-col border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-400/40 dark:outline-zinc-700/40 bg-[rgba(230,230,230,0.18)] dark:bg-[rgba(24,24,27,0.28)] hover:bg-black/[.025] dark:hover:bg-white/10 transition-colors">
                     {notif.type === 'follow_request' && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button className="absolute top-2 right-2 p-1 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition" aria-label="Dismiss">
-                              <X className="w-4 h-4 text-zinc-500" />
+                              <X className="w-4 h-4 text-zinc-900" />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent side="left" className="text-xs">Dismiss</TooltipContent>
@@ -189,7 +194,11 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ open, 
                         <div className="text-xs text-zinc-500">@{notif.actor?.username}</div>
                       </div>
                     </div>
-                    <span className="font-semibold capitalize mb-1 text-zinc-700 dark:text-zinc-200">{notif.type.replace(/_/g, ' ')}</span>
+                    <span className="text-1xl lg:leading-tight tracking-tight font-medium text-black dark:text-white">
+                      {notif.type === 'follow_request_accepted'
+                        ? 'Accepted your follow request.'
+                        : toTitleCase(notif.type.replace(/_/g, ' '))}
+                    </span>
                     {!(notif.type === 'follow_request' || notif.type === 'follow_request_accepted') && (
                       <span className="text-zinc-800 dark:text-zinc-100">{typeof notif.content === 'string' ? JSON.parse(notif.content).message : notif.content.message}</span>
                     )}

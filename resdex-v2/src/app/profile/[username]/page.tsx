@@ -29,6 +29,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 import { FollowButton } from "@/components/ui/FollowButton";
+import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
+import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -90,6 +92,7 @@ export default function ProfilePage() {
   const [interestSearch, setInterestSearch] = useState("");
   const [myProfile, setMyProfile] = useState<any>(null);
   const [followingCount, setFollowingCount] = useState<number>(0);
+  const [organizationDraft, setOrganizationDraft] = useState("");
 
   // Posts data and pagination state
   const [page, setPage] = useState(1);
@@ -276,6 +279,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (editOpen && profile) {
       setInterestsDraft(Array.isArray(profile.interests) ? profile.interests : []);
+      setOrganizationDraft(profile.organization || "");
     }
   }, [editOpen, profile]);
 
@@ -286,13 +290,13 @@ export default function ProfilePage() {
     setEditSuccess("");
     const { error } = await supabase
       .from("profiles")
-      .update({ bio: aboutDraft, location: locationDraft, interests: interestsDraft })
+      .update({ bio: aboutDraft, location: locationDraft, interests: interestsDraft, organization: organizationDraft })
       .eq("id", profile.id);
     if (error) {
       setEditError(error.message || "Failed to update profile.");
     } else {
       setEditSuccess("Profile updated!");
-      setProfile({ ...profile, bio: aboutDraft, location: locationDraft, interests: interestsDraft });
+      setProfile({ ...profile, bio: aboutDraft, location: locationDraft, interests: interestsDraft, organization: organizationDraft });
       setEditOpen(false);
     }
     setEditLoading(false);
@@ -478,26 +482,21 @@ export default function ProfilePage() {
                 <div className="text-md text-neutral-400 mb-4">
                   {profile?.location ? profile.location : (isOwnProfile ? <span className="italic text-neutral-400">Add your location</span> : <span className="italic text-neutral-400"></span>)}
                 </div>
-                {/* Stats row */}
-                <div className="flex gap-6 mb-6">
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.followers_count || 0}</span> followers</div>
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{followingCount}</span> following</div>
-                  <div className="text-base text-neutral-700 font-semibold"><span className="font-bold">{profile?.contribution_count || "500+"}</span> contributions</div>
-                </div>
-                {/* Organization and Interests on same line */}
-                <div className="mb-4 flex items-center gap-2 flex-wrap">
-                  <Building size={18} className="text-neutral-500" />
-                  <span className="font-medium text-gray-800 text-base">{profile?.organization || "Google"}</span>
-                  <Tag size={16} className="text-neutral-500 ml-6" />
-                  {profile?.interests && profile.interests.length > 0 ? (
-                    profile.interests.map((interest: string, index: number) => (
-                      <span key={index} className="rounded-full px-4 py-2 bg-gray-100 font-medium text-gray-700">{interest}</span>
-                    ))
-                  ) : (
-                    isOwnProfile ? (
-                      <span className="italic text-neutral-400 text-sm ml-2">No interests added...</span>
-                    ) : null
-                  )}
+                {/* Stats row replaced with ProfileStatsCard */}
+                <div className="w-full flex mb-6 gap-6">
+                  <ProfileStatsCard
+                    followers={profile?.followers_count || 0}
+                    following={followingCount}
+                    contributions={profile?.contribution_count || 0}
+                    noShadow
+                    className="!mx-0"
+                    disableTilt={true}
+                  />
+                  <ProfileOrgInterestsCard
+                    organization={profile?.organization || "Google"}
+                    interests={profile?.interests || []}
+                    disableTilt={true}
+                  />
                 </div>
               </div>
             </div>
@@ -688,6 +687,15 @@ export default function ProfilePage() {
               <div className="text-right text-xs text-neutral-400 mb-2">
                 {interestsDraft.length}/3 selected
               </div>
+              <label className="block text-sm font-medium text-neutral-700 mt-2">Organization</label>
+              <input
+                className="w-full border border-gray-300 rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
+                value={organizationDraft}
+                onChange={e => setOrganizationDraft(e.target.value)}
+                maxLength={60}
+                placeholder="e.g. Google, University of Toronto"
+                type="text"
+              />
               <AlertDialogFooter>
                 <AlertDialogCancel asChild>
                   <button
