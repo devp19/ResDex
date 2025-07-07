@@ -222,10 +222,12 @@ export default function ProfilePage() {
           {/* Main Profile Card */}
           <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
             {/* Banner */}
-            <div
-              className="w-full h-40 rounded-t-xl"
-              style={{ background: gradient }}
-            />
+            <div className="p-2">
+              <div
+                className="w-full h-40 rounded-xl"
+                style={{ background: gradient }}
+              />
+            </div>
             {/* Avatar - left-aligned and overlapping banner & info */}
             <div className="relative w-full">
               <div className="absolute -top-20 left-10 z-10">

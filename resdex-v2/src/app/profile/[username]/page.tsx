@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check } from "lucide-react";
+import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check, Pencil } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
 import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
@@ -413,10 +413,12 @@ export default function ProfilePage() {
           {/* Main Profile Card */}
           <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
             {/* Banner */}
-            <div
-              className="w-full h-40 rounded-t-xl"
-              style={{ background: gradient }}
-            />
+            <div className="p-4">
+              <div
+                className="w-full h-40 rounded-xl"
+                style={{ background: gradient }}
+              />
+            </div>
             {/* Avatar - left-aligned and overlapping banner & info */}
             <div className="relative w-full">
               <div className="absolute -top-20 left-10 z-10">
@@ -440,36 +442,46 @@ export default function ProfilePage() {
                 </div>
               </div>
               {/* Info Section - left-aligned below avatar */}
-              <div className="flex flex-col items-start w-full mt-20 ml-12 pr-25 pb-8">
+              <div className="flex flex-col items-start w-full mt-16 ml-12 pr-25 pb-8">
                 {/* Name and Follow/Edit button row */}
                 <div className="flex w-full items-center mb-2">
                   <div className="text-3xl font-bold text-neutral-800 flex-1 flex items-center gap-2">
-                    {profile?.display_name || profile?.full_name || profile?.username}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="inline-flex items-center">
-                          <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
-                    </Tooltip>
+                    <span className="flex items-center">
+                      <span>
+                        {profile?.display_name || profile?.full_name || profile?.username}
+                      </span>
+                      {isOwnProfile && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="p-1 rounded-full hover:bg-zinc-100 transition flex items-center ml-2 justify-center cursor-pointer group"
+                              style={{ color: '#2a2a2a' }}
+                              onClick={() => {
+                                setAboutDraft(profile.bio || "");
+                                setLocationDraft(profile.location || "");
+                                setEditOpen(true);
+                              }}
+                              aria-label="Edit Profile"
+                            >
+                              <Pencil className="w-5 h-5" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={6}>Edit Profile</TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center">
+                            <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
+                      </Tooltip>
+                    </span>
                   </div>
                   {/* Show Follow button only if not own profile and user is authenticated */}
                   {currentUser && !isOwnProfile && profile?.id && (
                     <FollowButton userId={profile.id} />
-                  )}
-                  {/* Show Edit button only if own profile */}
-                  {isOwnProfile && (
-                    <button
-                      className="ml-4 px-5 py-3 rounded-full bg-[#2a2a2a] text-white text-base font-medium hover:bg-[#444] transition"
-                      onClick={() => {
-                        setAboutDraft(profile.bio || "");
-                        setLocationDraft(profile.location || "");
-                        setEditOpen(true);
-                      }}
-                    >
-                      Edit Profile
-                    </button>
                   )}
                 </div>
                 {/* Bio/Title (dynamic) */}

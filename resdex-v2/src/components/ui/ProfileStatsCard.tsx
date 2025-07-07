@@ -47,17 +47,17 @@ export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({ followers, f
     >
       <div className="flex-1 flex flex-col items-start justify-center mx-3">
         <span className="text-2xl font-bold">{followers}</span>
-        <span className="text-sm mt-1">Followers</span>
+        <span className="text-sm mt-1 text-neutral-400">Followers</span>
       </div>
       <div className="w-px bg-zinc-200 dark:bg-zinc-700 mx-6" />
       <div className="flex-1 flex flex-col items-start justify-center">
         <span className="text-2xl font-bold">{following}</span>
-        <span className="text-sm mt-1">Following</span>
+        <span className="text-sm mt-1 text-neutral-400">Following</span>
       </div>
       <div className="w-px bg-zinc-200 dark:bg-zinc-700 mx-6" />
       <div className="flex-1 flex flex-col items-start justify-center">
         <span className="text-2xl font-bold">{contributions}</span>
-        <span className="text-sm mt-1">Contributions</span>
+        <span className="text-sm mt-1 text-neutral-400">Contributions</span>
       </div>
     </div>
   );
