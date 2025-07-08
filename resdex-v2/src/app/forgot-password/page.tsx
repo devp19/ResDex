@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { auth } from "../../lib/firebaseConfig";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import Image from "next/image";
 import { cn } from "@/lib/utils";

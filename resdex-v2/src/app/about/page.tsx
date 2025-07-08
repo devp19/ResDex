@@ -10,7 +10,7 @@ import { ChartCard } from "@/components/ChartCard";
 import { Navbar, NavBody, NavItems, NavbarLogo } from "@/components/ui/navbar";
 import { Footer7 } from "@/components/footer7";
 import { signOut, onAuthStateChanged, User, linkWithPopup, unlink, GoogleAuthProvider } from "firebase/auth";
-import { auth, db } from "../firebaseConfig";
+import { auth, db } from "../../lib/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function About() {

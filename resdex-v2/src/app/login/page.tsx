@@ -81,9 +81,24 @@ const LoginPage: React.FC = () => {
       setLoading(false);
       return;
     }
+    // Fetch the user's profile to get the username
+    const userId = data.user?.id;
+    let username = null;
+    if (userId) {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", userId)
+        .single();
+      username = profileData?.username;
+    }
     setLoginSuccess(true);
     setTimeout(() => {
-      router.push("/");
+      if (username) {
+        router.push(`/profile/${username}`);
+      } else {
+        router.push("/");
+      }
     }, 1500);
     setLoading(false);
   };

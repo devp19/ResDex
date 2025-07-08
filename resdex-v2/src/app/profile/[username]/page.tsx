@@ -422,7 +422,7 @@ export default function ProfilePage() {
             {/* Avatar - left-aligned and overlapping banner & info */}
             <div className="relative w-full">
               <div className="absolute -top-20 left-10 z-10">
-                <div className="w-36 h-36 rounded-full border-8 border-white overflow-hidden bg-gray-300">
+                <div className={`w-36 h-36 ${((profile?.username || '').toLowerCase() === 'resdex') ? 'rounded-xl' : 'rounded-full'} border-8 border-white overflow-hidden bg-gray-300`}>
                   <Image
                     src={profile.avatar_url}
                     alt="Profile Avatar"
@@ -469,14 +469,16 @@ export default function ProfilePage() {
                           <TooltipContent sideOffset={6}>Edit Profile</TooltipContent>
                         </Tooltip>
                       )}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="inline-flex items-center">
-                            <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
-                      </Tooltip>
+                      {['dev','tirth','deep','bhavi','kush','jay','aaryan','darsh','fenil','resdex'].includes((profile?.username || '').toLowerCase()) && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center">
+                              <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
+                        </Tooltip>
+                      )}
                     </span>
                   </div>
                   {/* Show Follow button only if not own profile and user is authenticated */}
