@@ -4,6 +4,7 @@ import "./globals.css";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { AuthProvider } from '@/components/auth-provider';
 import NotificationSidebarProvider from '@/components/ui/NotificationSidebarProvider';
+import { Footer7 } from "@/components/footer7";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,50 @@ export default function RootLayout({
         <AuthProvider>
           <SmoothCursor />
           <NotificationSidebarProvider>
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-1">
+                {children}
+              </main>
+              <div className="flex justify-center w-full">
+                <Footer7
+                  logo={{
+                    url: "/",
+                    src: "/beige-logo.png",
+                    alt: "ResDex Logo",
+                    title: "ResDex"
+                  }}
+                  sections={[
+                    {
+                      title: "Product",
+                      links: [
+                        { name: "Overview", href: "#" },
+                        { name: "Pricing", href: "#" },
+                        { name: "Marketplace", href: "#" },
+                        { name: "Features", href: "#" },
+                      ],
+                    },
+                    {
+                      title: "Company",
+                      links: [
+                        { name: "About", href: "/about" },
+                        { name: "Team", href: "#" },
+                        { name: "Blog", href: "#" },
+                        { name: "Careers", href: "#" },
+                      ],
+                    },
+                    {
+                      title: "Resources",
+                      links: [
+                        { name: "Help", href: "#" },
+                        { name: "Sales", href: "#" },
+                        { name: "Advertise", href: "#" },
+                        { name: "Privacy", href: "#" },
+                      ],
+                    },
+                  ]}
+                />
+              </div>
+            </div>
           </NotificationSidebarProvider>
         </AuthProvider>
       </body>
