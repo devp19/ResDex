@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge } from "@/components/ui/navbar";
+import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge, MessageBadge } from "@/components/ui/navbar";
 import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
@@ -36,7 +36,6 @@ const navItems = [
   { name: "Home", link: "/" },
   { name: "Network", link: "/network" },
   { name: "Jobs", link: "/jobs" },
-  { name: "Messaging", link: "/messaging" },
 ];
 
 // Responsive hook for small screens
@@ -365,7 +364,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
       {/* Navbar */}
       <Navbar>
-        <NavBody showNotifications>
+        <NavBody>
           <div className="flex items-center w-full">
             {/* Left group: Logo + Search */}
             <div className="flex items-center gap-6 min-w-0">
@@ -384,9 +383,10 @@ export default function ProfilePage() {
             <div className="flex-grow" />
             {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
+            <MessageBadge />
+            <NotificationBadge />
             {/* Avatar/Login button */}
             <div className="relative ml-4 flex items-center gap-2">
-              {currentUser && <NotificationBadge />}
               {currentUser ? (
                 <AvatarDropdown
                   userProfile={myProfile}

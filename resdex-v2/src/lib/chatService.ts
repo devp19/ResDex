@@ -103,6 +103,19 @@ import {
     );
   
     await syncMessageMetadata(conversationId, senderId, recipientId, messageText);
+
+    // Always insert a notification for the recipient, unless sender and recipient are the same
+    if (senderId !== recipientId) {
+      await supabase.from('notifications').insert({
+        recipient_id: recipientId,
+        actor_id: senderId,
+        type: 'message',
+        content: { message: messageText },
+        related_resource_type: 'conversation',
+        related_resource_id: conversationId,
+        read: false,
+      });
+    }
   };
   
   export const listenToMessages = (

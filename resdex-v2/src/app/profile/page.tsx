@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Navbar, NavBody, NavbarLogo, NavItems } from "@/components/ui/navbar";
+import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge, MessageBadge } from "@/components/ui/navbar";
 import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
@@ -208,6 +208,8 @@ export default function ProfilePage() {
             <div className="flex-grow" />
             {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
+            <MessageBadge />
+            <NotificationBadge />
           </div>
         </NavBody>
       </Navbar>
