@@ -9,7 +9,7 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import type { Message } from "@/lib/chatService";
 import Image from "next/image";
-import { collection, query, where, orderBy, limit as fbLimit, startAfter, onSnapshot, getDocs } from "firebase/firestore";
+import { collection, query, where, orderBy, limit as fbLimit, startAfter, onSnapshot, getDocs, doc, updateDoc, onSnapshot as onDocSnapshot, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { ArrowUp } from "lucide-react";
 import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge, MessageBadge } from "@/components/ui/navbar";
@@ -24,9 +24,12 @@ import { useSearchParams } from "next/navigation";
 
 export type User = { id: string; name: string; avatar_url?: string; lastMessage?: string; convoDoc?: any; lastMessageTimestamp?: any; username?: string };
 
+// Patch: extend Message type locally to include 'id'
+type MessageWithId = Message & { id: string };
+
 export default function MessagesPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageWithId[]>([]);
   const [text, setText] = useState("");
   const [conversationId, setConversationId] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
@@ -42,6 +45,8 @@ export default function MessagesPage() {
   const [paginatedConvos, setPaginatedConvos] = useState<User[]>([]);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState<{ [convoId: string]: number }>({});
+  // Add state for readStatus
+  const [readStatus, setReadStatus] = useState<any>({});
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -111,7 +116,12 @@ export default function MessagesPage() {
       const convoId = await createConversation(currentUserId, selectedUser.id);
       setConversationId(convoId);
       unsubscribeMessages = listenToMessages(convoId, async (msgs) => {
-        setMessages(msgs);
+        // Patch: ensure each message has an 'id' property
+        const patchedMsgs = msgs.map((msg: any, idx: number) => ({
+          ...msg,
+          id: msg.id || msg._id || idx.toString(), // fallback if missing
+        }));
+        setMessages(patchedMsgs);
         loadRecentConversations();
 
         // Update unread counts in real-time if a new message is received from the other user
@@ -128,14 +138,10 @@ export default function MessagesPage() {
     };
   }, [selectedUser, currentUserId]);
 
+  // When chat is opened, mark notifications as read AND update readStatus
   useEffect(() => {
     if (!selectedUser || !currentUserId || !conversationId) return;
     // Mark all message notifications for this conversation as read
-    console.log('Marking notifications as read for:', {
-      recipient_id: currentUserId,
-      conversationId,
-      selectedUserId: selectedUser.id
-    });
     supabase
       .from('notifications')
       .update({ read: true, dismissed: true })
@@ -144,13 +150,27 @@ export default function MessagesPage() {
       .eq('related_resource_id', conversationId)
       .eq('type', 'message')
       .eq('read', false)
-      .then(({ error, data }) => {
+      .then(({ error }) => {
         if (error) {
           console.error('Error marking notification as read:', error);
-        } else {
-          console.log('Notification(s) marked as read:', data);
         }
       });
+    // Update readStatus in Firestore
+    // Find the latest message ID
+    const fetchAndUpdateReadStatus = async () => {
+      const messagesCol = collection(db, `conversations/${conversationId}/messages`);
+      const q = query(messagesCol, orderBy("timestamp", "desc"), fbLimit(1));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const lastMsgDoc = snap.docs[0];
+        const lastMsgId = lastMsgDoc.id;
+        const convoRef = doc(db, "conversations", conversationId);
+        await updateDoc(convoRef, {
+          [`readStatus.${currentUserId}`]: lastMsgId,
+        });
+      }
+    };
+    fetchAndUpdateReadStatus();
   }, [selectedUser, currentUserId, conversationId]);
 
   useEffect(() => {
@@ -404,6 +424,17 @@ export default function MessagesPage() {
     // eslint-disable-next-line
   }, [searchParams, users]);
 
+  // Listen to readStatus changes for the current conversation
+  useEffect(() => {
+    if (!conversationId) return;
+    const convoRef = doc(db, "conversations", conversationId);
+    const unsubscribe = onDocSnapshot(convoRef, (snap) => {
+      const data = snap.data();
+      setReadStatus(data?.readStatus || {});
+    });
+    return () => unsubscribe();
+  }, [conversationId]);
+
   // Sign out handler for AvatarDropdown
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -637,8 +668,8 @@ export default function MessagesPage() {
                 messages.length > 0 ? (
                   // Group consecutive messages by sender
                   (() => {
-                    const groups: Message[][] = [];
-                    let currentGroup: Message[] = [];
+                    const groups: MessageWithId[][] = [];
+                    let currentGroup: MessageWithId[] = [];
                     let lastSender: string | null = null;
                     messages.forEach((msg, i) => {
                       if (msg.senderId !== lastSender) {
@@ -699,34 +730,47 @@ export default function MessagesPage() {
                                   : new Date(msg.timestamp);
                                 timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                               }
+                              // After rendering the message bubble, check if this is the last message sent by current user that the other user has read
+                              const isLastReadByOther = isCurrentUser &&
+                                readStatus &&
+                                selectedUser &&
+                                readStatus[selectedUser.id] === msg.id;
                               return (
-                                <div
-                                  key={j}
-                                  className={`group flex items-center max-w-[80%] sm:max-w-md md:max-w-lg px-0 mb-0.5 transition-all duration-200 ${
-                                    isCurrentUser
-                                      ? "flex-row self-end"
-                                      : "flex-row self-start"
-                                  }`}
-                                >
-                                  {/* Timestamp on hover, left for current user, right for other user */}
-                                  {isCurrentUser && timeString && (
-                                    <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap mr-2">
-                                      {timeString}
-                                    </span>
-                                  )}
-                                  <div
-                                    className={`px-4 py-2 rounded-2xl shadow-sm transition-colors duration-200 break-words ${
-                                      isCurrentUser
-                                        ? "bg-[var(--primary)] text-[var(--primary-foreground)] text-right"
-                                        : "bg-[var(--muted)] text-[var(--foreground)] text-left"
-                                    }`}
-                                  >
-                                    {msg.content}
+                                <div key={j} className="flex flex-col items-end max-w-[80%] sm:max-w-md md:max-w-lg mb-0.5">
+                                  <div className={`group flex items-center px-0 transition-all duration-200 ${isCurrentUser ? "flex-row self-end" : "flex-row self-start"}`}>
+                                    {/* Timestamp on hover, left for current user, right for other user */}
+                                    {isCurrentUser && timeString && (
+                                      <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap mr-2">
+                                        {timeString}
+                                      </span>
+                                    )}
+                                    <div className={`px-4 py-2 rounded-2xl shadow-sm transition-colors duration-200 break-words ${isCurrentUser ? "bg-[var(--primary)] text-[var(--primary-foreground)] text-right" : "bg-[var(--muted)] text-[var(--foreground)] text-left"}`}>
+                                      {msg.content}
+                                    </div>
+                                    {!isCurrentUser && timeString && (
+                                      <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap ml-2">
+                                        {timeString}
+                                      </span>
+                                    )}
                                   </div>
-                                  {!isCurrentUser && timeString && (
-                                    <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap ml-2">
-                                      {timeString}
-                                    </span>
+                                  {/* Read receipt avatar for the other user, now on the left with 'seen' text */}
+                                  {isLastReadByOther && (
+                                    <div className="flex items-center gap-1 mt-1" style={{ alignSelf: "flex-end" }}>
+                                      {/* {selectedUser.avatar_url ? (
+                                        <Image
+                                          src={selectedUser.avatar_url}
+                                          alt={selectedUser.name}
+                                          width={16}
+                                          height={16}
+                                          className="rounded-full border border-gray-300 shadow-sm"
+                                        />
+                                      ) : (
+                                        <div className="w-4 h-4 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-gray-300 text-xs">
+                                          {getInitials(selectedUser.name)}
+                                        </div>
+                                      )} */}
+                                      <span className="text-xs text-gray-400 mr-2">Viewed</span>
+                                    </div>
                                   )}
                                 </div>
                               );
