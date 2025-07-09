@@ -20,6 +20,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { QRCodeCanvas } from "qrcode.react";
 // @ts-ignore
 import ColorThief from "colorthief";
+import { useSearchParams } from "next/navigation";
 
 export type User = { id: string; name: string; avatar_url?: string; lastMessage?: string; convoDoc?: any; lastMessageTimestamp?: any; username?: string };
 
@@ -43,6 +44,7 @@ export default function MessagesPage() {
   const [unreadCounts, setUnreadCounts] = useState<{ [convoId: string]: number }>({});
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     getCurrentUserId().then((id) => {
@@ -373,6 +375,35 @@ export default function MessagesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId, users, paginatedConvos]);
 
+  useEffect(() => {
+    // Auto-select user if ?user=username is present
+    const usernameParam = searchParams?.get("user");
+    if (usernameParam && users.length > 0) {
+      const found = users.find(u => u.username === usernameParam);
+      if (found) {
+        setSelectedUser(found);
+      } else {
+        // If not found, try to fetch user by username
+        (async () => {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("id, username, display_name, avatar_url")
+            .eq("username", usernameParam)
+            .single();
+          if (!error && data) {
+            setSelectedUser({
+              id: data.id,
+              name: data.display_name || data.username,
+              avatar_url: data.avatar_url,
+              username: data.username,
+            });
+          }
+        })();
+      }
+    }
+    // eslint-disable-next-line
+  }, [searchParams, users]);
+
   // Sign out handler for AvatarDropdown
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -598,7 +629,7 @@ export default function MessagesPage() {
                     alt="ResDex Logo"
                     className="w-24 h-24 mb-6 opacity-20 grayscale"
                   />
-                  <div className="text-center text-gray-400  ml-20 mr-20">Start a conversation. Don't know who to message? Search for someone.</div>
+                  <div className="text-center text-gray-400  ml-20 mr-20">Start a conversation! ResDex is a place to share your thoughts and ideas with others.</div>
                 </div>
               )}
             <div ref={chatContainerRef} className="flex-1 p-6 overflow-y-auto">

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
 // @ts-ignore
 import ColorThief from "colorthief";
-import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check, Pencil } from "lucide-react";
+import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check, Pencil, MessageCircleIcon } from "lucide-react";
 import { ChartCard } from "@/components/ChartCard";
 import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
@@ -483,7 +483,19 @@ export default function ProfilePage() {
                   </div>
                   {/* Show Follow button only if not own profile and user is authenticated */}
                   {currentUser && !isOwnProfile && profile?.id && (
-                    <FollowButton userId={profile.id} />
+                    <>
+                      <FollowButton userId={profile.id} />
+                      <button
+                        className="ml-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 cursor-pointer"
+                        title="Message"
+                        onClick={() => router.push(`/messages?user=${profile.username}`)}
+                        aria-label="Message"
+                        type="button"
+                      >
+                        <span className="font-semibold text-[#2a2a2a]">Message</span>
+                        <MessageCircleIcon className="w-6 h-6" style={{ color: '#2a2a2a' }} />
+                      </button>
+                    </>
                   )}
                 </div>
                 {/* Bio/Title (dynamic) */}

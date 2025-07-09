@@ -67,7 +67,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({ userId, onStatusChan
   };
 
   if (status === 'loading') {
-    return <button disabled className="ml-4 rounded-full px-8 py-3 border bg-gray-200 text-gray-500">Loading...</button>;
+    return <button disabled className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 font-semibold text-[#2a2a2a] border-none">Loading...</button>;
   }
 
   if (status === 'not_following') {
@@ -75,7 +75,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({ userId, onStatusChan
       <button
         onClick={handleFollowAction}
         disabled={isProcessing}
-        className="ml-4 rounded-full px-8 py-3 border bg-[#2a2a2a] text-white hover:bg-[#444] transition"
+        className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 font-semibold text-[#2a2a2a] border-none cursor-pointer"
       >
         {isProcessing ? 'Processing...' : 'Follow'}
       </button>
@@ -87,18 +87,19 @@ export const FollowButton: React.FC<FollowButtonProps> = ({ userId, onStatusChan
       <button
         onClick={handleFollowAction}
         disabled={isProcessing}
-        className="ml-4 rounded-full px-8 py-3 border bg-gray-300 text-gray-700 cursor-not-allowed"
+        className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 font-semibold text-[#2a2a2a] border-none cursor-not-allowed"
       >
         {isProcessing ? 'Processing...' : 'Requested'}
       </button>
     );
   }
 
+  // Following state: dark background, white text
   return (
     <button
       onClick={handleFollowAction}
       disabled={isProcessing}
-      className="ml-4 rounded-full px-8 py-3 border bg-[#2a2a2a] text-white hover:bg-[#444] transition"
+      className="px-4 py-2 rounded-full bg-[#2a2a2a] hover:bg-[#444] transition flex items-center justify-center gap-2 font-semibold text-white border-none cursor-pointer"
     >
       {isProcessing ? 'Processing...' : 'Following'}
     </button>
