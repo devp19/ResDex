@@ -524,7 +524,7 @@ export default function MessagesPage() {
                   )}
                   {currentUserProfile.organization && (
                     <div className="flex items-center gap-2 mt-3">
-                      <span className="font-semibold text-gray-400">{currentUserProfile.organization}</span>
+                      <span className="font-semibold text-gray-400">Organization: {currentUserProfile.organization}</span>
                     </div>
                   )}
                 </div>
