@@ -919,43 +919,6 @@ export default function Home() {
           </div>
         </section>
         {/* Footer7 with TextAnimate on all content */}
-        <Footer7
-          logo={{
-            url: "/",
-            src: "/beige-logo.png",
-            alt: "ResDex Logo",
-            title: "ResDex"
-          }}
-          sections={[
-            {
-              title: "Product",
-              links: [
-                { name: "Overview", href: "#" },
-                { name: "Pricing", href: "#" },
-                { name: "Marketplace", href: "#" },
-                { name: "Features", href: "#" },
-              ],
-            },
-            {
-              title: "Company",
-              links: [
-                { name: "About", href: "/about" },
-                { name: "Team", href: "#" },
-                { name: "Blog", href: "#" },
-                { name: "Careers", href: "#" },
-              ],
-            },
-            {
-              title: "Resources",
-              links: [
-                { name: "Help", href: "#" },
-                { name: "Sales", href: "#" },
-                { name: "Advertise", href: "#" },
-                { name: "Privacy", href: "#" },
-              ],
-            },
-          ]}
-        />
       </div>
     </>
   );
