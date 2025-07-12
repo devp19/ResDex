@@ -527,7 +527,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          {/* Posts Section Placeholder */}
+          {/* Posts Section Placeholder (Replace with actual posts) */}
           <div className="bg-white rounded-xl min-h-[800px] flex flex-col p-6 w-full overflow-x-auto border border-gray-200">
             <Tabs
               tabs={[
