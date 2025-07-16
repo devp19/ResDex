@@ -24,7 +24,7 @@
     "firebase": "^11.9.1",
     "framer-motion": "^12.22.0",
     "lucide-react": "^0.523.0",
-    "motion": "^12.22.0",
+    "motion": "^12.23.6",
     "next": "15.3.4",
     "qr-code-styling": "^1.9.2",
     "qrcode.react": "^4.2.0",

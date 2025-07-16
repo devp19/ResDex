@@ -58,6 +58,7 @@ import { Timeline } from "@/components/ui/timeline";
 import { Check } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
+import { BlurFade } from "@/components/magicui/blur-fade";
 
 const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
@@ -128,51 +129,57 @@ const DATA = {
 // Marquee3D review data and components
 const reviews = [
   {
+    name: "Ava Patel",
+    username: "@avapatel",
+    body: "Quick sign-up and I found a project in my field within a day!",
+    img: "https://avatar.vercel.sh/ava",
+  },
+  {
     name: "Lucas Kim",
     username: "@lucaskim",
-    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors.",
+    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors. I was able to connect with mentors who provided valuable feedback on my application, and the platform's resources made the whole process stress-free.",
     img: "https://avatar.vercel.sh/jack",
   },
   {
     name: "Priya Singh",
     username: "@priyasingh",
-    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly.",
+    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly. The notifications kept me updated on new opportunities, and the support team was always quick to help.",
     img: "https://avatar.vercel.sh/jill",
   },
   {
     name: "Mateo Alvarez",
     username: "@mateoa",
-    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey.",
+    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey. I especially loved the ability to join different research groups and participate in discussions.",
     img: "https://avatar.vercel.sh/john",
   },
   {
     name: "Emily Chen",
     username: "@emchen",
-    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise!",
+    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise! The search and filter tools are incredibly helpful for narrowing down the best matches for my interests.",
     img: "https://avatar.vercel.sh/jack",
   },
   {
     name: "Noah Williams",
     username: "@noahw",
-    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here.",
+    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here. The verification process for opportunities gave me peace of mind, and the support team was always quick to respond to my questions. I also love the regular updates and new features!",
     img: "https://avatar.vercel.sh/jill",
   },
   {
     name: "Sara Müller",
     username: "@saramuller",
-    body: "Connecting with professors was seamless. I got feedback on my research proposal within days!",
+    body: "Connecting with professors was seamless. I got feedback on my research proposal within days! The messaging system made it easy to keep track of all my conversations in one place.",
     img: "https://avatar.vercel.sh/john",
   },
   {
     name: "Omar Farouk",
     username: "@omarfarouk",
-    body: "The verified opportunities gave me confidence that I was applying to real, quality positions.",
+    body: "Verified opportunities = less stress. I was able to apply to positions knowing they were legitimate, and the application process was straightforward. I recommend ResDex to all my classmates.",
     img: "https://avatar.vercel.sh/jack",
   },
   {
     name: "Julia Rossi",
     username: "@juliarossi",
-    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend!",
+    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend! The resources and guides available on the platform helped me prepare a strong application and ace my interviews. I also made some great friends through the community forums.",
     img: "https://avatar.vercel.sh/jill",
   },
 ];
@@ -482,6 +489,41 @@ function CustomChartTooltip(props: any) {
   );
 }
 
+// Flat testimonial card grid section
+function FlatTestimonials() {
+  return (
+    <section className="w-full flex flex-col items-center justify-center mb-24 relative">
+      <div
+        className="w-full max-w-4xl columns-1 sm:columns-2 lg:columns-3 gap-6"
+      >
+        {reviews.map((review, idx) => (
+          <BlurFade key={review.username} delay={0.1 * idx} inView>
+            <div
+              className="bg-[#f5f6fa] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
+              style={{ background: '#f5f6fa' }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <img
+                  className="rounded-full w-10 h-10 object-cover"
+                  width="40"
+                  height="40"
+                  alt={review.name}
+                  src={review.img}
+                />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-sm text-neutral-800 leading-tight">{review.name}</span>
+                  <span className="text-xs text-neutral-500">{review.username}</span>
+                </div>
+              </div>
+              <blockquote className="text-sm text-neutral-700 mt-2 flex-1">{review.body}</blockquote>
+            </div>
+          </BlurFade>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const tilt1 = use3dTilt();
   const tilt2 = use3dTilt();
@@ -758,14 +800,16 @@ export default function Home() {
           <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
             <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
           </Tilt>
-          <TextAnimate
-            animation="fadeIn"
-            by="line"
-            as="h1"
-            className="title text-center"
-          >
-            {`Rediscover the world of research.`}
-          </TextAnimate>
+          <BlurFade delay={0.1} inView>
+            <TextAnimate
+              animation="fadeIn"
+              by="line"
+              as="h1"
+              className="title text-center"
+            >
+              {`Rediscover the world of research.`}
+            </TextAnimate>
+          </BlurFade>
           <TextAnimate
             animation="fadeIn"
             by="line"
@@ -833,27 +877,35 @@ export default function Home() {
           data={[
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Transparency</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">We believe in open access to research opportunities. No hidden forms, no closed loops. Everything on ResDex — from positions to profiles — is built to be clear, searchable, and student-first.
-
-</p>,
+              content: (
+                <BlurFade delay={0.1 * 0} inView>
+                  <p className="text-neutral-700 dark:text-neutral-300">We believe in open access to research opportunities. No hidden forms, no closed loops. Everything on ResDex — from positions to profiles — is built to be clear, searchable, and student-first.</p>
+                </BlurFade>
+              ),
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Equity</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">Research shouldn't be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.
-
-</p>,
+              content: (
+                <BlurFade delay={0.1 * 1} inView>
+                  <p className="text-neutral-700 dark:text-neutral-300">Research shouldn't be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.</p>
+                </BlurFade>
+              ),
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Growth</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">ResDex isn't just about finding a position — it's about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.
-
-</p>,
+              content: (
+                <BlurFade delay={0.1 * 2} inView>
+                  <p className="text-neutral-700 dark:text-neutral-300">ResDex isn't just about finding a position — it's about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.</p>
+                </BlurFade>
+              ),
             },
             {
               title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Collaboration</span>,
-              content: <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it's students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.
-
-</p>,
+              content: (
+                <BlurFade delay={0.1 * 3} inView>
+                  <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it's students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.</p>
+                </BlurFade>
+              ),
             },
           ]}
         />
@@ -864,11 +916,12 @@ export default function Home() {
           </h2>
         </section>
         {/* 3D Marquee Section (MagicUI style) */}
-        <section className="w-full flex flex-col items-center justify-center mb-24">
+        {/* <section className="w-full flex flex-col items-center justify-center mb-24">
           <div className="w-full flex justify-center">
             <Marquee3D />
           </div>
-        </section>
+        </section> */}
+        <FlatTestimonials />
         {/* FAQ Section */}
         <section className="w-full flex flex-col items-center justify-center my-24">
           <TextAnimate animation="fadeIn" by="line" as="h2" className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white mb-10">Frequently Asked Questions</TextAnimate>
