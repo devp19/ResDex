@@ -379,13 +379,13 @@
       >
       
         <Image
-          src="/transparent-black.png"
+          src="/beige-logo.png"
           alt="ResDex transparent logo"
           width={30}
           height={30}
-          style={{ objectFit: 'contain' }}
+          style={{ objectFit: 'contain', borderRadius: '10px' }}
         />
-        {/* <span className="title text-black dark:text-white mt-1" style={{ fontSize: '1.1rem' }}>ResDex</span> */}
+        <span className="text-xl font-semibold">ResDex</span>
       </a>
     );
   };

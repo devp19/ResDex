@@ -15,7 +15,7 @@ const navItems = [
 export default function WaitlistPage() {
   const [email, setEmail] = useState("");
   // Placeholder for live count (replace with real fetch logic)
-  const [waitlistCount] = useState(1234);
+  const [waitlistCount] = useState(438);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,26 +30,32 @@ export default function WaitlistPage() {
       <Navbar>
         <NavBody>
           <NavbarLogo />
+          
           <NavItems items={navItems} />
         </NavBody>
       </Navbar>
       {/* Main Content */}
       <div className="flex flex-1 flex-col items-center justify-center px-4">
-      <BlurFade delay={0.1} inView>
-          <h1 className="title text-center flex flex-wrap items-center justify-center gap-2">
-            <TextAnimate
-              animation="fadeIn"
-              by="line"
-              as="span"
-              className=""
-            >
-              {`Research Made`}
+        <div className="w-full max-w-2xl mx-auto">
+          <h1 className="title text-center">
+            <span className="whitespace-nowrap">
+              <TextAnimate animation="fadeIn" by="text" as="span" className="inline">
+                {`Change the way `}
+              </TextAnimate>
+              <PointerHighlight pointerClassName="text-[#2a2a2a]">
+                <TextAnimate animation="fadeIn" by="text" as="span" className="inline px-2 py-1">
+                  {`you`}
+                </TextAnimate>
+              </PointerHighlight>
+            </span>
+            <br />
+            <TextAnimate animation="fadeIn" by="text" as="span" className="inline">
+              {`do research.`}
             </TextAnimate>
-            <PointerHighlight pointerClassName="text-[#2a2a2a]">
-              <span className="relative z-10">easy</span>
-            </PointerHighlight>
           </h1>
-        </BlurFade>        <p className="text-base sm:text-lg text-gray-400 text-center mb-8 max-w-md">Be the first to discover new research opportunities and get early access to our platform.</p>
+        </div>
+        
+        <p className="text-base sm:text-lg text-gray-400 text-center mb-8 mt-4 max-w-md">Be the first to discover new research opportunities and get early access to our platform.</p>
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 mb-6 w-full max-w-md">
           <input
             type="email"
@@ -67,7 +73,7 @@ export default function WaitlistPage() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
-          <span className="text-sm text-gray-500">{waitlistCount.toLocaleString()} people already joined (live)</span>
+          <span className="text-sm text-gray-500">{waitlistCount.toLocaleString()} people are changing the way they do research.</span>
         </div>
       </div>
     </div>
