@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothCursor } from "@/components/ui/SmoothCursor";
+<<<<<<< HEAD
+=======
+import { AuthProvider } from '@/components/auth-provider';
+import NotificationSidebarProvider from '@/components/ui/NotificationSidebarProvider';
+import { Footer7 } from "@/components/footer7";
+>>>>>>> origin
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +34,60 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+<<<<<<< HEAD
         <SmoothCursor />
         {children}
+=======
+        <AuthProvider>
+          <SmoothCursor />
+          <NotificationSidebarProvider>
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-1">
+                {children}
+              </main>
+              <div className="flex justify-center w-full">
+                <Footer7
+                  logo={{
+                    url: "/",
+                    src: "/beige-logo.png",
+                    alt: "ResDex Logo",
+                    title: "ResDex"
+                  }}
+                  sections={[
+                    {
+                      title: "Product",
+                      links: [
+                        { name: "Overview", href: "#" },
+                        { name: "Pricing", href: "#" },
+                        { name: "Marketplace", href: "#" },
+                        { name: "Features", href: "#" },
+                      ],
+                    },
+                    {
+                      title: "Company",
+                      links: [
+                        { name: "About", href: "/about" },
+                        { name: "Team", href: "#" },
+                        { name: "Blog", href: "#" },
+                        { name: "Careers", href: "#" },
+                      ],
+                    },
+                    {
+                      title: "Resources",
+                      links: [
+                        { name: "Help", href: "#" },
+                        { name: "Sales", href: "#" },
+                        { name: "Advertise", href: "#" },
+                        { name: "Privacy", href: "#" },
+                      ],
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          </NotificationSidebarProvider>
+        </AuthProvider>
+>>>>>>> origin
       </body>
     </html>
   );
