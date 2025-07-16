@@ -5,12 +5,17 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { PointerHighlight } from "@/components/ui/pointer-highlight";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const navItems = [
   { name: "Home", link: "/" },
   { name: "Blog", link: "/blog" },
   { name: "Contact", link: "/contact" },
 ];
+
+const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
+
 
 export default function WaitlistPage() {
   const [email, setEmail] = useState("");
@@ -25,57 +30,56 @@ export default function WaitlistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden px-4 sm:px-6 md:px-8">
       {/* Navbar */}
       <Navbar>
         <NavBody>
           <NavbarLogo />
-          
           <NavItems items={navItems} />
         </NavBody>
       </Navbar>
       {/* Main Content */}
-      <div className="flex flex-1 flex-col items-center justify-center px-4">
-        <div className="w-full max-w-2xl mx-auto">
-          <h1 className="title text-center">
-            <span className="whitespace-nowrap">
-              <TextAnimate animation="fadeIn" by="text" as="span" className="inline">
-                {`Change the way `}
-              </TextAnimate>
-              <PointerHighlight pointerClassName="text-[#2a2a2a]">
-                <TextAnimate animation="fadeIn" by="text" as="span" className="inline px-2 py-1">
-                  {`you`}
-                </TextAnimate>
-              </PointerHighlight>
-            </span>
-            <br />
-            <TextAnimate animation="fadeIn" by="text" as="span" className="inline">
-              {`do research.`}
+      <main className="flex flex-4 flex-col items-center justify-center w-full max-w-md mx-auto py-8 gap-4">
+        <div className="w-full">
+          <div className="flex justify-center mb-4">
+            <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500}>
+              <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
+            </Tilt>
+          </div>
+          <BlurFade delay={0.1} inView>
+            <TextAnimate
+              animation="fadeIn"
+              by="line"
+              as="h1"
+              className="title text-center"
+            >
+              {`Changing the way you do research.`}
             </TextAnimate>
-          </h1>
+          </BlurFade>
         </div>
-        
-        <p className="text-base sm:text-lg text-gray-400 text-center mb-8 mt-4 max-w-md">Be the first to discover new research opportunities and get early access to our platform.</p>
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 mb-6 w-full max-w-md">
+        <p className="text-base sm:text-lg text-gray-400 text-center mb-6 mt-2 max-w-xs sm:max-w-md mx-auto px-2">
+          Be the first to discover new research opportunities and get early access to our platform.
+        </p>
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-3 mb-4 w-full">
           <input
             type="email"
             required
             placeholder="Enter your email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="flex-1 px-6 py-3 rounded-full border border-gray-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a] shadow-sm placeholder:text-gray-400 transition w-full sm:w-auto"
+            className="flex-1 px-4 py-3 rounded-full border border-gray-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a] shadow-sm placeholder:text-gray-400 transition w-full"
             style={{ minWidth: 0 }}
           />
-          <ShimmerButton type="submit" className="px-6 py-3 rounded-full text-base whitespace-nowrap">Join Waitlist</ShimmerButton>
+          <ShimmerButton type="submit" className="px-6 py-3 rounded-full text-base whitespace-nowrap w-full sm:w-auto">Join Waitlist</ShimmerButton>
         </form>
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mt-2 justify-center">
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
-          <span className="text-sm text-gray-500">{waitlistCount.toLocaleString()} people are changing the way they do research.</span>
+          <span className="text-sm text-gray-500">{waitlistCount.toLocaleString()} people already have shown interest</span>
         </div>
-      </div>
+      </main>
     </div>
   );
 } 
