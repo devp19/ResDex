@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { FaEnvelope, FaRegSadTear, FaUserGraduate, FaUser, FaBook, FaRegLightbulb } from "react-icons/fa";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { NumberTicker } from "@/components/magicui/number-ticker";
+import { BlurFade } from "@/components/magicui/blur-fade";
 
 // Custom color for primary button
 const PRIMARY_BTN_BG = '#101828';
@@ -47,6 +48,146 @@ const features = [
     desc: "All listings are vetted for authenticity and relevance.",
   },
 ];
+
+
+// Flat testimonial card grid section
+function FlatTestimonials() {
+  return (
+    <section className="w-full flex flex-col items-center justify-center mb-24 relative">
+      <div
+        className="w-full max-w-4xl columns-1 sm:columns-2 lg:columns-3 gap-6"
+      >
+        {reviews.map((review, idx) => (
+          <BlurFade key={review.username} delay={0.1 * idx} inView>
+            <div
+              className="bg-[#f5f6fa] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
+              style={{ background: '#f5f6fa' }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <img
+                  className="rounded-full w-10 h-10 object-cover"
+                  width="40"
+                  height="40"
+                  alt={review.name}
+                  src={review.img}
+                />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-sm text-neutral-800 leading-tight">{review.name}</span>
+                  <span className="text-xs text-neutral-500">{review.username}</span>
+                </div>
+              </div>
+              <blockquote className="text-sm text-neutral-700 mt-2 flex-1">{review.body}</blockquote>
+            </div>
+          </BlurFade>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Add import for Image at the top if not already present
+// import Image from "next/image";
+
+// Add reviews data (copy from home page)
+const reviews = [
+  {
+    name: "Ava Patel",
+    username: "@avapatel",
+    body: "Quick sign-up and I found a project in my field within a day!",
+    img: "https://avatar.vercel.sh/ava",
+    role: "Student, UofT"
+  },
+  {
+    name: "Lucas Kim",
+    username: "@lucaskim",
+    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors. I was able to connect with mentors who provided valuable feedback on my application, and the platform's resources made the whole process stress-free.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, McMaster"
+  },
+  {
+    name: "Priya Singh",
+    username: "@priyasingh",
+    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly. The notifications kept me updated on new opportunities, and the support team was always quick to help.",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+  {
+    name: "Mateo Alvarez",
+    username: "@mateoa",
+    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey. I especially loved the ability to join different research groups and participate in discussions.",
+    img: "https://avatar.vercel.sh/john",
+    role: "Student, UOttawa"
+  },
+  {
+    name: "Emily Chen",
+    username: "@emchen",
+    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise! The search and filter tools are incredibly helpful for narrowing down the best matches for my interests.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, UofT"
+  },
+  {
+    name: "Noah Williams",
+    username: "@noahw",
+    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here. The verification process for opportunities gave me peace of mind, and the support team was always quick to respond to my questions. I also love the regular updates and new features!",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+  {
+    name: "Sara Müller",
+    username: "@saramuller",
+    body: "Connecting with professors was seamless. I got feedback on my research proposal within days! The messaging system made it easy to keep track of all my conversations in one place.",
+    img: "https://avatar.vercel.sh/john",
+    role: "Student, McMaster"
+  },
+  {
+    name: "Omar Farouk",
+    username: "@omarfarouk",
+    body: "Verified opportunities = less stress. I was able to apply to positions knowing they were legitimate, and the application process was straightforward. I recommend ResDex to all my classmates.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, UOttawa"
+  },
+  {
+    name: "Julia Rossi",
+    username: "@juliarossi",
+    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend! The resources and guides available on the platform helped me prepare a strong application and ace my interviews. I also made some great friends through the community forums.",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+];
+
+// TestimonialCard component styled like the attached image
+function TestimonialCard({ img, name, role, body }: { img: string; name: string; role: string; body: string }) {
+  return (
+    <div className="bg-[#f7f7f8] rounded-xl p-6 max-w-sm min-h-[220px] flex flex-col items-start justify-between" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+      <span className="text-4xl text-gray-200 mb-4 select-none">&ldquo;</span>
+      <blockquote className="text-base text-gray-800 mb-6" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{body}</blockquote>
+      <div className="flex items-center gap-3 mt-auto w-full pt-2">
+        <img src={img} alt={name} className="w-8 h-8 rounded-full object-cover mt-2" />
+        <div className="flex flex-col mt-2">
+          <span className="font-bold text-sm text-gray-900" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{name}</span>
+          <span className="text-xs text-gray-400 mt-0.5" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{role}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Testimonials section
+function TestimonialsSection() {
+  return (
+    <section className="w-full flex flex-col items-center justify-center py-32 bg-white">
+      <h2 className="text-4xl md:text-6xl font-bold mb-20 text-center" style={{ fontFamily: 'GellixMedium, sans-serif', lineHeight: 1.15 }}>
+        Used by 10,000+ businesses, creators,<br className="hidden md:block" />
+        <span className="text-gray-400 font-bold">and other brands</span>
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mx-auto">
+        {reviews.slice(0, 9).map((review, idx) => (
+          <TestimonialCard key={review.name + idx} {...review} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function CanopyDemo() {
   // For background fade
@@ -196,7 +337,7 @@ export default function CanopyDemo() {
   {/* Products Section (dark, horizontally scrollable cards) */}
   <section
         ref={productsRef}
-        className="w-full min-h-screen flex flex-col items-start justify-start py-24 px-0 relative"
+        className="w-full min-h-[900px] flex flex-col items-start justify-start py-40 px-0 relative"
         style={{ background: bgColor, transition: 'background 0.4s linear' }}
       >
         <div className="w-full max-w-7xl mx-auto px-8">
@@ -406,6 +547,10 @@ export default function CanopyDemo() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      {/* <TestimonialsSection /> */}
+        <FlatTestimonials />
 
 
         
