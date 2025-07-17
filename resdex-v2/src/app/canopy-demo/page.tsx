@@ -160,7 +160,7 @@ export default function CanopyDemo() {
           </h1>
           <a
               href="#"
-              className="flex items-center gap-2 bg-[#ececec] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#c8c8c8] transition shadow-none mt-12 satoshi-medium"
+              className="flex items-center gap-2 bg-[#6B7280] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#52525b] transition shadow-none mt-12 satoshi-medium"
             >
             Explore ResDex
             <span className="ml-1">
