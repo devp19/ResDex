@@ -296,3 +296,31 @@
   font-family: 'Satoshi-Medium', sans-serif;
   font-weight: 500;
 }
+
+@font-face {
+  font-family: 'Satoshi-MediumItalic';
+  src: url('../../public/fonts/Satoshi-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+.satoshi-medium-italic {
+  font-family: 'Satoshi-MediumItalic', 'Satoshi-Medium', sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Satoshi-BoldItalic';
+  src: url('../../public/fonts/Satoshi-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+.satoshi-bold-italic {
+  font-family: 'Satoshi-BoldItalic', 'Satoshi-Bold', sans-serif;
+  font-weight: bold;
+  font-style: italic;
+}

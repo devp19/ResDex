@@ -136,9 +136,9 @@ export default function CanopyDemo() {
         <svg className="absolute left-[-15%] top-0 w-[70%] h-full z-0 pointer-events-none" width="70%" height="100%" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="maze-fade" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="white" stop-opacity="1" />
-              <stop offset="80%" stopColor="white" stop-opacity="0.2" />
-              <stop offset="100%" stopColor="white" stop-opacity="0" />
+              <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="80%" stopColor="white" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
             </linearGradient>
             <mask id="maze-mask">
               <rect x="0" y="0" width="800" height="400" fill="url(#maze-fade)" />
@@ -156,7 +156,7 @@ export default function CanopyDemo() {
         <div className="max-w-4xl w-full flex flex-col items-start justify-center px-4 mx-auto relative z-10">
           <span className="uppercase tracking-widest text-xs text-gray-400 mb-6 satoshi-medium">ResDex</span>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 satoshi-bold text-left">
-            Finding research shouldn't feel like a maze.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
+            Finding research shouldn't feel like a <span className="satoshi-bold-italic">maze</span>.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
           </h1>
           <a
               href="#"
