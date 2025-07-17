@@ -261,3 +261,11 @@
   text-wrap: balance;
   text-rendering: optimizeLegibility;
 }
+
+@font-face {
+  font-family: 'GellixMedium';
+  src: url('/fonts/Gellix-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
