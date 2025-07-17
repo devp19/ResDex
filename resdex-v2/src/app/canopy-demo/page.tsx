@@ -4,6 +4,8 @@ import Link from "next/link";
 import React from "react";
 import { motion } from "framer-motion";
 import { FaEnvelope, FaRegSadTear, FaUserGraduate } from "react-icons/fa";
+import { TextAnimate } from "@/components/magicui/text-animate";
+import { NumberTicker } from "@/components/magicui/number-ticker";
 
 // Custom color for primary button
 const PRIMARY_BTN_BG = '#101828';
@@ -167,6 +169,93 @@ export default function CanopyDemo() {
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
             </span>
           </a>
+        </div>
+      </section>
+
+      {/* Flows Section (inspired by attached image) */}
+      <section className="w-full flex flex-col items-center justify-center py-24 bg-white">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
+          Modernizing research <br></br>one {" "}
+          <span className="text-5xl md:text-5xl font-bold text-gray-500 mb-8 satoshi-bold text-left">
+            <TextAnimate by="character" animation="slideDown" duration={0.6} className="inline-block" segmentClassName="inline-block" once={false}>
+              scroll
+            </TextAnimate>
+          </span> at a time.
+        </h2>
+        <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mx-auto justify-center">
+          {/* Card 1 */}
+          <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
+            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8">
+              {/* Placeholder for video or image */}
+              <div className="w-8 h-8 border-2 border-gray-400 rounded-full animate-spin"></div>
+            </div>
+            <div className="w-full">
+              <div className="text-lg font-bold satoshi-bold mb-2">Videos</div>
+              <div className="text-gray-500 text-base satoshi-medium">
+                Experience flows the way they were meant to be experienced, complete with transitions, micro-interactions, and animations.
+              </div>
+            </div>
+          </div>
+          {/* Card 2 */}
+          <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
+            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
+              {/* Placeholder for phone UI image */}
+              <div className="text-white text-left px-4 py-8 w-full">
+                <div className="text-base leading-snug">
+                  Want to use Location Services to help you find the closest Nike Store, access in-store and location-based features, and see experiences near you?
+                </div>
+                <button className="mt-8 bg-white text-black rounded-lg px-4 py-2 text-sm satoshi-medium">Next</button>
+              </div>
+            </div>
+            <div className="w-full">
+              <div className="text-lg font-bold satoshi-bold mb-2">Prototype mode</div>
+              <div className="text-gray-500 text-base satoshi-medium">
+                Walk through flows, step by step, by using the interactive hotspots at your own preferred pace.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section (inspired by attached image) */}
+      <section className="w-full flex flex-col items-center justify-center py-20 bg-white">
+        <div className="flex flex-col md:flex-row gap-12 w-full max-w-6xl mx-auto justify-center items-start md:items-stretch">
+          {/* Stat 1 */}
+          <div className="flex-1 flex flex-col items-start text-left px-4">
+            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f7f5ee] text-[#181818] font-semibold satoshi-medium text-sm">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm0 0v4m0 4h.01"/></svg>
+              Researchers
+            </span>
+            <div className="relative flex items-baseline mb-2 mt-2">
+              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={20} startValue={0} />K</span>
+              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+            </div>
+            <div className="text-gray-500 text-base satoshi-medium">Active researchers and students on ResDex.</div>
+          </div>
+          {/* Stat 2 */}
+          <div className="flex-1 flex flex-col items-start text-left px-15 border-l border-r border-gray-200">
+            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f7f5ee] text-[#181818] font-semibold satoshi-medium text-sm">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Projects
+            </span>
+            <div className="relative flex items-baseline mb-2 mt-2">
+              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={0} />%</span>
+              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+            </div>
+            <div className="text-gray-500 text-base satoshi-medium">Research projects and opportunities listed.</div>
+          </div>
+          {/* Stat 3 */}
+          <div className="flex-1 flex flex-col items-start text-left px-4">
+            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f7f5ee] text-[#181818] font-semibold satoshi-medium text-sm">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+              Connections
+            </span>
+            <div className="relative flex items-baseline mb-2 mt-2">
+              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={89} startValue={0} />%</span>
+              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+            </div>
+            <div className="text-gray-500 text-base satoshi-medium">Connections made between students and mentors.</div>
+          </div>
         </div>
       </section>
 
