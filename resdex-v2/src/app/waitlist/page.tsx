@@ -46,7 +46,7 @@ export default function WaitlistPage() {
     if (error) {
       alert("There was an error. Please try again.");
     } else {
-      setEmail("");
+    setEmail("");
       setJoined(true);
       setTimeout(() => setJoined(false), 2000);
       setTimeout(fetchCount, 200);

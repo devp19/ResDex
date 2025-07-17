@@ -821,9 +821,9 @@ export default function Home() {
           </TextAnimate>
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
             <Link href="/waitlist">
-              <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-                <span className="text-white group-hover:text-black">Join the waitlist</span>
-              </InteractiveHoverButton>
+            <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
+              <span className="text-white group-hover:text-black">Join the waitlist</span>
+            </InteractiveHoverButton>
             </Link>
             <InteractiveHoverButton className="bg-white text-black border-black">Learn more</InteractiveHoverButton>
           </div>

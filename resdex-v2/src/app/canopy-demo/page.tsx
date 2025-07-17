@@ -49,14 +49,6 @@ const features = [
 export default function CanopyDemo() {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* SVG Curved Streaks Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <svg width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path d="M0 200 Q720 400 1440 200" stroke="#ececec" strokeWidth="2" fill="none" />
-          <path d="M0 400 Q720 600 1440 400" stroke="#f3f3f3" strokeWidth="2" fill="none" />
-          <path d="M0 600 Q720 800 1440 600" stroke="#f5f5f5" strokeWidth="2" fill="none" />
-        </svg>
-      </div>
       {/* Navbar */}
       <nav className="relative z-10 flex items-center py-6 px-8 w-full max-w-7xl mx-auto">
         {/* Logo */}
@@ -84,42 +76,50 @@ export default function CanopyDemo() {
       </nav>
      
       {/* Hero Section */}
-      <section className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] flex-1 -mt-12" style={{ fontFamily: 'GellixMedium, sans-serif', minHeight: 'calc(100vh - 100px)' }}>
-        <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl mb-6" />
-        <h1 className="text-5xl md:text-7xl font-bold text-center leading-tight text-gray-900 mb-6" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-          Rediscover<br className="sm:hidden" /> the <br></br>world of <br className="sm:hidden" /> research.
-        </h1>
-        <p className="mt-2 text-base md:text-lg text-gray-600 text-center max-w-xl mb-8" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-          ResDex is the new way to explore, connect, and stay updated with the latest in research and academia.
-        </p>
-        <div className="flex gap-4 mt-2">
-          <a
-            href="#"
-            className="flex items-center gap-2 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-none"
-            style={{ fontFamily: 'GellixMedium, sans-serif', background: PRIMARY_BTN_BG, border: 'none' }}
-            onMouseOver={e => e.currentTarget.style.background = '#23272F'}
-            onMouseOut={e => e.currentTarget.style.background = PRIMARY_BTN_BG}
-          >
-            Join Waitlist
-            <span className="ml-1">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-          </a>
-          <a
-            href="#"
-            className="flex items-center gap-2 bg-[#f7f7f9] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#ececec] transition shadow-none"
-            style={{ fontFamily: 'GellixMedium, sans-serif' }}
-          >
-            Explore ResDex
-            <span className="ml-1">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-          </a>
+      <section className="relative flex flex-col items-center justify-center min-h-[calc(100vh-100px)] flex-1 -mt-12" style={{ fontFamily: 'GellixMedium, sans-serif', minHeight: 'calc(100vh - 100px)' }}>
+        {/* SVG Curved Streaks Background - now only in hero section */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <svg width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path d="M0 200 Q720 400 1440 200" stroke="#ececec" strokeWidth="2" fill="none" />
+            <path d="M0 400 Q720 600 1440 400" stroke="#f3f3f3" strokeWidth="2" fill="none" />
+            <path d="M0 600 Q720 800 1440 600" stroke="#f5f5f5" strokeWidth="2" fill="none" />
+          </svg>
         </div>
-        
+        <div className="relative z-10 w-full flex flex-col items-center">
+          <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl mb-6" />
+          <h1 className="text-5xl md:text-7xl font-bold text-center leading-tight text-gray-900 mb-6" style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}>
+            Rediscover<br className="sm:hidden" /> the <br></br>world of <br className="sm:hidden" /> research.
+          </h1>
+          <p className="mt-2 text-base md:text-lg text-gray-600 text-center max-w-xl mb-8 satoshi-medium">
+            The new way to explore, connect, and stay updated with the latest in research and academia.
+          </p>
+          <div className="flex gap-4 mt-2">
+            <a
+              href="#"
+              className="flex items-center gap-2 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-none satoshi-medium"
+              style={{ background: PRIMARY_BTN_BG, border: 'none' }}
+              onMouseOver={e => e.currentTarget.style.background = '#23272F'}
+              onMouseOut={e => e.currentTarget.style.background = PRIMARY_BTN_BG}
+            >
+              Join Waitlist
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </a>
+            <a
+              href="#"
+              className="flex items-center gap-2 bg-[#f7f7f9] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#ececec] transition shadow-none satoshi-medium"
+            >
+              Explore ResDex
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </a>
+          </div>
+        </div>
       </section>
-       {/* Partnered Universities - straight line */}
-       <div className="relative w-full flex flex-col items-center justify-center -mt-16 mb-8">
+      {/* Partnered Universities - straight line */}
+      <div className="relative w-full flex flex-col items-center justify-center -mt-16 mb-8">
         <div className="mt-8 text-gray-500 text-sm" style={{ fontFamily: 'GellixMedium, sans-serif' }}>Trusted by students at</div>
         <div className="flex flex-row items-center justify-center gap-32 mt-6 w-full max-w-3xl mx-auto">
           <img src="/McMaster.png" alt="McMaster" className="w-20 h-20 object-contain" />
@@ -130,72 +130,49 @@ export default function CanopyDemo() {
         </div>
       </div>
 
-      {/* Problem Showcase Section */}
-      <section className="w-full flex flex-col md:flex-row items-center justify-center py-24 bg-transparent max-w-6xl mx-auto">
-        {/* Left: Floating message cards */}
-        <div className="relative flex-1 flex flex-col items-center justify-center min-h-[340px] w-full md:w-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, type: "spring" }}
-            className="absolute left-0 top-8 md:left-8 md:top-8 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 w-72 flex flex-row items-center gap-3 border border-gray-100"
-            style={{ fontFamily: 'GellixMedium, sans-serif' }}
-          >
-            <FaEnvelope className="text-2xl" style={{ color: '#c4c4bc' }} />
-            <div>
-              <div className="font-semibold text-gray-800">Cold Email</div>
-              <div className="text-gray-500 text-sm">Hi Professor, I’m interested in your research. Are there any open positions in your lab?</div>
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, type: "spring", delay: 0.2 }}
-            className="absolute right-0 top-40 md:right-8 md:top-40 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 w-72 flex flex-row items-center gap-3 border border-gray-100"
-            style={{ fontFamily: 'GellixMedium, sans-serif' }}
-          >
-            <FaRegSadTear className="text-2xl" style={{ color: '#c4c4bc' }} />
-            <div>
-              <div className="font-semibold text-gray-800">No Response</div>
-              <div className="text-gray-500 text-sm">(2 weeks later) Still waiting for a reply...</div>
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, type: "spring", delay: 0.4 }}
-            className="absolute left-1/2 -translate-x-1/2 bottom-0 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 w-72 flex flex-row items-center gap-3 border border-gray-100"
-            style={{ fontFamily: 'GellixMedium, sans-serif' }}
-          >
-            <FaUserGraduate className="text-2xl" style={{ color: '#c4c4bc' }} />
-            <div>
-              <div className="font-semibold text-gray-800">Student</div>
-              <div className="text-gray-500 text-sm">I wish there was an easier way to find research opportunities...</div>
-            </div>
-          </motion.div>
-        </div>
-        {/* Right: Headline and Description */}
-        <div className="flex-1 flex flex-col items-center md:items-start justify-center mt-96 md:mt-0 px-4 md:px-12">
-          <div className="inline-block mb-3">
-            <span className="px-4 py-1 rounded-lg text-xs font-thin" style={{ background: '#c4c4bc', color: '#fff', fontFamily: 'GellixMedium, sans-serif' }}>
-              Problem
+      {/* Minimalist Hero Section (inspired by screenshot) */}
+      <section className="w-full flex flex-col items-center justify-center py-32 bg-[#FAFAF8] relative overflow-hidden">
+        {/* Maze SVG background */}
+        <svg className="absolute left-[-15%] top-0 w-[70%] h-full z-0 pointer-events-none" width="70%" height="100%" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="maze-fade" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="white" stop-opacity="1" />
+              <stop offset="80%" stopColor="white" stop-opacity="0.2" />
+              <stop offset="100%" stopColor="white" stop-opacity="0" />
+            </linearGradient>
+            <mask id="maze-mask">
+              <rect x="0" y="0" width="800" height="400" fill="url(#maze-fade)" />
+            </mask>
+          </defs>
+          <g opacity="0.07" mask="url(#maze-mask)">
+            <path d="M 100 50 Q 200 100 100 150 Q 0 200 100 250 Q 200 300 100 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 300 50 Q 400 100 300 150 Q 200 200 300 250 Q 400 300 300 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 500 50 Q 600 100 500 150 Q 400 200 500 250 Q 600 300 500 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 700 50 Q 800 100 700 150 Q 600 200 700 250 Q 800 300 700 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <circle cx="400" cy="200" r="120" stroke="#101117" strokeWidth="1.5" fill="none"/>
+            <rect x="50" y="100" width="700" height="200" rx="100" stroke="#101117" strokeWidth="1" fill="none"/>
+          </g>
+        </svg>
+        <div className="max-w-4xl w-full flex flex-col items-start justify-center px-4 mx-auto relative z-10">
+          <span className="uppercase tracking-widest text-xs text-gray-400 mb-6 satoshi-medium">ResDex</span>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 satoshi-bold text-left">
+            Finding research shouldn't feel like a maze.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
+          </h1>
+          <a
+              href="#"
+              className="flex items-center gap-2 bg-[#ececec] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#c8c8c8] transition shadow-none mt-12 satoshi-medium"
+            >
+            Explore ResDex
+            <span className="ml-1">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
             </span>
-          </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 text-center md:text-left" style={{ fontFamily: 'GellixMedium, sans-serif', color: '#101117' }}>
-            Research is hard.<br />
-            <span className="text-gray-400">Cold emailing is harder.</span>
-          </h2>
-          <p className="text-gray-600 text-lg max-w-xl mb-4 text-center md:text-left" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-            You send dozens of emails, wait for replies, and rarely hear back. Finding research opportunities shouldn’t be this difficult.
-          </p>
-          <p className="text-base max-w-xl text-center md:text-left" style={{ fontFamily: 'GellixMedium, sans-serif', color: '#c4c4bc' }}>
-            What if there was a better way to connect with mentors and labs?
-          </p>
+          </a>
         </div>
       </section>
+
+        
+
+     
       
       {/* Modern Rounded Rectangle Section */}
       <section className="w-full flex flex-col items-center justify-center py-24 bg-transparent">
@@ -213,11 +190,11 @@ export default function CanopyDemo() {
             </g>
           </svg>
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'GellixMedium, sans-serif', color: '#fff' }}>
-            We're building the biggest research hub in the world.<br />
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 satoshi-bold" style={{ color: '#fff' }}>
+              We're building the biggest research hub in the world.<br />
               <span className="text-[#c4c4bc]">and you're in the center of it.</span>
             </h2>
-            <p className="text-gray-300 text-lg max-w-xl mb-8" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+            <p className="text-gray-300 text-lg max-w-xl mb-8 satoshi-medium">
               Purpose built for students and researchers, our modern platform lets you discover, connect, and grow your academic impact with ease.
             </p>
             <a
@@ -234,8 +211,8 @@ export default function CanopyDemo() {
         </div>
       </section>
      
+
       
-     
     </div>
   );
 } 

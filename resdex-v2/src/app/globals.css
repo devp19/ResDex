@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('/fonts/satoshi.css');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -268,4 +269,30 @@
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi-Bold';
+  src: url('../../public/fonts/Satoshi-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+.satoshi-bold {
+  font-family: 'Satoshi-Bold', sans-serif;
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Satoshi-Medium';
+  src: url('../../public/fonts/Satoshi-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+.satoshi-medium {
+  font-family: 'Satoshi-Medium', sans-serif;
+  font-weight: 500;
 }
