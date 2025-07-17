@@ -820,9 +820,11 @@ export default function Home() {
             {`Explore, connect, and stay updated with the latest in research and academia.`}
           </TextAnimate>
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-              <span className="text-white group-hover:text-black">Join the waitlist</span>
-            </InteractiveHoverButton>
+            <Link href="/waitlist">
+              <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
+                <span className="text-white group-hover:text-black">Join the waitlist</span>
+              </InteractiveHoverButton>
+            </Link>
             <InteractiveHoverButton className="bg-white text-black border-black">Learn more</InteractiveHoverButton>
           </div>
           <div className="supporting mt-20 mb-2 text-center">Used by students at</div>

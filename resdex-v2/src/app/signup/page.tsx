@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -8,6 +8,8 @@ import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe
 import { ChevronRightIcon, CheckIcon } from "lucide-react";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { use3dTilt } from "@/hooks/use3dTilt";
+
+
 
 const SignupPage: React.FC = () => {
   const router = useRouter();
@@ -22,6 +24,39 @@ const SignupPage: React.FC = () => {
   const [usernameAvailable, setUsernameAvailable] = useState<null | boolean>(null);
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const tiltLogo = use3dTilt();
+
+
+  
+
+  // REMOVE THIS BLOCK TO RESTORE SIGNUP PAGE FUNCTIONALITY
+    // REMOVE THIS BLOCK TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+      // REMOVE THIS BLOCK TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+        // REMOVE THIS BLOCK TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+          // REMOVE THIS BLOCK TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+  useEffect(() => {
+    // --- TEMPORARY REDIRECT: Remove this block to restore signup page functionality ---
+    router.replace("/waitlist");
+    // --- END TEMPORARY REDIRECT ---
+  }, [router]);
+
+    // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+        // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+            // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+                // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+                    // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+                        // REMOVE THIS BLOCK ABOVE TO RESTORE SIGNUP PAGE FUNCTIONALITY
+
+
+
+
 
   // Function to check username availability
   async function checkUsernameAvailability(username: string) {

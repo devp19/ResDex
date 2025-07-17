@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar, NavBody, NavItems, NavbarLogo } from "@/components/ui/navbar";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { BlurFade } from "@/components/magicui/blur-fade";
@@ -7,6 +7,7 @@ import { TextAnimate } from "@/components/magicui/text-animate";
 import { PointerHighlight } from "@/components/ui/pointer-highlight";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -19,15 +20,40 @@ const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
 
 export default function WaitlistPage() {
   const [email, setEmail] = useState("");
-  // Placeholder for live count (replace with real fetch logic)
-  const [waitlistCount] = useState(438);
+  const [waitlistCount, setWaitlistCount] = useState(0);
+  const [joined, setJoined] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Add waitlist submission logic
-    alert("You have been added to the waitlist!");
-    setEmail("");
+  const fetchCount = async () => {
+    try {
+      const res = await fetch('/api/waitlist-count');
+      const data = await res.json();
+      setWaitlistCount(data.count);
+      console.log("Waitlist count:", data.count);
+    } catch (error) {
+      console.error("Error fetching waitlist count:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchCount();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase
+      .from("waitlist")
+      .insert([{ email }]);
+    if (error) {
+      alert("There was an error. Please try again.");
+    } else {
+      setEmail("");
+      setJoined(true);
+      setTimeout(() => setJoined(false), 2000);
+      setTimeout(fetchCount, 200);
+    }
+  };
+
+  // Remove offset and displayCount logic from frontend
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden px-4 sm:px-6 md:px-8">
@@ -70,7 +96,13 @@ export default function WaitlistPage() {
             className="flex-1 px-4 py-3 rounded-full border border-gray-200 bg-white text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a] shadow-sm placeholder:text-gray-400 transition w-full"
             style={{ minWidth: 0 }}
           />
-          <ShimmerButton type="submit" className="px-6 py-3 rounded-full text-base whitespace-nowrap w-full sm:w-auto">Join Waitlist</ShimmerButton>
+          <ShimmerButton
+            type="submit"
+            className={`px-6 py-3 rounded-full text-base whitespace-nowrap w-full sm:w-auto transition-all duration-300 ${joined ? "bg-green-500 text-white scale-105" : ""}`}
+            disabled={joined}
+          >
+            {joined ? "Joined Waitlist!" : "Join Waitlist"}
+          </ShimmerButton>
         </form>
         <div className="flex items-center gap-2 mt-2 justify-center">
           <span className="relative flex h-3 w-3">
