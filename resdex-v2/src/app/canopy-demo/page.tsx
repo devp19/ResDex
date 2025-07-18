@@ -550,6 +550,7 @@ export default function CanopyDemo() {
 
       {/* Testimonials Section */}
       {/* <TestimonialsSection /> */}
+      <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See what our users <br></br>have to say.</h2>
         <FlatTestimonials />
 
 
