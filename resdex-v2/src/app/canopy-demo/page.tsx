@@ -7,6 +7,7 @@ import { FaEnvelope, FaRegSadTear, FaUserGraduate, FaUser, FaBook, FaRegLightbul
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { use3dTilt } from "@/hooks/use3dTilt";
 
 // Custom color for primary button
 const PRIMARY_BTN_BG = '#101828';
@@ -60,8 +61,8 @@ function FlatTestimonials() {
         {reviews.map((review, idx) => (
           <BlurFade key={review.username} delay={0.1 * idx} inView>
             <div
-              className="bg-[#f5f6fa] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
-              style={{ background: '#f5f6fa' }}
+              className="bg-[#f5f5f5] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
+              style={{ background: '#f5f5f5' }}
             >
               <div className="flex items-center gap-3 mb-2">
                 <img
@@ -193,6 +194,7 @@ export default function CanopyDemo() {
   // For background fade
   const productsRef = useRef<HTMLDivElement | null>(null);
   const [bgColor, setBgColor] = useState('#fff'); // initial white
+  const tiltLogo = use3dTilt();
 
   useEffect(() => {
     const section = productsRef.current;
@@ -250,49 +252,101 @@ export default function CanopyDemo() {
           </svg>
         </div>
         <div className="relative z-10 w-full flex flex-col items-center">
-          <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl mb-6" />
-          <h1 className="text-5xl md:text-7xl font-bold text-center leading-tight text-gray-900 mb-6" style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}>
-            Rediscover<br className="sm:hidden" /> the <br></br>world of <br className="sm:hidden" /> research.
-          </h1>
-          <p className="mt-2 text-base md:text-lg text-gray-600 text-center max-w-xl mb-8 satoshi-medium">
+          <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-6 inline-block">
+            <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl" />
+          </div>
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="h1"
+            className="text-5xl md:text-7xl font-bold text-center leading-tight text-gray-900 mb-6 max-w-2xl mx-auto"
+            style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}
+          >
+            {`Rediscover the world of research.`}
+          </TextAnimate>
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="p"
+            className="mt-2 text-base md:text-lg text-gray-600 text-center max-w-xl mb-8 satoshi-medium"
+          >
             The new way to explore, connect, and stay updated with the latest in research and academia.
-          </p>
-          <div className="flex gap-4 mt-2">
-            <a
+          </TextAnimate>
+          <motion.div
+            className="flex gap-4 mt-2"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {},
+            }}
+          >
+            <motion.a
               href="#"
               className="flex items-center gap-2 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-none satoshi-medium"
               style={{ background: PRIMARY_BTN_BG, border: 'none' }}
               onMouseOver={e => e.currentTarget.style.background = '#23272F'}
               onMouseOut={e => e.currentTarget.style.background = PRIMARY_BTN_BG}
+              variants={{
+                hidden: { opacity: 0, y: 32 },
+                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+              }}
             >
               Join Waitlist
               <span className="ml-1">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
               </span>
-            </a>
-            <a
+            </motion.a>
+            <motion.a
               href="#"
               className="flex items-center gap-2 bg-[#f7f7f9] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#ececec] transition shadow-none satoshi-medium"
+              variants={{
+                hidden: { opacity: 0, y: 32 },
+                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+              }}
             >
               Explore ResDex
               <span className="ml-1">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
               </span>
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </div>
       </section>
       {/* Partnered Universities - straight line */}
-      <div className="relative w-full flex flex-col items-center justify-center -mt-16 mb-8">
-        <div className="mt-8 text-gray-500 text-sm" style={{ fontFamily: 'GellixMedium, sans-serif' }}>Trusted by students at</div>
-        <div className="flex flex-row items-center justify-center gap-32 mt-6 w-full max-w-3xl mx-auto">
-          <img src="/McMaster.png" alt="McMaster" className="w-20 h-20 object-contain" />
-          <img src="/TMU.png" alt="TMU" className="w-20 h-20 object-contain" />
-          <img src="/Laurier.png" alt="Laurier" className="w-20 h-20 object-contain" />
-          <img src="/UOFT.png" alt="UofT" className="w-20 h-20 object-contain" />
-          <img src="/UOttawa.png" alt="Ottawa" className="w-20 h-20 object-contain" />
-        </div>
-      </div>
+      <motion.div
+        className="relative w-full flex flex-col items-center justify-center -mt-16 mb-8"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {},
+        }}
+      >
+        <motion.div
+          className="mt-8 text-gray-500 text-sm"
+          style={{ fontFamily: 'GellixMedium, sans-serif' }}
+          variants={{
+            hidden: { opacity: 0, y: 32 },
+            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+          }}
+        >
+          Trusted by students at
+        </motion.div>
+        <motion.div
+          className="flex flex-row items-center justify-center gap-32 mt-6 w-full max-w-3xl mx-auto"
+          variants={{
+            hidden: { opacity: 0, y: 32 },
+            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+          }}
+        >
+          <motion.img src="/McMaster.png" alt="McMaster" className="w-20 h-20 object-contain" />
+          <motion.img src="/TMU.png" alt="TMU" className="w-20 h-20 object-contain" />
+          <motion.img src="/Laurier.png" alt="Laurier" className="w-20 h-20 object-contain" />
+          <motion.img src="/UOFT.png" alt="UofT" className="w-20 h-20 object-contain" />
+          <motion.img src="/UOttawa.png" alt="Ottawa" className="w-20 h-20 object-contain" />
+        </motion.div>
+      </motion.div>
 
       {/* Minimalist Hero Section (inspired by screenshot) */}
       <section className="w-full flex flex-col items-center justify-center py-32 bg-[#FAFAF8] relative overflow-hidden">
@@ -550,7 +604,7 @@ export default function CanopyDemo() {
 
       {/* Testimonials Section */}
       {/* <TestimonialsSection /> */}
-      <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See what our users <br></br>have to say.</h2>
+      <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See why students and researchers <br></br> love ResDex.</h2>
         <FlatTestimonials />
 
 

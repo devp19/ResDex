@@ -1,5 +1,6 @@
 import React from "react";
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { SiX } from "react-icons/si";
 import { TextAnimate } from "@/components/magicui/text-animate";
 
 interface Footer7Props {
@@ -58,8 +59,7 @@ const defaultSections = [
 
 const defaultSocialLinks = [
   { icon: <FaInstagram className="size-5" />, href: "#", label: "Instagram" },
-  { icon: <FaFacebook className="size-5" />, href: "#", label: "Facebook" },
-  { icon: <FaTwitter className="size-5" />, href: "#", label: "Twitter" },
+  { icon: <SiX className="size-5" />, href: "#", label: "Twitter/X" },
   { icon: <FaLinkedin className="size-5" />, href: "#", label: "LinkedIn" },
 ];
 

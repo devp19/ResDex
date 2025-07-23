@@ -528,6 +528,7 @@ export default function Home() {
   const tilt1 = use3dTilt();
   const tilt2 = use3dTilt();
   const tilt3 = use3dTilt();
+  const tiltLogo = use3dTilt();
   const afterHeroRef = useRef<HTMLDivElement>(null);
   const [showDock, setShowDock] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -797,9 +798,9 @@ export default function Home() {
         </Navbar>
         {/* Main content */}
         <div className="w-full flex flex-col items-center justify-center min-h-screen">
-          <Tilt glareEnable={true} glareMaxOpacity={0.08} glareColor="#fff" glarePosition="all" scale={1.01} transitionSpeed={2500} className="mb-4">
+          <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-4 inline-block">
             <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
-          </Tilt>
+          </div>
           <BlurFade delay={0.1} inView>
             <TextAnimate
               animation="fadeIn"
