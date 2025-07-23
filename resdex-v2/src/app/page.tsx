@@ -1,493 +1,56 @@
 "use client";
-
 import Image from "next/image";
-import { TextAnimate } from "@/components/magicui/text-animate";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
-import { Dock, DockIcon } from "@/components/magicui/dock";
-import React, { useEffect, useState, useRef, RefObject } from "react";
 import Link from "next/link";
-import { HomeIcon, PencilIcon, MailIcon, CalendarIcon, ChevronDownIcon, ChevronDown } from "lucide-react";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { Separator } from "@/components/ui/separator";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Marquee } from "@/components/magicui/marquee";
-import { TextReveal, TextRevealWithVerticalSlot } from "@/components/magicui/text-reveal";
+import React, { useRef, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { FaEnvelope, FaRegSadTear, FaUserGraduate, FaUser, FaBook, FaRegLightbulb } from "react-icons/fa";
+import { TextAnimate } from "@/components/magicui/text-animate";
 import { NumberTicker } from "@/components/magicui/number-ticker";
-import dynamic from "next/dynamic";
-import { use3dTilt } from "@/hooks/use3dTilt";
-import { WordRotate } from "@/components/magicui/word-rotate";
-import { VelocityScroll } from "@/components/magicui/scroll-based-velocity";
-import { BentoGrid, BentoCard } from "@/components/magicui/bento-grid";
-import AnimatedBeamMultipleOutputDemo from "@/components/magicui/animated-beam-multiple-outputs";
-import { FileTextIcon, Share2Icon } from "@radix-ui/react-icons";
-import { AnimatedList } from "@/components/magicui/animated-list";
-import { TrendingDown, TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis, Tooltip as RechartsTooltip } from "recharts";
-import { Users, School, BrainCircuit } from "lucide-react";
-import { Ripple } from "@/components/magicui/ripple";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Footer7 } from "@/components/footer7";
-import { FaInstagram, FaDiscord } from "react-icons/fa";
-import {
-  Navbar,
-  NavBody,
-  NavItems,
-  MobileNav,
-  MobileNavHeader,
-  MobileNavMenu,
-  MobileNavToggle,
-  NavbarLogo,
-  NavbarButton
-} from "@/components/ui/navbar";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
-import { FeaturesSectionDemo } from "@/components/ui/features-section-demo";
-import { Timeline } from "@/components/ui/timeline";
-import { Check } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
-import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { use3dTilt } from "@/hooks/use3dTilt";
+import { useRouter } from 'next/navigation';
 
-const Tilt = dynamic(() => import("react-parallax-tilt"), { ssr: false });
+// Custom color for primary button
+const PRIMARY_BTN_BG = '#101828';
 
-export type IconProps = React.HTMLAttributes<SVGElement>;
-
-const Icons = {
-  calendar: (props: IconProps) => <CalendarIcon {...props} />, 
-  email: (props: IconProps) => <MailIcon {...props} />, 
-  linkedin: (props: IconProps) => (
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <title>LinkedIn</title>
-      <path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-    </svg>
-  ),
-  x: (props: IconProps) => (
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <title>X</title>
-      <path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
-    </svg>
-  ),
-  youtube: (props: IconProps) => (
-    <svg width="32px" height="32px" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <title>youtube</title>
-      <path d="M29.41,9.26a3.5,3.5,0,0,0-2.47-2.47C24.76,6.2,16,6.2,16,6.2s-8.76,0-10.94.59A3.5,3.5,0,0,0,2.59,9.26,36.13,36.13,0,0,0,2,16a36.13,36.13,0,0,0,.59,6.74,3.5,3.5,0,0,0,2.47,2.47C7.24,25.8,16,25.8,16,25.8s8.76,0,10.94-.59a3.5,3.5,0,0,0,2.47-2.47A36.13,36.13,0,0,0,30,16,36.13,36.13,0,0,0,29.41,9.26ZM13.2,20.2V11.8L20.47,16Z" />
-    </svg>
-  ),
-  github: (props: IconProps) => (
-    <svg viewBox="0 0 438.549 438.549" {...props}>
-      <path
-        fill="currentColor"
-        d="M409.132 114.573c-19.608-33.596-46.205-60.194-79.798-79.8-33.598-19.607-70.277-29.408-110.063-29.408-39.781 0-76.472 9.804-110.063 29.408-33.596 19.605-60.192 46.204-79.8 79.8C9.803 148.168 0 184.854 0 224.63c0 47.78 13.94 90.745 41.827 128.906 27.884 38.164 63.906 64.572 108.063 79.227 5.14.954 8.945.283 11.419-1.996 2.475-2.282 3.711-5.14 3.711-8.562 0-.571-.049-5.708-.144-15.417a2549.81 2549.81 0 01-.144-25.406l-6.567 1.136c-4.187.767-9.469 1.092-15.846 1-6.374-.089-12.991-.757-19.842-1.999-6.854-1.231-13.229-4.086-19.13-8.559-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-.951-2.568-2.098-3.711-3.429-1.142-1.331-1.997-2.663-2.568-3.997-.572-1.335-.098-2.43 1.427-3.289 1.525-.859 4.281-1.276 8.28-1.276l5.708.853c3.807.763 8.516 3.042 14.133 6.851 5.614 3.806 10.229 8.754 13.846 14.842 4.38 7.806 9.657 13.754 15.846 17.847 6.184 4.093 12.419 6.136 18.699 6.136 6.28 0 11.704-.476 16.274-1.423 4.565-.952 8.848-2.383 12.847-4.285 1.713-12.758 6.377-22.559 13.988-29.41-10.848-1.14-20.601-2.857-29.264-5.14-8.658-2.286-17.605-5.996-26.835-11.14-9.235-5.137-16.896-11.516-22.985-19.126-6.09-7.614-11.088-17.61-14.987-29.979-3.901-12.374-5.852-26.648-5.852-42.826 0-23.035 7.52-42.637 22.557-58.817-7.044-17.318-6.379-36.732 1.997-58.24 5.52-1.715 13.706-.428 24.554 3.853 10.85 4.283 18.794 7.952 23.84 10.994 5.046 3.041 9.089 5.618 12.135 7.708 17.705-4.947 35.976-7.421 54.818-7.421s37.117 2.474 54.823 7.421l10.849-6.849c7.419-4.57 16.18-8.758 26.262-12.565 10.088-3.805 17.802-4.853 23.134-3.138 8.562 21.509 9.325 40.922 2.279 58.24 15.036 16.18 22.559 35.787 22.559 58.817 0 16.178-1.958 30.497-5.853 42.966-3.9 12.471-8.941 22.457-15.125 29.979-6.191 7.521-13.901 13.85-23.131 18.986-9.232 5.14-18.182 8.85-26.84 11.136-8.662 2.286-18.415 4.004-29.263 5.146 9.894 8.562 14.842 22.077 14.842 40.539v60.237c0 3.422 1.19 6.279 3.572 8.562 2.379 2.279 6.136 2.95 11.276 1.995 44.163-14.653 80.185-41.062 108.068-79.226 27.88-38.161 41.825-81.126 41.825-128.906-.01-39.771-9.818-76.454-29.414-110.049z"
-      />
-    </svg>
-  ),
-};
-
-const DATA = {
-  navbar: [
-    { href: "#", icon: HomeIcon, label: "Home" },
-    { href: "#", icon: PencilIcon, label: "Blog" },
-  ],
-  contact: {
-    social: {
-      GitHub: {
-        name: "GitHub",
-        url: "#",
-        icon: Icons.github,
-      },
-      LinkedIn: {
-        name: "LinkedIn",
-        url: "#",
-        icon: Icons.linkedin,
-      },
-      X: {
-        name: "X",
-        url: "#",
-        icon: Icons.x,
-      },
-      email: {
-        name: "Send Email",
-        url: "#",
-        icon: Icons.email,
-      },
-    },
-  },
-};
-
-// Marquee3D review data and components
-const reviews = [
-  {
-    name: "Ava Patel",
-    username: "@avapatel",
-    body: "Quick sign-up and I found a project in my field within a day!",
-    img: "https://avatar.vercel.sh/ava",
-  },
-  {
-    name: "Lucas Kim",
-    username: "@lucaskim",
-    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors. I was able to connect with mentors who provided valuable feedback on my application, and the platform's resources made the whole process stress-free.",
-    img: "https://avatar.vercel.sh/jack",
-  },
-  {
-    name: "Priya Singh",
-    username: "@priyasingh",
-    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly. The notifications kept me updated on new opportunities, and the support team was always quick to help.",
-    img: "https://avatar.vercel.sh/jill",
-  },
-  {
-    name: "Mateo Alvarez",
-    username: "@mateoa",
-    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey. I especially loved the ability to join different research groups and participate in discussions.",
-    img: "https://avatar.vercel.sh/john",
-  },
-  {
-    name: "Emily Chen",
-    username: "@emchen",
-    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise! The search and filter tools are incredibly helpful for narrowing down the best matches for my interests.",
-    img: "https://avatar.vercel.sh/jack",
-  },
-  {
-    name: "Noah Williams",
-    username: "@noahw",
-    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here. The verification process for opportunities gave me peace of mind, and the support team was always quick to respond to my questions. I also love the regular updates and new features!",
-    img: "https://avatar.vercel.sh/jill",
-  },
-  {
-    name: "Sara Müller",
-    username: "@saramuller",
-    body: "Connecting with professors was seamless. I got feedback on my research proposal within days! The messaging system made it easy to keep track of all my conversations in one place.",
-    img: "https://avatar.vercel.sh/john",
-  },
-  {
-    name: "Omar Farouk",
-    username: "@omarfarouk",
-    body: "Verified opportunities = less stress. I was able to apply to positions knowing they were legitimate, and the application process was straightforward. I recommend ResDex to all my classmates.",
-    img: "https://avatar.vercel.sh/jack",
-  },
-  {
-    name: "Julia Rossi",
-    username: "@juliarossi",
-    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend! The resources and guides available on the platform helped me prepare a strong application and ace my interviews. I also made some great friends through the community forums.",
-    img: "https://avatar.vercel.sh/jill",
-  },
-];
-
-const firstRow = reviews.slice(0, 2);
-const secondRow = reviews.slice(2, 4);
-const thirdRow = reviews.slice(4, 6);
-const fourthRow = reviews.slice(6, 8);
-
-const ReviewCard = ({ img, name, username, body }: { img: string; name: string; username: string; body: string }) => (
-  <figure
-    className={cn(
-      "relative h-full w-fit sm:w-36 cursor-pointer overflow-hidden rounded-xl border p-4",
-      "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-      "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-    )}
-  >
-    <div className="flex flex-row items-center gap-2">
-      <img className="rounded-full" width="32" height="32" alt="" src={img} />
-      <div className="flex flex-col">
-        <figcaption className="text-sm font-medium dark:text-white">{name}</figcaption>
-        <p className="text-xs font-medium dark:text-white/40">{username}</p>
-      </div>
-    </div>
-    <blockquote className="mt-2 text-sm">{body}</blockquote>
-  </figure>
+// Placeholder SVGs for floating shapes
+const FloatingShape = ({ className, style, children }: any) => (
+  <div className={className} style={{ position: 'absolute', ...style }}>
+    {children}
+  </div>
 );
-
-function Marquee3D() {
-  return (
-    <div className="relative flex h-[32rem] max-w-7xl mx-auto flex-row items-center justify-center gap-4 overflow-hidden [perspective:300px]">
-      <div
-        className="flex flex-row items-center gap-4 w-full"
-        style={{
-          transform:
-            "translateX(-100px) translateY(0px) translateZ(-100px) rotateX(20deg) rotateY(-10deg) rotateZ(20deg)",
-        }}
-      >
-        <Marquee pauseOnHover vertical className="[--duration:20s]">
-          {firstRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
-          ))}
-        </Marquee>
-        <Marquee reverse pauseOnHover className="[--duration:20s]" vertical>
-          {secondRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
-          ))}
-        </Marquee>
-        <Marquee reverse pauseOnHover className="[--duration:20s]" vertical>
-          {thirdRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
-          ))}
-        </Marquee>
-        <Marquee pauseOnHover className="[--duration:20s]" vertical>
-          {fourthRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
-          ))}
-        </Marquee>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-background"></div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background"></div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
-    </div>
-  );
-}
-
-// Notification demo data and component
-const notifications = Array.from({ length: 10 }, () => [
-  {
-    name: "New follow request!",
-    description: "Tirth Patel sent you a follow request!",
-    time: "15m ago",
-    icon: (
-      <img
-        src="https://github.com/impateltirth.png"
-        alt="Dev Patel"
-        className="w-6 h-6 rounded-full"
-      />
-    ),
-    color: "#00C9A7",
-  },
-  {
-    name: "New Comment",
-    description: "Aaryan Bhavsar commented!",
-    time: "10m ago",
-    icon: "👤",
-    color: "#FFB800",
-  },
-  {
-    name: "Hey! How are you?",
-    description: "Dev Patel sent you a message",
-    time: "5m ago",
-    icon: (
-      <img
-        src="https://github.com/devp19.png"
-        alt="Dev Patel"
-        className="w-6 h-6 rounded-full"
-      />
-    ),
-    color: "#FF3D71",
-  },
-  {
-    name: "Loves your paper!",
-    description: "Fenil Shah liked your paper",
-    time: "2m ago",
-    icon: (
-      <img
-        src="https://github.com/Fshah05.png"
-        alt="Fenil Shah"
-        className="w-6 h-6 rounded-full"
-      />
-    ),
-    color: "#1E86FF",
-  },
-]).flat();
-
-interface NotificationProps {
-  name: string;
-  description: string;
-  icon: string | React.ReactNode;
-  color: string;
-  time: string;
-  small?: boolean;
-}
-
-const Notification = ({ name, description, icon, color, time, small = false }: NotificationProps) => {
-  return (
-    <figure
-      className={cn(
-        small
-          ? "relative mx-auto min-h-fit w-full max-w-[260px] cursor-pointer overflow-hidden rounded-xl p-2"
-          : "relative mx-auto min-h-fit w-full max-w-[400px] cursor-pointer overflow-hidden rounded-2xl p-4",
-        // animation styles
-        small
-          ? "transition-all duration-200 ease-in-out hover:scale-[102%]"
-          : "transition-all duration-200 ease-in-out hover:scale-[103%]",
-        // light styles
-        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-        // dark styles
-        "transform-gpu dark:bg-transparent dark:backdrop-blur-md dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
-      )}
-    >
-      <div className="flex flex-row items-center gap-3">
-        <div
-          className={small ? "flex size-7 items-center justify-center rounded-xl" : "flex size-10 items-center justify-center rounded-2xl"}
-          style={{ backgroundColor: color }}
-        >
-          {typeof icon === "string" ? (
-            <span className={small ? "text-base" : "text-lg"}>{icon}</span>
-          ) : (
-            icon
-          )}
-        </div>
-        <div className="flex flex-col overflow-hidden">
-          <figcaption className={small ? "flex flex-row items-center whitespace-pre text-[15px] font-medium dark:text-white" : "flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white"}>
-            <span className={small ? "text-xs sm:text-sm" : "text-sm sm:text-lg"}>{name}</span>
-            <span className="mx-1">·</span>
-            <span className={small ? "text-[10px] text-gray-500" : "text-xs text-gray-500"}>{time}</span>
-          </figcaption>
-          <p className={small ? "text-xs font-normal dark:text-white/60" : "text-sm font-normal dark:text-white/60"}>{description}</p>
-        </div>
-      </div>
-    </figure>
-  );
-};
-
-function AnimatedListDemo({ className = "" }) {
-  return (
-    <div className={cn(
-      "relative flex h-[180px] w-full flex-col overflow-hidden p-1 mt-2",
-      className
-    )}>
-      <AnimatedList>
-        {notifications.map((item, idx) => (
-          <Notification {...item} key={idx} small />
-        ))}
-      </AnimatedList>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background"></div>
-    </div>
-  );
-}
-
-// Placeholder Calendar
-const Calendar = ({ className = "" }) => (
-  <div className={`flex items-center justify-center h-full w-full text-center text-neutral-400 ${className}`}>Calendar</div>
-);
-
-const files = [
-  {
-    name: "quantum-computing.pdf",
-    body: "Quantum computing is a field of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data.",
-  },
-  {
-    name: "large-language-models.pdf",
-    body: "Large language models are a type of machine learning model that are trained on large amounts of text data. They are used to generate text, translate text, and answer questions.",
-  },
-  {
-    name: "ai-in-research.pdf",
-    body: "AI is being used in research to help with tasks such as literature review, data analysis, and writing.",
-  },
-  {
-    name: "cell-phone-networks.pdf",
-    body: "Cell phone networks are a type of wireless network that are used to communicate between devices.",
-  },
-  {
-    name: "psychology.pdf",
-    body: "Psychology is the study of the mind and behavior. It is a science that seeks to understand how people think, feel, and behave.",
-  },
-];
 
 const features = [
   {
-    Icon: FileTextIcon,
-    name: "Create",
-    description: "Let your ideas come to life right in your profile.",
-    href: "#",
-    cta: "Learn more",
-    className: "col-span-3 lg:col-span-1",
-    background: (
-      <Marquee
-        pauseOnHover={false}
-        className="absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] "
-      >
-        {files.map((f, idx) => (
-          <figure
-            key={idx}
-            className={cn(
-              "relative w-32 cursor-pointer overflow-hidden rounded-xl border p-4",
-              "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-              "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-              "transform-gpu blur-[1px] transition-all duration-300 ease-out hover:blur-none",
-            )}
-          >
-            <div className="flex flex-row items-center gap-2">
-              <div className="flex flex-col">
-                <figcaption className="text-sm font-medium dark:text-white ">{f.name}</figcaption>
-              </div>
-            </div>
-            <blockquote className="mt-2 text-xs">{f.body}</blockquote>
-          </figure>
-        ))}
-      </Marquee>
+    icon: (
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#101828" strokeWidth="2"/><path d="M8 12h8M12 8v8" stroke="#101828" strokeWidth="2" strokeLinecap="round"/></svg>
     ),
+    title: "Discovery",
+    desc: "Find research opportunities, labs, and mentors across universities.",
   },
   {
-    Icon: Users,
-    name: "Connect",
-    description: "Collaborate with other students and professors to get your research done. We're building a community of researchers.",
-    href: "#",
-    cta: "Learn more",
-    className: "col-span-3 lg:col-span-2",
-    background: (
-      <AnimatedListDemo className="absolute right-2 top-4 h-[300px] w-full scale-75 border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90" />
+    icon: (
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" stroke="#101828" strokeWidth="2"/><path d="M8 16v-4a4 4 0 118 0v4" stroke="#101828" strokeWidth="2"/></svg>
     ),
+    title: "Portfolio",
+    desc: "Showcase your work, skills, and academic journey.",
   },
   {
-    Icon: School,
-    name: "Affiliations",
-    description: "Supports organization portals to find your next research opportunity.",
-    href: "#",
-    cta: "Learn more",
-    className: "col-span-3 lg:col-span-2",
-    background: (
-      <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out filter grayscale [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
+    icon: (
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3" stroke="#101828" strokeWidth="2"/><circle cx="16" cy="12" r="3" stroke="#101828" strokeWidth="2"/><path d="M8 15c-2.5 0-4 1.5-4 3v1h8v-1c0-1.5-1.5-3-4-3zm8 0c-2.5 0-4 1.5-4 3v1h8v-1c0-1.5-1.5-3-4-3z" stroke="#101828" strokeWidth="2"/></svg>
     ),
+    title: "Community",
+    desc: "Connect with peers, join discussions, and get feedback.",
   },
   {
-    Icon: BrainCircuit,
-    name: "Brainwave",
-    description: "The ResDex way of blog-posting. Share your thoughts and ideas with the world.",
-    className: "col-span-3 lg:col-span-1",
-    href: "#",
-    cta: "Learn more",
-    background: (
-      <Ripple className="absolute inset-0" mainCircleSize={120} mainCircleOpacity={0.12} />
+    icon: (
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#101828" strokeWidth="2"/><path d="M9 12l2 2 4-4" stroke="#12B76A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
     ),
+    title: "Verified",
+    desc: "All listings are vetted for authenticity and relevance.",
   },
 ];
 
-// Custom tooltip for the AreaChart
-function CustomChartTooltip(props: any) {
-  const { active, payload, label } = props;
-  if (!active || !payload || !payload.length) return null;
-  const platform = payload.find((p: any) => p.dataKey === "platform");
-  const coldEmail = payload.find((p: any) => p.dataKey === "coldEmail");
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white/90 px-4 py-2 shadow-xl text-sm text-gray-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-gray-100">
-      <div className="font-semibold mb-1">{label}</div>
-      <div className="flex flex-col gap-1">
-        {platform && (
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f5f5f5', border: '1px solid #e5e5e5' }} />
-            <span>Via ResDex:</span>
-            <span className="font-bold">{platform.value}</span>
-          </div>
-        )}
-        {coldEmail && (
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#e5e5e5', border: '1px solid #bdbdbd' }} />
-            <span>Cold Email:</span>
-            <span className="font-bold">{coldEmail.value}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // Flat testimonial card grid section
 function FlatTestimonials() {
@@ -499,8 +62,8 @@ function FlatTestimonials() {
         {reviews.map((review, idx) => (
           <BlurFade key={review.username} delay={0.1 * idx} inView>
             <div
-              className="bg-[#f5f6fa] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
-              style={{ background: '#f5f6fa' }}
+              className="bg-[#f5f5f5] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
+              style={{ background: '#f5f5f5' }}
             >
               <div className="flex items-center gap-3 mb-2">
                 <img
@@ -524,458 +87,600 @@ function FlatTestimonials() {
   );
 }
 
-export default function Home() {
-  const tilt1 = use3dTilt();
-  const tilt2 = use3dTilt();
-  const tilt3 = use3dTilt();
+// Add import for Image at the top if not already present
+// import Image from "next/image";
+
+// Add reviews data (copy from home page)
+const reviews = [
+  {
+    name: "Ava Patel",
+    username: "@avapatel",
+    body: "Quick sign-up and I found a project in my field within a day!",
+    img: "https://avatar.vercel.sh/ava",
+    role: "Student, UofT"
+  },
+  {
+    name: "Lucas Kim",
+    username: "@lucaskim",
+    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors. I was able to connect with mentors who provided valuable feedback on my application, and the platform's resources made the whole process stress-free.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, McMaster"
+  },
+  {
+    name: "Priya Singh",
+    username: "@priyasingh",
+    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly. The notifications kept me updated on new opportunities, and the support team was always quick to help.",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+  {
+    name: "Mateo Alvarez",
+    username: "@mateoa",
+    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey. I especially loved the ability to join different research groups and participate in discussions.",
+    img: "https://avatar.vercel.sh/john",
+    role: "Student, UOttawa"
+  },
+  {
+    name: "Emily Chen",
+    username: "@emchen",
+    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise! The search and filter tools are incredibly helpful for narrowing down the best matches for my interests.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, UofT"
+  },
+  {
+    name: "Noah Williams",
+    username: "@noahw",
+    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here. The verification process for opportunities gave me peace of mind, and the support team was always quick to respond to my questions. I also love the regular updates and new features!",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+  {
+    name: "Sara Müller",
+    username: "@saramuller",
+    body: "Connecting with professors was seamless. I got feedback on my research proposal within days! The messaging system made it easy to keep track of all my conversations in one place.",
+    img: "https://avatar.vercel.sh/john",
+    role: "Student, McMaster"
+  },
+  {
+    name: "Omar Farouk",
+    username: "@omarfarouk",
+    body: "Verified opportunities = less stress. I was able to apply to positions knowing they were legitimate, and the application process was straightforward. I recommend ResDex to all my classmates.",
+    img: "https://avatar.vercel.sh/jack",
+    role: "Student, UOttawa"
+  },
+  {
+    name: "Julia Rossi",
+    username: "@juliarossi",
+    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend! The resources and guides available on the platform helped me prepare a strong application and ace my interviews. I also made some great friends through the community forums.",
+    img: "https://avatar.vercel.sh/jill",
+    role: "Student, Laurier"
+  },
+];
+
+// TestimonialCard component styled like the attached image
+function TestimonialCard({ img, name, role, body }: { img: string; name: string; role: string; body: string }) {
+  return (
+    <div className="bg-[#f7f7f8] rounded-xl p-6 max-w-sm min-h-[220px] flex flex-col items-start justify-between" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+      <span className="text-4xl text-gray-200 mb-4 select-none">&ldquo;</span>
+      <blockquote className="text-base text-gray-800 mb-6" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{body}</blockquote>
+      <div className="flex items-center gap-3 mt-auto w-full pt-2">
+        <img src={img} alt={name} className="w-8 h-8 rounded-full object-cover mt-2" />
+        <div className="flex flex-col mt-2">
+          <span className="font-bold text-sm text-gray-900" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{name}</span>
+          <span className="text-xs text-gray-400 mt-0.5" style={{ fontFamily: 'GellixMedium, sans-serif' }}>{role}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Testimonials section
+function TestimonialsSection() {
+  return (
+    <section className="w-full flex flex-col items-center justify-center py-32 bg-white">
+      <h2 className="text-4xl md:text-6xl font-bold mb-20 text-center" style={{ fontFamily: 'GellixMedium, sans-serif', lineHeight: 1.15 }}>
+        Used by 10,000+ businesses, creators,<br className="hidden md:block" />
+        <span className="text-gray-400 font-bold">and other brands</span>
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mx-auto">
+        {reviews.slice(0, 9).map((review, idx) => (
+          <TestimonialCard key={review.name + idx} {...review} />
+        ))}
+      </div>
+    </section>
+  );
+
+  
+}
+
+export default function CanopyDemo() {
+  // For background fade
+  const productsRef = useRef<HTMLDivElement | null>(null);
+  const [bgColor, setBgColor] = useState('#fff'); // initial white
   const tiltLogo = use3dTilt();
-  const afterHeroRef = useRef<HTMLDivElement>(null);
-  const [showDock, setShowDock] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [loginHovered, setLoginHovered] = useState(false);
-  const [loginMobileHovered, setLoginMobileHovered] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
-  const [signoutConfirmed, setSignoutConfirmed] = useState(false);
-  const [dropdownHover, setDropdownHover] = useState<number | null>(null);
-  const [hoverBgStyle, setHoverBgStyle] = useState<{ top: number; height: number } | null>(null);
-  const dropdownOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  // Dropdown auto-close on mouse leave
-  const closeDropdownTimeout = useRef<NodeJS.Timeout | null>(null);
-  const handleDropdownMouseLeave = () => {
-    closeDropdownTimeout.current = setTimeout(() => setDropdownOpen(false), 120);
-  };
-  const handleDropdownMouseEnter = () => {
-    if (closeDropdownTimeout.current) {
-      clearTimeout(closeDropdownTimeout.current);
-      closeDropdownTimeout.current = null;
-    }
-  };
-
-  // User info for dropdown
-  const fullName = profile?.display_name || profile?.full_name || profile?.username || currentUser?.user_metadata?.full_name || currentUser?.email;
-  let username = profile?.username || currentUser?.user_metadata?.username || currentUser?.email?.split("@")[0];
-  username = username ? `@${username}` : "";
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!afterHeroRef.current) return;
-      const rect = afterHeroRef.current.getBoundingClientRect();
-      // Show dock if the top of the section after hero is above the top of the viewport
-      setShowDock(rect.top < 0);
-    };
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    const section = productsRef.current;
+    if (!section) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setBgColor('#13141A');
+        } else {
+          setBgColor('#fff');
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setCurrentUser(data.user);
-      if (data.user) {
-        // Fetch profile from DB
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .single()
-          .then(({ data: profileData }) => {
-            setProfile(profileData);
-            setLoading(false);
-          });
-      } else {
-        setProfile(null);
-        setLoading(false);
-      }
-    });
-  }, []);
-
-  // Example navigation items
-  const navItems = [
-    { name: "Home", link: "/" },
-    { name: "Blog", link: "/blog" },
-    { name: "Contact", link: "/contact" },
-  ];
-
-  // Sign out handler
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    // Wait for animation before actual sign out
-    setTimeout(async () => {
-      await supabase.auth.signOut();
-      setSigningOut(false);
-      setDropdownOpen(false);
-      setConfirmSignOut(false);
-      window.location.reload();
-    }, 900);
+  const router = useRouter();
+  
+    const handleClick = () => {
+    router.push('/waitlist');
   };
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleClick(e: MouseEvent) {
-      setDropdownOpen(false);
-      setConfirmSignOut(false);
-    }
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
-  }, [dropdownOpen]);
-
-  // Update hover background position/size on hover
-  useEffect(() => {
-    if (dropdownHover === null || !dropdownOptionRefs.current[dropdownHover]) {
-      setHoverBgStyle(null);
-      return;
-    }
-    const el = dropdownOptionRefs.current[dropdownHover];
-    if (el) {
-      const parent = el.parentElement;
-      if (parent) {
-        const parentRect = parent.getBoundingClientRect();
-        const rect = el.getBoundingClientRect();
-        setHoverBgStyle({
-          top: rect.top - parentRect.top,
-          height: rect.height,
-        });
-      }
-    }
-  }, [dropdownHover, dropdownOpen]);
 
   return (
-    <>
-      <div className="flex flex-col items-center min-h-screen px-4 sm:px-8 md:px-16 lg:px-32 xl:px-0 max-w-5xl mx-auto relative">
-        {/* Navbar at the very top of the page */}
-        <Navbar>
-          <NavBody>
-            <NavbarLogo />
-            <NavItems items={navItems} />
-            <div className="relative ml-4">
-              {currentUser ? (
-                <AvatarDropdown
-                  userProfile={profile}
-                  displayName={profile?.display_name || profile?.full_name || profile?.username || currentUser.email}
-                  username={profile?.username || currentUser.email?.split("@")[0]}
-                  avatarUrl={profile?.avatar_url || "/empty-pic.webp"}
-                  onSignOut={handleSignOut}
-                />
-              ) : (
-                <>
-                  <div className="flex items-center">
-                    <div
-                      className="relative group px-4 py-2"
-                      onMouseEnter={() => setLoginHovered(true)}
-                      onMouseLeave={() => setLoginHovered(false)}
-                    >
-                      <Link href="/login" className="relative z-10 text-sm text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors">
-                        Login
-                      </Link>
-                    </div>
-                    <AnimatePresence>
-                      {showDock && (
-                        <motion.div
-                          key="join-for-free-desktop"
-                          initial={{ x: -32, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          exit={{ x: -32, opacity: 0 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                          style={{ display: 'inline-block' }}
-                        >
-                          <Link href="/signup">
-                            <ShimmerButton type="button" className="px-5 py-2 rounded-full text-sm">Join for free</ShimmerButton>
-                          </Link>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </>
-              )}
-            </div>
-          </NavBody>
-          <MobileNav visible={mobileOpen}>
-            <MobileNavHeader>
-              <NavbarLogo />
-              <MobileNavToggle isOpen={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)} />
-            </MobileNavHeader>
-            <MobileNavMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)}>
-              {navItems.map((item) => (
-                <a key={item.name} href={item.link} onClick={() => setMobileOpen(false)} className="py-2 text-lg block">
-                  {item.name}
-                </a>
-              ))}
-              <div className="flex items-center gap-2">
-                {currentUser ? (
-                  <div className="relative">
-                    <button
-                      className="flex items-center gap-2 w-full focus:outline-none rounded-full transition-colors duration-150 hover:bg-gray-200/60 dark:hover:bg-neutral-800/60 cursor-pointer px-2 py-1"
-                      onClick={() => setDropdownOpen((v) => !v)}
-                    >
-                      <img
-                        src={profile?.avatar_url || currentUser?.user_metadata?.avatar_url || "/empty-pic.webp"}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-neutral-700"
-                      />
-                      <ChevronDownIcon
-                        className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : "rotate-0"}`}
-                        size={20}
-                      />
-                    </button>
-                    <AnimatePresence>
-                      {dropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -8 }}
-                          transition={{ duration: 0.18 }}
-                          className="absolute right-0 mt-5 w-56 rounded-2xl bg-[rgba(230,230,230,0.65)] dark:bg-[rgba(24,24,27,0.80)] backdrop-blur-md shadow-lg border border-gray-200 dark:border-neutral-800 z-50 overflow-hidden p-2"
-                          style={{ position: 'absolute' }}
-                          onMouseLeave={handleDropdownMouseLeave}
-                          onMouseEnter={handleDropdownMouseEnter}
-                        >
-                          {/* User info at top of dropdown */}
-                          <div className="px-4 pt-2 pb-3 border-b border-gray-200 dark:border-neutral-800 mb-1">
-                            <div className="font-semibold text-base text-black dark:text-white truncate">{fullName}</div>
-                            <div className="text-xs text-neutral-500 dark:text-neutral-400 opacity-80 truncate mt-0.5">{username}</div>
-                          </div>
-                          {/* Sliding hover background */}
-                          <AnimatePresence>
-                            {hoverBgStyle && (
-                              <motion.div
-                                layoutId="dropdown-hovered"
-                                className="absolute left-0 w-full rounded-full bg-gray-300 dark:bg-neutral-800 z-0"
-                                style={{
-                                  top: hoverBgStyle.top + 4,
-                                  height: hoverBgStyle.height - 8,
-                                  left: 4,
-                                  width: 'calc(100% - 8px)',
-                                }}
-                                initial={{ opacity: 0.7 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                              />
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <React.Fragment>
-                    <div
-                      className="relative group py-2 text-lg block"
-                      onMouseEnter={() => setLoginMobileHovered(true)}
-                      onMouseLeave={() => setLoginMobileHovered(false)}
-                    >
-                      <Link href="/login" className="relative z-10 text-lg text-neutral-600 dark:text-neutral-300 font-medium hover:text-black dark:hover:text-white transition-colors block">
-                        Login
-                      </Link>
-                    </div>
-                    <AnimatePresence>
-                      {showDock && (
-                        <motion.div
-                          key="join-for-free-mobile"
-                          initial={{ x: -32, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          exit={{ x: -32, opacity: 0 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                          style={{ display: 'inline-block' }}
-                        >
-                          <Link href="/signup">
-                            <ShimmerButton type="button" className="px-5 py-2 rounded-full text-lg">Join for free</ShimmerButton>
-                          </Link>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                )}
-              </div>
-            </MobileNavMenu>
-          </MobileNav>
-        </Navbar>
-        {/* Main content */}
-        <div className="w-full flex flex-col items-center justify-center min-h-screen">
-          <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-4 inline-block">
-            <Image src="/beige-logo.png" alt="ResDex Logo" width={80} height={80} className="rounded-xl" />
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Navbar */}  
+      <nav className="relative z-10 flex items-center py-6 px-8 w-full max-w-7xl mx-auto">
+        {/* Logo */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Image src="/beige-logo.png" alt="ResDex Logo" width={32} height={32} />
+          <span className="ml-1 font-bold text-lg" style={{ fontFamily: 'GellixMedium, sans-serif' }}>ResDex</span>
+        </div>
+        {/* Nav Links - centered absolutely */}
+        <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+          <a href="/" className="px-3 py-2 rounded-full hover:bg-gray-100 transition text-black bg-white shadow">Home</a>
+          <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Digest</a>
+          <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Brainwave</a>
+          <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Discovery ↗</a>
+        </div>
+        {/* Right side: Discord + Wallet */}
+        <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+          <button className="rounded-full p-2 hover:bg-gray-100 transition">
+            {/* Discord icon (placeholder) */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#23272A"/><path d="M8.5 15.5C8.5 15.5 9.5 16 12 16C14.5 16 15.5 15.5 15.5 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><ellipse cx="9.5" cy="12" rx="1" ry="1.5" fill="#fff"/><ellipse cx="14.5" cy="12" rx="1" ry="1.5" fill="#fff"/></svg>
+          </button>
+          <button  onClick={handleClick} className="rounded-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-medium transition" style={{ fontFamily: 'GellixMedium, sans-serif', cursor: 'pointer' }}>
+            Join Waitlist ↗
+          </button>
+        </div>
+      </nav>
+     
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center min-h-[calc(100vh-100px)] flex-1 -mt-12" style={{ fontFamily: 'GellixMedium, sans-serif', minHeight: 'calc(100vh - 100px)' }}>
+        {/* SVG Curved Streaks Background - now only in hero section */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <svg width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path d="M0 200 Q720 400 1440 200" stroke="#ececec" strokeWidth="2" fill="none" />
+            <path d="M0 400 Q720 600 1440 400" stroke="#f3f3f3" strokeWidth="2" fill="none" />
+            <path d="M0 600 Q720 800 1440 600" stroke="#f5f5f5" strokeWidth="2" fill="none" />
+          </svg>
+        </div>
+        <div className="relative z-10 w-full flex flex-col items-center">
+          <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-6 inline-block">
+            <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl" />
           </div>
-          <BlurFade delay={0.1} inView>
-            <TextAnimate
-              animation="fadeIn"
-              by="line"
-              as="h1"
-              className="title text-center"
-            >
-              {`Rediscover the world of research.`}
-            </TextAnimate>
-          </BlurFade>
+          <TextAnimate
+            animation="fadeIn"
+            by="line"
+            as="h1"
+            className="text-5xl md:text-7xl font-bold text-center leading-tight text-gray-900 mb-6 max-w-2xl mx-auto"
+            style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}
+          >
+            {`Rediscover the world of research.`}
+          </TextAnimate>
           <TextAnimate
             animation="fadeIn"
             by="line"
             as="p"
-            className="description mt-4"
-            delay={0.5}
+            className="mt-2 text-base md:text-lg text-gray-600 text-center max-w-xl mb-8 satoshi-medium"
           >
-            {`Explore, connect, and stay updated with the latest in research and academia.`}
+            The new way to explore, connect, and stay updated with the latest in research and academia.
           </TextAnimate>
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link href="/waitlist">
-            <InteractiveHoverButton className="bg-black border-black hover:text-black" dotClassName="bg-white" hoverArrowClassName="text-black">
-              <span className="text-white group-hover:text-black">Join the waitlist</span>
-            </InteractiveHoverButton>
-            </Link>
-            <InteractiveHoverButton className="bg-white text-black border-black">Learn more</InteractiveHoverButton>
-          </div>
-          <div className="supporting mt-20 mb-2 text-center">Used by students at</div>
-          {/* Marquee with repeating university logos */}
-          <div className="relative w-full mt-4 flex items-center justify-center overflow-hidden">
-            <Marquee pauseOnHover={false} className="[--gap:3rem] py-2">
-              {Array(3).fill([
-                { src: "/McMaster.png", alt: "McMaster University" },
-                { src: "/TMU.png", alt: "Toronto Metropolitan University" },
-                { src: "/Laurier.png", alt: "Wilfrid Laurier University" },
-                { src: "/UOFT.png", alt: "University of Toronto" },
-                { src: "/UOttawa.png", alt: "University of Ottawa" },
-              ]).flat().map((logo, i) => (
-            <Image
-                  key={i}
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={96}
-                  height={96}
-                  className="rounded-lg mx-6 object-contain"
-                  draggable={false}
-                />
-              ))}
-            </Marquee>
-            {/* Gradient fade on left/right */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background" />
-          </div>
-        </div>
-        {/* Section: Research Made Easy with TextReveal */}
-        <section ref={afterHeroRef} className="w-full text-[5rem] font-normal leading-[1.2] tracking-tight text-[#181818] flex flex-col items-center text-center justify-center mt-0 pt-0">
-          <TextRevealWithVerticalSlot
-            className="text-center text-[5rem] font-normal leading-[1.2] tracking-tight text-[#181818]"
-            slotWords={["papers", "assistants", "positions", "experience"]}
+          <motion.div
+            className="flex gap-4 mt-2"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {},
+            }}
           >
-            {`Finding research __BLANK__ is hard. We know. So we made it easier.`}
-          </TextRevealWithVerticalSlot>
-        </section>
-        <section>
-          <FeaturesSectionDemo />
-        </section>
-        {/* Scroll-based velocity text animation */}
-        <div className="w-full flex flex-col items-center justify-center font-medium mb-40 mt-20 relative overflow-hidden">
-          <VelocityScroll numRows={2} defaultVelocity={5}>
-            Research is a journey. Let your curiosity set the pace.
-          </VelocityScroll>
-          {/* Gradient fade on left/right */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white dark:from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white dark:from-background to-transparent" />
+            <motion.a
+              href="/waitlist"
+              className="flex items-center gap-2 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-none satoshi-medium"
+              style={{ background: PRIMARY_BTN_BG, border: 'none' }}
+              onMouseOver={e => e.currentTarget.style.background = '#23272F'}
+              onMouseOut={e => e.currentTarget.style.background = PRIMARY_BTN_BG}
+              variants={{
+                hidden: { opacity: 0, y: 32 },
+                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+              }}
+            >
+              Join Waitlist
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </motion.a>
+            <motion.a
+              href="#"
+              className="flex items-center gap-2 bg-[#f7f7f9] text-[#101117] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#ececec] transition shadow-none satoshi-medium"
+              variants={{
+                hidden: { opacity: 0, y: 32 },
+                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+              }}
+            >
+              Explore ResDex
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </motion.a>
+          </motion.div>
         </div>
-        <Timeline
-          data={[
-            {
-              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Transparency</span>,
-              content: (
-                <BlurFade delay={0.1 * 0} inView>
-                  <p className="text-neutral-700 dark:text-neutral-300">We believe in open access to research opportunities. No hidden forms, no closed loops. Everything on ResDex — from positions to profiles — is built to be clear, searchable, and student-first.</p>
-                </BlurFade>
-              ),
-            },
-            {
-              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Equity</span>,
-              content: (
-                <BlurFade delay={0.1 * 1} inView>
-                  <p className="text-neutral-700 dark:text-neutral-300">Research shouldn't be limited by privilege or proximity. ResDex levels the playing field by removing gatekeeping and giving every student, regardless of background, the chance to contribute meaningfully.</p>
-                </BlurFade>
-              ),
-            },
-            {
-              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Growth</span>,
-              content: (
-                <BlurFade delay={0.1 * 2} inView>
-                  <p className="text-neutral-700 dark:text-neutral-300">ResDex isn't just about finding a position — it's about building a journey. From uploading your first research reflection to publishing with a supervisor, we support students at every stage of their development.</p>
-                </BlurFade>
-              ),
-            },
-            {
-              title: <span style={{ color: '#2a2a2a', fontWeight: 500 }}>Collaboration</span>,
-              content: (
-                <BlurFade delay={0.1 * 3} inView>
-                  <p className="text-neutral-700 dark:text-neutral-300">Innovation thrives when people connect. Whether it's students co-authoring a paper, peer reviewers offering feedback, or labs mentoring first-time researchers — collaboration is at the heart of everything we do.</p>
-                </BlurFade>
-              ),
-            },
-          ]}
-        />
-        {/* Section: Join the 1000 students, reshaping the future of research */}
-        <section className="w-full flex flex-col items-center justify-center mt-20 my-12">
-          <h2 className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
-            <span>Join the <NumberTicker startValue={500} value={1000} className="text-3xl ml-2 mr-2 lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-bold text-black dark:text-white" />+ students, reshaping the future of research</span>
+      </section>
+      {/* Partnered Universities - straight line */}
+      <motion.div
+        className="relative w-full flex flex-col items-center justify-center -mt-16 mb-8"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {},
+        }}
+      >
+        <motion.div
+          className="mt-8 text-gray-500 text-sm"
+          style={{ fontFamily: 'GellixMedium, sans-serif' }}
+          variants={{
+            hidden: { opacity: 0, y: 32 },
+            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+          }}
+        >
+          Trusted by students at
+        </motion.div>
+        <motion.div
+          className="flex flex-row items-center justify-center gap-32 mt-6 w-full max-w-3xl mx-auto"
+          variants={{
+            hidden: { opacity: 0, y: 32 },
+            visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 18 } },
+          }}
+        >
+          <motion.img src="/McMaster.png" alt="McMaster" className="w-20 h-20 object-contain" />
+          <motion.img src="/TMU.png" alt="TMU" className="w-20 h-20 object-contain" />
+          <motion.img src="/Laurier.png" alt="Laurier" className="w-20 h-20 object-contain" />
+          <motion.img src="/UOFT.png" alt="UofT" className="w-20 h-20 object-contain" />
+          <motion.img src="/UOttawa.png" alt="Ottawa" className="w-20 h-20 object-contain" />
+        </motion.div>
+      </motion.div>
+
+      {/* Minimalist Hero Section (inspired by screenshot) */}
+      <section className="w-full flex flex-col items-center justify-center py-32 bg-[#FAFAF8] relative overflow-hidden">
+        {/* Maze SVG background */}
+        <svg className="absolute left-[-15%] top-0 w-[70%] h-full z-0 pointer-events-none" width="70%" height="100%" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="maze-fade" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="80%" stopColor="white" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </linearGradient>
+            <mask id="maze-mask">
+              <rect x="0" y="0" width="800" height="400" fill="url(#maze-fade)" />
+            </mask>
+          </defs>
+          <g opacity="0.07" mask="url(#maze-mask)">
+            <path d="M 100 50 Q 200 100 100 150 Q 0 200 100 250 Q 200 300 100 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 300 50 Q 400 100 300 150 Q 200 200 300 250 Q 400 300 300 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 500 50 Q 600 100 500 150 Q 400 200 500 250 Q 600 300 500 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <path d="M 700 50 Q 800 100 700 150 Q 600 200 700 250 Q 800 300 700 350" stroke="#101117" strokeWidth="2" fill="none"/>
+            <circle cx="400" cy="200" r="120" stroke="#101117" strokeWidth="1.5" fill="none"/>
+            <rect x="50" y="100" width="700" height="200" rx="100" stroke="#101117" strokeWidth="1" fill="none"/>
+          </g>
+        </svg>
+        <div className="max-w-4xl w-full flex flex-col items-start justify-center px-4 mx-auto relative z-10">
+          <BlurFade delay={0.1} inView>
+            <span className="uppercase tracking-widest text-xs text-gray-400 mb-6 satoshi-medium">ResDex</span>
+          </BlurFade>
+          <BlurFade delay={0.15} inView>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 satoshi-bold text-left">
+              Finding research shouldn't feel like a <span className="satoshi-bold-italic">maze</span>.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
+            </h1>
+          </BlurFade>
+          <BlurFade delay={0.2} inView>
+            <a
+              href="#"
+              className="flex items-center gap-2 bg-[#6B7280] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#52525b] transition shadow-none mt-12 satoshi-medium"
+            >
+              Explore ResDex
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </a>
+          </BlurFade>
+        </div>
+      </section>
+
+  {/* Products Section (dark, horizontally scrollable cards) */}
+  <section
+        ref={productsRef}
+        className="w-full min-h-[900px] flex flex-col items-start justify-start py-40 px-0 relative"
+        style={{ background: bgColor, transition: 'background 0.4s linear' }}
+      >
+        <div className="w-full max-w-7xl mx-auto px-8">
+          <BlurFade delay={0.1} inView>
+            <div className="uppercase text-xs tracking-widest text-gray-400 mb-4 satoshi-medium">Discover, showcase, and collaborate on research — all in one place.</div>
+          </BlurFade>
+          <BlurFade delay={0.15} inView>
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-16 satoshi-bold max-w-3xl leading-tight"
+              style={{
+                color: bgColor === '#13141A' ? '#fff' : '#181818',
+                transition: 'color 0.4s linear',
+              }}
+            >
+              A research-based platform built to scale past the classroom.
+            </h2>
+          </BlurFade>
+        </div>
+        <div className="w-full overflow-x-auto pb-8 px-32">
+          <div className="flex flex-row gap-8 min-w-[900px]" style={{ width: 'max-content' }}>
+            {/* Card 1 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <FaUser size={22} color="#fff" />
+                  <span className="text-xs tracking-widest text-gray-200 satoshi-medium">RESDEX PROFILES</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Build your research identity.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Create a professional research profile to showcase your work, papers, and projects. ResDex makes you discoverable by peers, mentors, and institutions.</div>
+              </div>
+            </div>
+            {/* Card 2 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <FaBook size={22} color="#fff" />
+                  <span className="text-xs tracking-widest text-gray-200 satoshi-medium">PROJECT HUB</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Connect and collaborate on projects.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Join or start research projects. ResDex helps you find collaborators, share updates, and manage academic work with your team.</div>
+              </div>
+            </div>
+            {/* Card 3 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <FaRegLightbulb size={22} color="#fff" />
+                  <span className="text-xs tracking-widest text-gray-200 satoshi-medium">INSIGHTS & OPPORTUNITIES</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Surface the opportunities that matter.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Get matched with labs, supervisors, and open calls for papers. ResDex curates recommendations based on your interests and activity.</div>
+              </div>
+            </div>
+            {/* Card 4 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  {/* Placeholder icon */}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" fill="#C7FF5A"/><rect x="8" y="8" width="8" height="8" rx="2" fill="#6B7280"/></svg>
+                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">AUTOMATOR</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Automate your workflows.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Automator lets you build and deploy custom automations for your loan management process.</div>
+              </div>
+            </div>
+            {/* Card 5 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  {/* Placeholder icon */}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#A3A3A3"/><rect x="6" y="6" width="12" height="12" rx="6" fill="#C7FF5A"/></svg>
+                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">RISK ANALYTICS</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Analyze risk in real time.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Risk Analytics provides real-time risk assessment and reporting for your loan portfolio.</div>
+              </div>
+            </div>
+            {/* Card 6 */}
+            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  {/* Placeholder icon */}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="8" fill="#C7FF5A"/><rect x="10" y="10" width="4" height="4" rx="2" fill="#6B7280"/></svg>
+                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">PORTAL</span>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">A portal for your clients.</div>
+                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Portal gives your clients a secure, branded space to manage their loans and documents.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* Flows Section (inspired by attached image) */}
+      <section className="w-full flex flex-col items-center justify-center py-24 bg-white">
+        <BlurFade delay={0.1} inView>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
+            Modernizing research <br></br>one {" "}
+            <span className="text-5xl md:text-5xl font-bold text-gray-500 mb-8 satoshi-bold text-left">
+              <TextAnimate by="character" animation="slideDown" duration={0.6} className="inline-block" segmentClassName="inline-block" once={false}>
+                scroll
+              </TextAnimate>
+            </span> at a time.
           </h2>
-        </section>
-        {/* 3D Marquee Section (MagicUI style) */}
-        {/* <section className="w-full flex flex-col items-center justify-center mb-24">
-          <div className="w-full flex justify-center">
-            <Marquee3D />
+        </BlurFade>
+        <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mx-auto justify-center">
+          {/* Card 1 */}
+          <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
+            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8">
+              {/* Placeholder for video or image */}
+              <div className="w-8 h-8 border-2 border-gray-400 rounded-full animate-spin"></div>
+            </div>
+            <div className="w-full">
+              <div className="text-lg font-bold satoshi-bold mb-2">Videos</div>
+              <div className="text-gray-500 text-base satoshi-medium">
+                Experience flows the way they were meant to be experienced, complete with transitions, micro-interactions, and animations.
+              </div>
+            </div>
           </div>
-        </section> */}
+          {/* Card 2 */}
+          <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
+            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
+              {/* Placeholder for phone UI image */}
+              <div className="text-white text-left px-4 py-8 w-full">
+                <div className="text-base leading-snug">
+                  Want to use Location Services to help you find the closest Nike Store, access in-store and location-based features, and see experiences near you?
+                </div>
+                <button className="mt-8 bg-white text-black rounded-lg px-4 py-2 text-sm satoshi-medium">Next</button>
+              </div>
+            </div>
+            <div className="w-full">
+              <div className="text-lg font-bold satoshi-bold mb-2">Prototype mode</div>
+              <div className="text-gray-500 text-base satoshi-medium">
+                Walk through flows, step by step, by using the interactive hotspots at your own preferred pace.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section (inspired by attached image) */}
+      <section className="w-full flex flex-col items-center justify-center py-20 bg-white">
+        <BlurFade delay={0.1} inView>
+          <div className="flex flex-col md:flex-row gap-12 w-full max-w-6xl mx-auto justify-center items-start md:items-stretch">
+            {/* Stat 1 */}
+            <div className="flex-1 flex flex-col items-start text-left px-4">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm0 0v4m0 4h.01"/></svg>
+                Researchers
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={20} startValue={0} />K</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Active researchers and students on ResDex.</div>
+            </div>
+            {/* Stat 2 */}
+            <div className="flex-1 flex flex-col items-start text-left px-15 border-l border-r border-gray-200">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Projects
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={0} />%</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Research projects and opportunities listed.</div>
+            </div>
+            {/* Stat 3 */}
+            <div className="flex-1 flex flex-col items-start text-left px-4">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                Connections
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={89} startValue={0} />%</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Connections made between students and mentors.</div>
+            </div>
+          </div>
+        </BlurFade>
+      </section>
+
+      {/* Testimonials Section */}
+      <BlurFade delay={0.1} inView>
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See why students and researchers <br></br> love ResDex.</h2>
+      </BlurFade>
         <FlatTestimonials />
-        {/* FAQ Section */}
-        <section className="w-full flex flex-col items-center justify-center my-24">
-          <TextAnimate animation="fadeIn" by="line" as="h2" className="text-3xl lg:text-5xl lg:leading-tight max-w-2xl mx-auto text-center tracking-tight font-medium text-black dark:text-white mb-10">Frequently Asked Questions</TextAnimate>
-          <div className="w-full max-w-2xl mx-auto">
-            <Accordion type="single" collapsible className="">
-              <AccordionItem value="item-1" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What is ResDex?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  ResDex is a platform for students to discover, apply to, and manage research opportunities. We connect students with professors and research groups, making research more accessible and transparent.
-                </AccordionContent>
-              </AccordionItem>
-              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
-              <AccordionItem value="item-2" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">I'm a student. How can I help?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  <>We're always looking for students to help us build the platform. If you're interested, please check out our <Link href="/careers" className="text-blue-500">careers page</Link> to become a student ambassador.</>
-                </AccordionContent>
-              </AccordionItem>
-              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
-              <AccordionItem value="item-6" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">What's next for ResDex?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  We're just getting started! Our vision is to transition ResDex into a full-fledged global research hub—where students, professors, and organizations can connect, share, and discover research in one place. Upcoming features include daily research digests, article and preprint postings, collaborative tools, and more. We want ResDex to be your all-in-one platform for everything research, from discovery to publication and beyond.
-                </AccordionContent>
-              </AccordionItem>
-              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
-              <AccordionItem value="item-3" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">Is ResDex free to use?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  Yes! ResDex is free for everyone. We believe in making research accessible to everyone.
-                </AccordionContent>
-              </AccordionItem>
-              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
-              <AccordionItem value="item-4" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is ResDex different from traditional research portals or job boards?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  ResDex is built by students, for students. Unlike traditional job boards or research portals, ResDex focuses on the unique needs of student researchers—offering verified research opportunities, a modern portfolio builder, direct faculty connections, and a supportive community. We combine discovery, application, and networking in one place, making research more accessible, transparent, and student-friendly.
-                </AccordionContent>
-              </AccordionItem>
-              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700 my-0.5" />
-              <AccordionItem value="item-5" className="px-6 py-4">
-                <AccordionTrigger><TextAnimate animation="fadeIn" by="line">How is my data protected on ResDex?</TextAnimate></AccordionTrigger>
-                <AccordionContent>
-                  Your privacy and security are our top priorities. ResDex uses industry-standard encryption and best practices to protect your data. We never sell your information, and you have full control over your profile and what you share. For more details, see our Privacy Policy.
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+
+
+        
+
+     
+      
+      {/* Modern Rounded Rectangle Section */}
+      <section className="w-full flex flex-col items-center justify-center py-24 bg-transparent">
+        <BlurFade delay={0.1} inView>
+          <div className="relative bg-[#101117] rounded-3xl shadow-xl max-w-4xl w-full mx-auto px-8 py-20 flex flex-col items-center justify-center" style={{ minHeight: '380px' }}>
+            {/* Subtle grid background pattern */}
+            <svg className="absolute inset-0 w-full h-full z-0" style={{ borderRadius: 'inherit' }} width="100%" height="100%" viewBox="0 0 800 400" fill="none">
+              <g opacity="0.08">
+                <rect x="0" y="0" width="800" height="400" fill="none" />
+                {[...Array(9)].map((_, i) => (
+                  <line key={i} x1={i*100} y1="0" x2={i*100} y2="400" stroke="#fff" strokeWidth="1" />
+                ))}
+                {[...Array(5)].map((_, i) => (
+                  <line key={i} x1="0" y1={i*80} x2="800" y2={i*80} stroke="#fff" strokeWidth="1" />
+                ))}
+              </g>
+            </svg>
+            <div className="relative z-10 flex flex-col items-center justify-center text-center">
+              <BlurFade delay={0.1} inView>
+                <h2 className="text-3xl md:text-5xl font-bold mb-4 satoshi-bold" style={{ color: '#fff' }}>
+                  We're building the biggest research hub in the world.<br />
+                  <span className="text-[#f5f5f5]">and you're in the center of it.</span>
+                </h2>
+              </BlurFade>
+              <BlurFade delay={0.15} inView>
+                <p className="text-gray-300 text-lg max-w-xl mb-8 satoshi-medium">
+                  Purpose built for students and researchers, our modern platform lets you discover, connect, and grow your academic impact with ease.
+                </p>
+              </BlurFade>
+              <BlurFade delay={0.2} inView>
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-2 bg-[#c4c4bc] text-[#101117] px-6 py-3 rounded-xl font-semibold text-base hover:bg-[#b0b0a8] transition shadow-none"
+                  style={{ fontFamily: 'GellixMedium, sans-serif' }}
+                >
+                  Explore Initiatives
+                  <span className="ml-1">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                  </span>
+                </a>
+              </BlurFade>
+            </div>
           </div>
-        </section>
-        {/* Footer7 with TextAnimate on all content */}
-      </div>
-    </>
+        </BlurFade>
+      </section>
+     
+
+      
+    </div>
   );
-}
+} 
