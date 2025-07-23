@@ -372,19 +372,25 @@ export default function CanopyDemo() {
           </g>
         </svg>
         <div className="max-w-4xl w-full flex flex-col items-start justify-center px-4 mx-auto relative z-10">
-          <span className="uppercase tracking-widest text-xs text-gray-400 mb-6 satoshi-medium">ResDex</span>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 satoshi-bold text-left">
-            Finding research shouldn't feel like a <span className="satoshi-bold-italic">maze</span>.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
-          </h1>
-          <a
+          <BlurFade delay={0.1} inView>
+            <span className="uppercase tracking-widest text-xs text-gray-400 mb-6 satoshi-medium">ResDex</span>
+          </BlurFade>
+          <BlurFade delay={0.15} inView>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 satoshi-bold text-left">
+              Finding research shouldn't feel like a <span className="satoshi-bold-italic">maze</span>.  <span className="text-5xl md:text-6xl font-bold text-gray-500 mb-8 satoshi-bold text-left">  Now it doesn't.</span>
+            </h1>
+          </BlurFade>
+          <BlurFade delay={0.2} inView>
+            <a
               href="#"
               className="flex items-center gap-2 bg-[#6B7280] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[#52525b] transition shadow-none mt-12 satoshi-medium"
             >
-            Explore ResDex
-            <span className="ml-1">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-          </a>
+              Explore ResDex
+              <span className="ml-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+            </a>
+          </BlurFade>
         </div>
       </section>
 
@@ -395,18 +401,20 @@ export default function CanopyDemo() {
         style={{ background: bgColor, transition: 'background 0.4s linear' }}
       >
         <div className="w-full max-w-7xl mx-auto px-8">
-          <div className="uppercase text-xs tracking-widest text-gray-400 mb-4 satoshi-medium">Discover, showcase, and collaborate on research — all in one place.
-
-</div>
-          <h2
-            className="text-4xl md:text-5xl font-bold mb-16 satoshi-bold max-w-3xl leading-tight"
-            style={{
-              color: bgColor === '#13141A' ? '#fff' : '#181818',
-              transition: 'color 0.4s linear',
-            }}
-          >
-            A research-based platform built to scale past the classroom.
-          </h2>
+          <BlurFade delay={0.1} inView>
+            <div className="uppercase text-xs tracking-widest text-gray-400 mb-4 satoshi-medium">Discover, showcase, and collaborate on research — all in one place.</div>
+          </BlurFade>
+          <BlurFade delay={0.15} inView>
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-16 satoshi-bold max-w-3xl leading-tight"
+              style={{
+                color: bgColor === '#13141A' ? '#fff' : '#181818',
+                transition: 'color 0.4s linear',
+              }}
+            >
+              A research-based platform built to scale past the classroom.
+            </h2>
+          </BlurFade>
         </div>
         <div className="w-full overflow-x-auto pb-8 px-32">
           <div className="flex flex-row gap-8 min-w-[900px]" style={{ width: 'max-content' }}>
@@ -517,14 +525,16 @@ export default function CanopyDemo() {
 
       {/* Flows Section (inspired by attached image) */}
       <section className="w-full flex flex-col items-center justify-center py-24 bg-white">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
-          Modernizing research <br></br>one {" "}
-          <span className="text-5xl md:text-5xl font-bold text-gray-500 mb-8 satoshi-bold text-left">
-            <TextAnimate by="character" animation="slideDown" duration={0.6} className="inline-block" segmentClassName="inline-block" once={false}>
-              scroll
-            </TextAnimate>
-          </span> at a time.
-        </h2>
+        <BlurFade delay={0.1} inView>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
+            Modernizing research <br></br>one {" "}
+            <span className="text-5xl md:text-5xl font-bold text-gray-500 mb-8 satoshi-bold text-left">
+              <TextAnimate by="character" animation="slideDown" duration={0.6} className="inline-block" segmentClassName="inline-block" once={false}>
+                scroll
+              </TextAnimate>
+            </span> at a time.
+          </h2>
+        </BlurFade>
         <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mx-auto justify-center">
           {/* Card 1 */}
           <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
@@ -562,49 +572,52 @@ export default function CanopyDemo() {
 
       {/* Stats Section (inspired by attached image) */}
       <section className="w-full flex flex-col items-center justify-center py-20 bg-white">
-        <div className="flex flex-col md:flex-row gap-12 w-full max-w-6xl mx-auto justify-center items-start md:items-stretch">
-          {/* Stat 1 */}
-          <div className="flex-1 flex flex-col items-start text-left px-4">
-            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm0 0v4m0 4h.01"/></svg>
-              Researchers
-            </span>
-            <div className="relative flex items-baseline mb-2 mt-2">
-              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={20} startValue={0} />K</span>
-              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+        <BlurFade delay={0.1} inView>
+          <div className="flex flex-col md:flex-row gap-12 w-full max-w-6xl mx-auto justify-center items-start md:items-stretch">
+            {/* Stat 1 */}
+            <div className="flex-1 flex flex-col items-start text-left px-4">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm0 0v4m0 4h.01"/></svg>
+                Researchers
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={20} startValue={0} />K</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Active researchers and students on ResDex.</div>
             </div>
-            <div className="text-gray-500 text-base satoshi-medium">Active researchers and students on ResDex.</div>
-          </div>
-          {/* Stat 2 */}
-          <div className="flex-1 flex flex-col items-start text-left px-15 border-l border-r border-gray-200">
-            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              Projects
-            </span>
-            <div className="relative flex items-baseline mb-2 mt-2">
-              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={0} />%</span>
-              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+            {/* Stat 2 */}
+            <div className="flex-1 flex flex-col items-start text-left px-15 border-l border-r border-gray-200">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Projects
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={0} />%</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Research projects and opportunities listed.</div>
             </div>
-            <div className="text-gray-500 text-base satoshi-medium">Research projects and opportunities listed.</div>
-          </div>
-          {/* Stat 3 */}
-          <div className="flex-1 flex flex-col items-start text-left px-4">
-            <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
-              Connections
-            </span>
-            <div className="relative flex items-baseline mb-2 mt-2">
-              <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={89} startValue={0} />%</span>
-              <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+            {/* Stat 3 */}
+            <div className="flex-1 flex flex-col items-start text-left px-4">
+              <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                Connections
+              </span>
+              <div className="relative flex items-baseline mb-2 mt-2">
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={89} startValue={0} />%</span>
+                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+              </div>
+              <div className="text-gray-500 text-base satoshi-medium">Connections made between students and mentors.</div>
             </div>
-            <div className="text-gray-500 text-base satoshi-medium">Connections made between students and mentors.</div>
           </div>
-        </div>
+        </BlurFade>
       </section>
 
       {/* Testimonials Section */}
-      {/* <TestimonialsSection /> */}
-      <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See why students and researchers <br></br> love ResDex.</h2>
+      <BlurFade delay={0.1} inView>
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See why students and researchers <br></br> love ResDex.</h2>
+      </BlurFade>
         <FlatTestimonials />
 
 
@@ -614,39 +627,47 @@ export default function CanopyDemo() {
       
       {/* Modern Rounded Rectangle Section */}
       <section className="w-full flex flex-col items-center justify-center py-24 bg-transparent">
-        <div className="relative bg-[#101117] rounded-3xl shadow-xl max-w-4xl w-full mx-auto px-8 py-20 flex flex-col items-center justify-center" style={{ minHeight: '380px' }}>
-          {/* Subtle grid background pattern */}
-          <svg className="absolute inset-0 w-full h-full z-0" style={{ borderRadius: 'inherit' }} width="100%" height="100%" viewBox="0 0 800 400" fill="none">
-            <g opacity="0.08">
-              <rect x="0" y="0" width="800" height="400" fill="none" />
-              {[...Array(9)].map((_, i) => (
-                <line key={i} x1={i*100} y1="0" x2={i*100} y2="400" stroke="#fff" strokeWidth="1" />
-              ))}
-              {[...Array(5)].map((_, i) => (
-                <line key={i} x1="0" y1={i*80} x2="800" y2={i*80} stroke="#fff" strokeWidth="1" />
-              ))}
-            </g>
-          </svg>
-          <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 satoshi-bold" style={{ color: '#fff' }}>
-              We're building the biggest research hub in the world.<br />
-              <span className="text-[#f5f5f5]">and you're in the center of it.</span>
-            </h2>
-            <p className="text-gray-300 text-lg max-w-xl mb-8 satoshi-medium">
-              Purpose built for students and researchers, our modern platform lets you discover, connect, and grow your academic impact with ease.
-            </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 bg-[#c4c4bc] text-[#101117] px-6 py-3 rounded-xl font-semibold text-base hover:bg-[#b0b0a8] transition shadow-none"
-              style={{ fontFamily: 'GellixMedium, sans-serif' }}
-            >
-              Explore Initiatives
-              <span className="ml-1">
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-              </span>
-            </a>
+        <BlurFade delay={0.1} inView>
+          <div className="relative bg-[#101117] rounded-3xl shadow-xl max-w-4xl w-full mx-auto px-8 py-20 flex flex-col items-center justify-center" style={{ minHeight: '380px' }}>
+            {/* Subtle grid background pattern */}
+            <svg className="absolute inset-0 w-full h-full z-0" style={{ borderRadius: 'inherit' }} width="100%" height="100%" viewBox="0 0 800 400" fill="none">
+              <g opacity="0.08">
+                <rect x="0" y="0" width="800" height="400" fill="none" />
+                {[...Array(9)].map((_, i) => (
+                  <line key={i} x1={i*100} y1="0" x2={i*100} y2="400" stroke="#fff" strokeWidth="1" />
+                ))}
+                {[...Array(5)].map((_, i) => (
+                  <line key={i} x1="0" y1={i*80} x2="800" y2={i*80} stroke="#fff" strokeWidth="1" />
+                ))}
+              </g>
+            </svg>
+            <div className="relative z-10 flex flex-col items-center justify-center text-center">
+              <BlurFade delay={0.1} inView>
+                <h2 className="text-3xl md:text-5xl font-bold mb-4 satoshi-bold" style={{ color: '#fff' }}>
+                  We're building the biggest research hub in the world.<br />
+                  <span className="text-[#f5f5f5]">and you're in the center of it.</span>
+                </h2>
+              </BlurFade>
+              <BlurFade delay={0.15} inView>
+                <p className="text-gray-300 text-lg max-w-xl mb-8 satoshi-medium">
+                  Purpose built for students and researchers, our modern platform lets you discover, connect, and grow your academic impact with ease.
+                </p>
+              </BlurFade>
+              <BlurFade delay={0.2} inView>
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-2 bg-[#c4c4bc] text-[#101117] px-6 py-3 rounded-xl font-semibold text-base hover:bg-[#b0b0a8] transition shadow-none"
+                  style={{ fontFamily: 'GellixMedium, sans-serif' }}
+                >
+                  Explore Initiatives
+                  <span className="ml-1">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                  </span>
+                </a>
+              </BlurFade>
+            </div>
           </div>
-        </div>
+        </BlurFade>
       </section>
      
 
