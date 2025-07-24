@@ -175,7 +175,7 @@ export default function LoginPage() {
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-gray-50 to-white border-l border-gray-200 relative z-10 order-2 md:order-1">
         
           <img
-        src="/logincover.png"
+        src="/logincover.webp"
         alt="Logo"
         className="object-cover w-full h-full rounded-2xl"
         style={{ transition: "transform 0.2s", willChange: "transform" }}
