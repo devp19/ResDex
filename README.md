@@ -2,16 +2,7 @@
 
 <!-- ![ResDex Banner](https://github.com/user-attachments/assets/8a7f5869-7c6a-4e1d-a8a4-f40965d0191a) -->
 
-___
-
-*“Research made easy. A platform tailored for students by students.”*
-
-___ 
-
-
-https://github.com/user-attachments/assets/0f32af24-bfa7-494b-99e5-dadbe9696ff6
-
-
+<img width="1470" height="833" alt="Screenshot 2025-07-23 at 10 36 11 PM" src="https://github.com/user-attachments/assets/fb8884c2-2f31-47d6-9a87-239246c188ce" />
 
 
 
