@@ -162,7 +162,7 @@ const SignupPage: React.FC = () => {
             )}
             <input
               type="text"
-              placeholder="Display Name (optional)"
+              placeholder="Full Name"
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
