@@ -547,14 +547,23 @@ export default function CanopyDemo() {
         <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mx-auto justify-center">
           {/* Card 1 */}
           <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
-            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8">
-              {/* Placeholder for video or image */}
-              <div className="w-8 h-8 border-2 border-gray-400 rounded-full animate-spin"></div>
+            <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
+              <video
+          src="https://mhnughbveavfihztvfvb.supabase.co/storage/v1/object/sign/video/video-shortform.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lM2U5NzhjNy0wODE4LTRmNjItOTA3Mi0wYTMyYzJjMzA5NGEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ2aWRlby92aWRlby1zaG9ydGZvcm0ubXA0IiwiaWF0IjoxNzUzMzc1ODU3LCJleHAiOjE5MTEwNTU4NTd9.r5SSLsi8tszAkq0VM2YDW8tr7tEhZINzvg0eRjwG4y0"
+          width={220}
+          height={400}
+          className="w-[220px] h-[400px] object-cover rounded-xl"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{ background: 'black' }}
+              />
             </div>
             <div className="w-full">
               <div className="text-lg font-bold satoshi-bold mb-2">Videos</div>
               <div className="text-gray-500 text-base satoshi-medium">
-                Experience flows the way they were meant to be experienced, complete with transitions, micro-interactions, and animations.
+We know you love scrollling, so we made it easy to share and discover research videos. From short-form clips to in-depth lectures, ResDex has you covered.
               </div>
             </div>
           </div>
