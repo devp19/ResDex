@@ -56,16 +56,15 @@ const features = [
 function FlatTestimonials() {
   return (
     <section className="w-full flex flex-col items-center justify-center mb-24 relative">
-      <div
-        className="w-full max-w-4xl columns-1 sm:columns-2 lg:columns-3 gap-6"
-      >
+      <div className="w-full max-w-4xl columns-1 sm:columns-2 lg:columns-3 gap-6">
         {reviews.map((review, idx) => (
           <BlurFade key={review.username} delay={0.1 * idx} inView>
             <div
               className="bg-[#f5f5f5] rounded-2xl flex flex-col p-6 mb-6 break-inside-avoid"
-              style={{ background: '#f5f5f5' }}
+              style={{ background: "#f5f5f5" }}
             >
-              <div className="flex items-center gap-3 mb-2">
+              {/* Header with Image, Name, and Role */}
+              <div className="flex items-center gap-3 mb-4">
                 <img
                   className="rounded-full w-10 h-10 object-cover"
                   width="40"
@@ -74,11 +73,17 @@ function FlatTestimonials() {
                   src={review.img}
                 />
                 <div className="flex flex-col">
-                  <span className="font-semibold text-sm text-neutral-800 leading-tight">{review.name}</span>
-                  <span className="text-xs text-neutral-500">{review.username}</span>
+                  <span className="font-semibold text-sm text-neutral-800 leading-tight">
+                    {review.name}
+                  </span>
+                  <span className="text-xs text-neutral-500">{review.role}</span>
                 </div>
               </div>
-              <blockquote className="text-sm text-neutral-700 mt-2 flex-1">{review.body}</blockquote>
+
+              {/* Quote Body */}
+              <blockquote className="text-sm text-neutral-700 leading-relaxed">
+                “{review.body}”
+              </blockquote>
             </div>
           </BlurFade>
         ))}
@@ -87,75 +92,78 @@ function FlatTestimonials() {
   );
 }
 
+
 // Add import for Image at the top if not already present
 // import Image from "next/image";
 
 // Add reviews data (copy from home page)
 const reviews = [
   {
-    name: "Ava Patel",
-    username: "@avapatel",
-    body: "Quick sign-up and I found a project in my field within a day!",
-    img: "https://avatar.vercel.sh/ava",
-    role: "Student, UofT"
+    name: "Ava Edwards",
+    username: "@avaed",
+    body: "ResDex gave me the confidence to explore opportunities beyond campus. Within a week, I was co-authoring a paper with a faculty mentor!",
+    img: "https://i.pravatar.cc/150?img=26",
+    role: "Computer Science, UofT"
   },
   {
     name: "Lucas Kim",
     username: "@lucaskim",
-    body: "ResDex helped me land my first research position! The process was so much easier than cold emailing professors. I was able to connect with mentors who provided valuable feedback on my application, and the platform's resources made the whole process stress-free.",
-    img: "https://avatar.vercel.sh/jack",
-    role: "Student, McMaster"
+    body: "The built‑in profile matching in ResDex made connections easy. I landed my first research role without sending dozens of emails.",
+    img: "https://i.pravatar.cc/150?img=12",
+    role: "Biomedical Engineering, McMaster"
   },
   {
-    name: "Priya Singh",
-    username: "@priyasingh",
-    body: "I love how transparent and student-focused ResDex is. I found a lab that matched my interests perfectly. The notifications kept me updated on new opportunities, and the support team was always quick to help.",
-    img: "https://avatar.vercel.sh/jill",
-    role: "Student, Laurier"
+    name: "Adam Garcia",
+    username: "@imadamg",
+    body: "As someone new to research, I appreciated the transparency and guidance. I found a lab fit and got fast help when I needed it.",
+    img: "https://i.pravatar.cc/150?img=57",
+    role: "Health Sci, Laurier"
   },
   {
     name: "Mateo Alvarez",
     username: "@mateoa",
-    body: "The community features are amazing. I connected with peers and mentors who guided me through my research journey. I especially loved the ability to join different research groups and participate in discussions.",
-    img: "https://avatar.vercel.sh/john",
-    role: "Student, UOttawa"
+    body: "ResDex’s community helped me build connections that mattered. Joining a climate lab early led to a publication!",
+    img: "https://i.pravatar.cc/150?img=68",
+    role: "Environmental Studies, UOttawa"
   },
   {
     name: "Emily Chen",
     username: "@emchen",
-    body: "ResDex's interface is so easy to use. I found opportunities I never would have discovered otherwise! The search and filter tools are incredibly helpful for narrowing down the best matches for my interests.",
-    img: "https://avatar.vercel.sh/jack",
-    role: "Student, UofT"
+    body: "The UX is polished and student-first. The powerful filters surfaced opportunities I would never have discovered otherwise.",
+    img: "https://i.pravatar.cc/150?img=38",
+    role: "Data Science, UofT"
   },
   {
     name: "Noah Williams",
     username: "@noahw",
-    body: "I appreciate the focus on student privacy and security. I feel safe sharing my achievements here. The verification process for opportunities gave me peace of mind, and the support team was always quick to respond to my questions. I also love the regular updates and new features!",
-    img: "https://avatar.vercel.sh/jill",
-    role: "Student, Laurier"
+    body: "I always felt my privacy was respected on ResDex. The platforms verified opportunity tags gave me peace of mind before applying, and I never felt pressured to share more than I was comfortable with. It felt like a safe space to showcase my achievements, explore roles that aligned with my goals, and connect with mentors who genuinely cared about student growth.",
+    img: "https://i.pravatar.cc/150?img=55",
+    role: "Comp Engineering, Laurier"
   },
   {
     name: "Sara Müller",
     username: "@saramuller",
-    body: "Connecting with professors was seamless. I got feedback on my research proposal within days! The messaging system made it easy to keep track of all my conversations in one place.",
-    img: "https://avatar.vercel.sh/john",
-    role: "Student, McMaster"
+    body: "I was able to stay organized through the messaging system. Now I co-moderate an AI research group I discovered here.",
+    img: "https://i.pravatar.cc/150?img=36",
+    role: "Cognitive Science, McMaster"
   },
   {
     name: "Omar Farouk",
     username: "@omarfarouk",
-    body: "Verified opportunities = less stress. I was able to apply to positions knowing they were legitimate, and the application process was straightforward. I recommend ResDex to all my classmates.",
-    img: "https://avatar.vercel.sh/jack",
-    role: "Student, UOttawa"
+    body: "As a second-year student, I thought research was out of reach. ResDex made it accessible and shaped my academic path.",
+    img: "https://i.pravatar.cc/150?img=56",
+    role: "Life Sciences, UOttawa"
   },
   {
     name: "Julia Rossi",
     username: "@juliarossi",
-    body: "ResDex is a game changer for undergrads looking to get into research. Highly recommend! The resources and guides available on the platform helped me prepare a strong application and ace my interviews. I also made some great friends through the community forums.",
-    img: "https://avatar.vercel.sh/jill",
-    role: "Student, Laurier"
+    body: "From opportunity discovery to application prep, ResDex was everything I wish I had in first year.",
+    img: "https://i.pravatar.cc/150?img=32",
+    role: "Psychology, Laurier"
   },
 ];
+
+
 
 // TestimonialCard component styled like the attached image
 function TestimonialCard({ img, name, role, body }: { img: string; name: string; role: string; body: string }) {
@@ -229,7 +237,7 @@ export default function CanopyDemo() {
         {/* Logo */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <Image src="/beige-logo.png" alt="ResDex Logo" width={32} height={32} />
-          <span className="ml-1 font-bold text-lg" style={{ fontFamily: 'GellixMedium, sans-serif' }}>ResDex</span>
+          <span className="ml-1 text-xl font-semibold">ResDex</span>
         </div>
         {/* Nav Links - centered absolutely */}
         <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
@@ -425,7 +433,7 @@ export default function CanopyDemo() {
             </h2>
           </BlurFade>
         </div>
-        <div className="w-full overflow-x-auto pb-8 px-32">
+        <div className="w-full overflow-x-auto pb-8 px-32 custom-scrollbar">
           <div className="flex flex-row gap-8 min-w-[900px]" style={{ width: 'max-content' }}>
             {/* Card 1 */}
             <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
@@ -475,57 +483,64 @@ export default function CanopyDemo() {
                 <div className="text-gray-400 text-sm mt-2 satoshi-medium">Get matched with labs, supervisors, and open calls for papers. ResDex curates recommendations based on your interests and activity.</div>
               </div>
             </div>
-            {/* Card 4 */}
-            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2">
-                  {/* Placeholder icon */}
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" fill="#C7FF5A"/><rect x="8" y="8" width="8" height="8" rx="2" fill="#6B7280"/></svg>
-                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">AUTOMATOR</span>
-                </div>
-                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-              </div>
-              <div className="flex-1 flex flex-col justify-end">
-                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Automate your workflows.</div>
-                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Automator lets you build and deploy custom automations for your loan management process.</div>
-              </div>
-            </div>
+           {/* Card 4 */}
+<div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+  <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center gap-2">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9" />
+        <polyline points="7 10 12 13 17 10" />
+        <rect x="7" y="18" width="2" height="2" />
+        <rect x="15" y="18" width="2" height="2" />
+      </svg>
+      <span className="text-xs tracking-widest text-gray-300 satoshi-medium">KEYNOTE SESSIONS</span>
+    </div>
+    <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+  <div className="flex-1 flex flex-col justify-end">
+    <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Join us for live keynote sessions.</div>
+    <div className="text-gray-400 text-sm mt-2 satoshi-medium">Hear directly from the ResDex team at conferences, student showcases, and AMAs. We talk about research, student success, and what’s next in academia.</div>
+  </div>
+</div>
+
             {/* Card 5 */}
-            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2">
-                  {/* Placeholder icon */}
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#A3A3A3"/><rect x="6" y="6" width="12" height="12" rx="6" fill="#C7FF5A"/></svg>
-                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">RISK ANALYTICS</span>
-                </div>
-                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-              </div>
-              <div className="flex-1 flex flex-col justify-end">
-                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Analyze risk in real time.</div>
-                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Risk Analytics provides real-time risk assessment and reporting for your loan portfolio.</div>
-              </div>
-            </div>
+<div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+  <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center gap-2">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+      <span className="text-xs tracking-widest text-gray-300 satoshi-medium">MENTOR MATCH</span>
+    </div>
+    <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+  <div className="flex-1 flex flex-col justify-end">
+    <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Find the right mentor for you.</div>
+    <div className="text-gray-400 text-sm mt-2 satoshi-medium">Use our intelligent match system to connect with faculty, researchers, and peers aligned with your interests and goals.</div>
+  </div>
+</div>
+
             {/* Card 6 */}
-            <div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2">
-                  {/* Placeholder icon */}
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="8" fill="#C7FF5A"/><rect x="10" y="10" width="4" height="4" rx="2" fill="#6B7280"/></svg>
-                  <span className="text-xs tracking-widest text-gray-300 satoshi-medium">PORTAL</span>
-                </div>
-                <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-              </div>
-              <div className="flex-1 flex flex-col justify-end">
-                <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">A portal for your clients.</div>
-                <div className="text-gray-400 text-sm mt-2 satoshi-medium">Portal gives your clients a secure, branded space to manage their loans and documents.</div>
-              </div>
-            </div>
+<div className="bg-[#181922] rounded-2xl p-8 min-w-[350px] max-w-[400px] flex flex-col justify-between shadow-lg border border-[#23242c] relative" style={{ height: '320px' }}>
+  <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center gap-2">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+      <span className="text-xs tracking-widest text-gray-300 satoshi-medium">RESEARCH EVENTS</span>
+    </div>
+    <button className="w-8 h-8 rounded-full bg-[#23242c] flex items-center justify-center text-gray-300 hover:bg-[#23242c]/80 transition">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+  <div className="flex-1 flex flex-col justify-end">
+    <div className="text-2xl font-semibold text-white mb-2 satoshi-bold leading-snug">Stay updated with research events.</div>
+    <div className="text-gray-400 text-sm mt-2 satoshi-medium">Discover conferences, calls for papers, funding deadlines, and workshops; all personalized to your academic interests.</div>
+  </div>
+</div>
+
           </div>
         </div>
       </section>
@@ -536,12 +551,7 @@ export default function CanopyDemo() {
       <section className="w-full flex flex-col items-center justify-center py-24 bg-white">
         <BlurFade delay={0.1} inView>
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
-            Modernizing research <br></br>one {" "}
-            <span className="text-5xl md:text-5xl font-bold text-gray-500 mb-8 satoshi-bold text-left">
-              <TextAnimate by="character" animation="slideDown" duration={0.6} className="inline-block" segmentClassName="inline-block" once={false}>
-                scroll
-              </TextAnimate>
-            </span> at a time.
+            Modernizing research <br></br> one step at a time.
           </h2>
         </BlurFade>
         <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mx-auto justify-center">
@@ -561,27 +571,31 @@ export default function CanopyDemo() {
               />
             </div>
             <div className="w-full">
-              <div className="text-lg font-bold satoshi-bold mb-2">Videos</div>
+              <div className="text-lg font-bold satoshi-bold mb-2">Short-Form</div>
               <div className="text-gray-500 text-base satoshi-medium">
-We know you love scrollling, so we made it easy to share and discover research videos. From short-form clips to in-depth lectures, ResDex has you covered.
+We know you love scrolling, so we made it easy to share and discover research videos. From short-form clips to in-depth lectures, ResDex has you covered.
               </div>
             </div>
           </div>
           {/* Card 2 */}
           <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
             <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
-              {/* Placeholder for phone UI image */}
-              <div className="text-white text-left px-4 py-8 w-full">
-                <div className="text-base leading-snug">
-                  Want to use Location Services to help you find the closest Nike Store, access in-store and location-based features, and see experiences near you?
-                </div>
-                <button className="mt-8 bg-white text-black rounded-lg px-4 py-2 text-sm satoshi-medium">Next</button>
-              </div>
+              <video
+          src="https://mhnughbveavfihztvfvb.supabase.co/storage/v1/object/sign/video/topics.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lM2U5NzhjNy0wODE4LTRmNjItOTA3Mi0wYTMyYzJjMzA5NGEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ2aWRlby90b3BpY3MubXA0IiwiaWF0IjoxNzUzNTYxMTM5LCJleHAiOjE4NDgxNjkxMzl9.MW_8tJJ3VBf4iYV0NwjODJhFfSIMwI9CceAg0NVqigk"
+          width={220}
+          height={400}
+          className="w-[220px] h-[400px] object-cover rounded-xl"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{ background: 'black' }}
+              />
             </div>
             <div className="w-full">
-              <div className="text-lg font-bold satoshi-bold mb-2">Prototype mode</div>
+              <div className="text-lg font-bold satoshi-bold mb-2">Personalization</div>
               <div className="text-gray-500 text-base satoshi-medium">
-                Walk through flows, step by step, by using the interactive hotspots at your own preferred pace.
+No more noise. Customize your ResDex experience to see the topics, researchers, and projects that matter most to you. Discover content tailored to your interests.
               </div>
             </div>
           </div>
@@ -590,6 +604,11 @@ We know you love scrollling, so we made it easy to share and discover research v
 
       {/* Stats Section (inspired by attached image) */}
       <section className="w-full flex flex-col items-center justify-center py-20 bg-white">
+         <BlurFade delay={0.1} inView>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold">
+            Let the numbers<br></br>do the talking.
+          </h2>
+        </BlurFade>
         <BlurFade delay={0.1} inView>
           <div className="flex flex-col md:flex-row gap-12 w-full max-w-6xl mx-auto justify-center items-start md:items-stretch">
             {/* Stat 1 */}
@@ -599,42 +618,48 @@ We know you love scrollling, so we made it easy to share and discover research v
                 Researchers
               </span>
               <div className="relative flex items-baseline mb-2 mt-2">
-                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={20} startValue={0} />K</span>
+                <span className="text-7xl font-medium gellix-medium leading-none"> 8.<NumberTicker value={9} startValue={0} />M</span>
                 <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
               </div>
-              <div className="text-gray-500 text-base satoshi-medium">Active researchers and students on ResDex.</div>
+              <div className="text-gray-500 text-base satoshi-medium">Researchers worldwide that ResDex can impact positively.</div>
             </div>
             {/* Stat 2 */}
             <div className="flex-1 flex flex-col items-start text-left px-15 border-l border-r border-gray-200">
               <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                Projects
+<svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24">
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+  <polyline points="22,6 12,13 2,6" />
+</svg>
+                Emails
               </span>
               <div className="relative flex items-baseline mb-2 mt-2">
-                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={0} />%</span>
-                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={99} startValue={50} />%</span>
+                {/* <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span> */}
               </div>
-              <div className="text-gray-500 text-base satoshi-medium">Research projects and opportunities listed.</div>
+              <div className="text-gray-500 text-base satoshi-medium">Of cold-emails go unnoticed or straight to spam.</div>
             </div>
             {/* Stat 3 */}
             <div className="flex-1 flex flex-col items-start text-left px-4">
               <span className="inline-flex items-center px-4 py-2 mb-6 rounded-lg bg-[#f5f5f5] text-[#181818] font-semibold satoshi-medium text-sm">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
-                Connections
+<svg className="w-4 h-4 mr-2" fill="none" stroke="#181818" strokeWidth="2" viewBox="0 0 24 24">
+  <path d="M3 17l5-5 4 4 7-7" strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M16 7h4v4" strokeLinecap="round" strokeLinejoin="round" />
+</svg>
+                Responses
               </span>
               <div className="relative flex items-baseline mb-2 mt-2">
-                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={89} startValue={0} />%</span>
-                <span className="absolute right-[-1.5rem] top-0 text-lg font-bold satoshi-bold text-gray-500">+</span>
+                <span className="text-7xl font-medium gellix-medium leading-none"> <NumberTicker value={300} startValue={150} /></span>
+                <span className="absolute right-[-2.9rem] bottom-0 text-lg text-gray-500">times</span>
               </div>
-              <div className="text-gray-500 text-base satoshi-medium">Connections made between students and mentors.</div>
+              <div className="text-gray-500 text-base satoshi-medium">More likely to get responses when contacted via verified profiles.</div>
             </div>
           </div>
         </BlurFade>
       </section>
 
       {/* Testimonials Section */}
-      <BlurFade delay={0.1} inView>
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">See why students and researchers <br></br> love ResDex.</h2>
+      <BlurFade delay={0.1} inView style={{ marginTop: '10rem' }}>
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">Why we love<br></br> doing what we do.</h2>
       </BlurFade>
         <FlatTestimonials />
 
@@ -667,17 +692,17 @@ We know you love scrollling, so we made it easy to share and discover research v
                 </h2>
               </BlurFade>
               <BlurFade delay={0.15} inView>
-                <p className="text-gray-300 text-lg max-w-xl mb-8 satoshi-medium">
+                <p className="text-gray-300 text-md max-w-xl mb-8 mt-8 satoshi-medium">
                   Purpose built for students and researchers, our modern platform lets you discover, connect, and grow your academic impact with ease.
                 </p>
               </BlurFade>
               <BlurFade delay={0.2} inView>
                 <a
-                  href="#"
-                  className="inline-flex items-center gap-2 bg-[#c4c4bc] text-[#101117] px-6 py-3 rounded-xl font-semibold text-base hover:bg-[#b0b0a8] transition shadow-none"
+                  href="/waitlist"
+                  className="inline-flex items-center gap-1 bg-[#f5f5f5] text-[#101117] px-6 py-3 rounded-xl text-base hover:bg-[#c7c7c7] transition shadow-none"
                   style={{ fontFamily: 'GellixMedium, sans-serif' }}
                 >
-                  Explore Initiatives
+                  Get Started
                   <span className="ml-1">
                     <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                   </span>
