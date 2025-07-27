@@ -8,6 +8,8 @@ interface ProfileStatsCardProps {
   noShadow?: boolean;
   className?: string;
   disableTilt?: boolean;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
 }
 
 // Custom tilt hook without scale
@@ -37,21 +39,48 @@ function use3dTiltNoScale(max = 15) {
   };
 }
 
-export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({ followers, following, contributions, noShadow = false, className = "", disableTilt = false }) => {
+export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({
+  followers,
+  following,
+  contributions,
+  noShadow = false,
+  className = "",
+  disableTilt = false,
+  onFollowersClick,
+  onFollowingClick
+}) => {
   const tilt = use3dTiltNoScale();
-  const tiltProps = disableTilt ? {} : { ref: tilt.ref, onMouseMove: tilt.onMouseMove, onMouseLeave: tilt.onMouseLeave };
+  const tiltProps = disableTilt
+    ? {}
+    : { ref: tilt.ref, onMouseMove: tilt.onMouseMove, onMouseLeave: tilt.onMouseLeave };
   return (
     <div
       {...tiltProps}
-      className={`flex w-full max-w-md bg-[rgba(230,230,230,0.18)] dark:bg-[rgba(24,24,27,0.28)] backdrop-blur-2xl rounded-3xl border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-300/20 dark:outline-zinc-700/20 p-3 ${noShadow ? '' : 'shadow-2xl'} ${className}`}
+      className={`flex w-full max-w-md bg-[rgba(230,230,230,0.18)] dark:bg-[rgba(24,24,27,0.28)] backdrop-blur-2xl rounded-3xl border border-zinc-200 dark:border-zinc-800 outline outline-1 outline-gray-300/20 dark:outline-zinc-700/20 p-3 ${noShadow ? "" : "shadow-2xl"} ${className}`}
     >
       <div className="flex-1 flex flex-col items-start justify-center mx-3">
-        <span className="text-2xl font-bold">{followers}</span>
+        <button
+          type="button"
+          onClick={onFollowersClick}
+          className="text-2xl font-bold focus:outline-none focus:underline hover:underline transition"
+          style={{ background: "none", border: 0, padding: 0, margin: 0, cursor: onFollowersClick ? "pointer" : "default" }}
+          tabIndex={0}
+        >
+          {followers}
+        </button>
         <span className="text-sm mt-1 text-neutral-400">Followers</span>
       </div>
       <div className="w-px bg-zinc-200 dark:bg-zinc-700 mx-6" />
       <div className="flex-1 flex flex-col items-start justify-center">
-        <span className="text-2xl font-bold">{following}</span>
+        <button
+          type="button"
+          onClick={onFollowingClick}
+          className="text-2xl font-bold focus:outline-none focus:underline hover:underline transition"
+          style={{ background: "none", border: 0, padding: 0, margin: 0, cursor: onFollowingClick ? "pointer" : "default" }}
+          tabIndex={0}
+        >
+          {following}
+        </button>
         <span className="text-sm mt-1 text-neutral-400">Following</span>
       </div>
       <div className="w-px bg-zinc-200 dark:bg-zinc-700 mx-6" />
@@ -61,4 +90,4 @@ export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({ followers, f
       </div>
     </div>
   );
-}; 
+};

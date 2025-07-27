@@ -54,8 +54,27 @@ const INTEREST_OPTIONS = [
   "Automation", "AI", "Finance", "Web Development", "Healthcare", "Education", "Design", "Research", "Data Science", "Blockchain", "Biotech", "Climate", "Product Management", "Cloud Computing", "Marketing", "Energy"
 ];
 
+// Get followers of a user
+async function getFollowers(userId: string) {
+  const { data, error } = await supabase.rpc('dev_get_followers', {
+    p_user_id: userId
+  });
+  if (error) console.error('Fetch followers failed:', error);
+  return data;
+}
+
+// Get users a profile is following
+async function getFollowing(userId: string) {
+  const { data, error } = await supabase.rpc('dev_get_following', {
+    p_user_id: userId
+  });
+  if (error) console.error('Fetch following failed:', error);
+  return data;
+}
+
 export default function ProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const usernameParam = params.username as string;
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -76,6 +95,12 @@ export default function ProfilePage() {
 
   // Follow system state
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
+
+  // Follower/Following Modal
+  const [listModalOpen, setListModalOpen] = useState(false);
+  const [listType, setListType] = useState<'followers' | 'following'>('followers');
+  const [listLoading, setListLoading] = useState(false);
+  const [listData, setListData] = useState<any[]>([]);
 
   // Posts/Pagination (mock posts)
   const [page, setPage] = useState(1);
@@ -313,7 +338,6 @@ export default function ProfilePage() {
     setEditLoading(false);
   };
 
-  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -380,6 +404,25 @@ export default function ProfilePage() {
       .eq("id", profile.id)
       .single();
     setProfile(updated || profile);
+  }
+
+  // --- Followers/Following modal handlers ---
+  async function openFollowersModal() {
+    setListType('followers');
+    setListLoading(true);
+    setListModalOpen(true);
+    const followers = await getFollowers(profile.id);
+    setListData(followers || []);
+    setListLoading(false);
+  }
+
+  async function openFollowingModal() {
+    setListType('following');
+    setListLoading(true);
+    setListModalOpen(true);
+    const following = await getFollowing(profile.id);
+    setListData(following || []);
+    setListLoading(false);
   }
 
   if (loading) {
@@ -560,6 +603,8 @@ export default function ProfilePage() {
                     noShadow
                     className="!mx-0"
                     disableTilt={true}
+                    onFollowersClick={openFollowersModal}
+                    onFollowingClick={openFollowingModal}
                   />
                   <ProfileOrgInterestsCard
                     organization={profile?.organization || "Google"}
@@ -572,7 +617,7 @@ export default function ProfilePage() {
           </div>
           {/* Posts Section */}
           <div className="bg-white rounded-xl min-h-[800px] flex flex-col p-6 w-full overflow-x-auto border border-gray-200">
-            <Tabs
+            {/* <Tabs
               tabs={[
                 {
                   title: "Research",
@@ -652,7 +697,7 @@ export default function ProfilePage() {
                   ),
                 },
               ]}
-            />
+            /> */}
           </div>
           {/* Edit Bio Modal */}
           <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
@@ -784,6 +829,53 @@ export default function ProfilePage() {
               </AlertDialogFooter>
               {editError && <div className="text-red-500 mt-2 text-sm">{editError}</div>}
               {editSuccess && <div className="text-green-600 mt-2 text-sm">{editSuccess}</div>}
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Followers/Following List Modal */}
+          <AlertDialog open={listModalOpen} onOpenChange={setListModalOpen}>
+            <AlertDialogContent style={{ maxHeight: 540, minWidth: 380, overflowY: 'auto' }} className="!p-6">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {listType === 'followers' ? 'Followers' : 'Following'}
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+              {listLoading ? (
+                <LoadingSpinner />
+              ) : listData.length === 0 ? (
+                <div className="text-neutral-500 text-center my-8">
+                  {listType === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+                </div>
+              ) : (
+                <ul className="flex flex-col gap-4">
+                  
+                  {listData.map((user) => (
+                    
+                    <li key={user.id} className="flex items-center gap-3 py-2">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        <Image src={user.avatar_url || '/empty-pic.webp'} alt={user.display_name || user.username} width={40} height={40} style={{ objectFit: "cover", width: "100%", height: "100%" }} unoptimized />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-neutral-800 truncate">{user.display_name || user.full_name || user.username}</div>
+                        <div className="text-xs text-neutral-500 truncate">{user.bio}</div>
+                      </div>
+                      <button
+                        className="rounded-full bg-gray-100 text-gray-700 px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition whitespace-nowrap ml-2"
+                        onClick={() => router.push(`/profile/${user.username}`)}
+                      >
+                        Visit
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <AlertDialogFooter>
+                <AlertDialogCancel asChild>
+                  <button className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Close
+                  </button>
+                </AlertDialogCancel>
+              </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
