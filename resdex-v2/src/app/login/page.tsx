@@ -53,7 +53,7 @@ export default function LoginPage() {
     let username = null;
     if (userId) {
       const { data: profileData } = await supabase
-        .from("profiles")
+        .from("dev_profiles")
         .select("username")
         .eq("id", userId)
         .single();
