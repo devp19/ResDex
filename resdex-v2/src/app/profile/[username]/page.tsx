@@ -28,17 +28,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
-import { FollowButton } from "@/components/ui/FollowButton";
 import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
 import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
+// Navigation items
 const navItems = [
   { name: "Home", link: "/" },
   { name: "Network", link: "/network" },
   { name: "Jobs", link: "/jobs" },
 ];
 
-// Responsive hook for small screens
+// Responsive utility
 function useIsSmallScreen() {
   const [isSmall, setIsSmall] = useState(false);
   useEffect(() => {
@@ -50,24 +50,8 @@ function useIsSmallScreen() {
   return isSmall;
 }
 
-// List of available interests
 const INTEREST_OPTIONS = [
-  "Automation",
-  "AI",
-  "Finance",
-  "Web Development",
-  "Healthcare",
-  "Education",
-  "Design",
-  "Research",
-  "Data Science",
-  "Blockchain",
-  "Biotech",
-  "Climate",
-  "Product Management",
-  "Cloud Computing",
-  "Marketing",
-  "Energy",
+  "Automation", "AI", "Finance", "Web Development", "Healthcare", "Education", "Design", "Research", "Data Science", "Blockchain", "Biotech", "Climate", "Product Management", "Cloud Computing", "Marketing", "Energy"
 ];
 
 export default function ProfilePage() {
@@ -76,10 +60,8 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
   const [gradient, setGradient] = useState("linear-gradient(to right, #fbe6b2, #f6b47b)");
   const imgRef = useRef<HTMLImageElement>(null);
-  const profileImgSrc = "/jess-avatar.jpeg";
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [aboutDraft, setAboutDraft] = useState("");
@@ -90,10 +72,12 @@ export default function ProfilePage() {
   const [editSuccess, setEditSuccess] = useState("");
   const [interestSearch, setInterestSearch] = useState("");
   const [myProfile, setMyProfile] = useState<any>(null);
-  const [followingCount, setFollowingCount] = useState<number>(0);
   const [organizationDraft, setOrganizationDraft] = useState("");
 
-  // Posts data and pagination state
+  // Follow system state
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+
+  // Posts/Pagination (mock posts)
   const [page, setPage] = useState(1);
   const posts = [
     <CardPost
@@ -180,9 +164,9 @@ export default function ProfilePage() {
     });
   }, []);
 
-  // Fetch profile from dev_profiles
+  // Fetch profile and follow relationship
   useEffect(() => {
-    async function fetchProfile() {
+    async function fetchProfileAndRelation() {
       setLoading(true);
       setNotFound(false);
       const { data, error } = await supabase
@@ -193,31 +177,44 @@ export default function ProfilePage() {
       if (error || !data) {
         setNotFound(true);
         setProfile(null);
-        setFollowingCount(0);
       } else {
         setProfile(data);
-        // Fetch following count for this user
-        const { count, error: followingError } = await supabase
-          .from("followers")
-          .select("id", { count: "exact", head: true })
-          .eq("follower_id", data.id)
-          .eq("status", "accepted");
-        setFollowingCount(followingError ? 0 : (count || 0));
+
+        // Check if current user is following this user
+        if (currentUser && data.id && currentUser.id !== data.id) {
+          const { data: followingData } = await supabase
+            .rpc("dev_is_following", { p_followed_id: data.id });
+          setIsFollowing(!!followingData);
+        } else {
+          setIsFollowing(false);
+        }
       }
       setLoading(false);
     }
-    if (usernameParam) fetchProfile();
-  }, [usernameParam]);
+    if (usernameParam) fetchProfileAndRelation();
+    // eslint-disable-next-line
+  }, [usernameParam, currentUser]);
+
+  // Refetch isFollowing when profile or currentUser changes
+  useEffect(() => {
+    async function checkFollowing() {
+      if (currentUser && profile && profile.id && currentUser.id !== profile.id) {
+        const { data: followingData } = await supabase.rpc("dev_is_following", { p_followed_id: profile.id });
+        setIsFollowing(!!followingData);
+      }
+    }
+    checkFollowing();
+    // eslint-disable-next-line
+  }, [profile, currentUser]);
 
   useEffect(() => {
     if (imgRef.current && imgRef.current.complete) {
       extractColors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileImgSrc]);
+  }, [profile?.avatar_url]);
 
   const darkenColor = (rgbArr: number[], amount = 0.15): number[] => {
-    // amount: 0.15 means 15% darker
     return rgbArr.map((c: number) => Math.max(0, Math.floor(c * (1 - amount))));
   };
 
@@ -232,13 +229,12 @@ export default function ProfilePage() {
         const rgb2 = `rgb(${darker.join(",")})`;
         setGradient(`linear-gradient(to right, ${rgb1}, ${rgb2})`);
       } catch (e) {
-        // fallback in case of error
         setGradient("linear-gradient(to right, #fbe6b2, #f6b47b)");
       }
     }
   };
 
-  // Example avatar URLs from randomuser.me for demo purposes
+  // Example recommended profiles
   const recommendedProfiles = [
     {
       name: "Jesselyn Wang",
@@ -273,9 +269,8 @@ export default function ProfilePage() {
   ];
 
   // Helper: is this my profile?
-  const isOwnProfile = currentUser && profile && currentUser.user_metadata?.username === profile.username;
+  const isOwnProfile = currentUser && profile && currentUser.id === profile.id;
 
-  // When opening edit modal, prefill interests
   useEffect(() => {
     if (editOpen && profile) {
       setInterestsDraft(Array.isArray(profile.interests) ? profile.interests : []);
@@ -287,16 +282,12 @@ export default function ProfilePage() {
     setEditLoading(true);
     setEditError("");
     setEditSuccess("");
-
-    // Get the current user's ID
     const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
       setEditError("You must be logged in to update your profile.");
       setEditLoading(false);
       return;
     }
-
     const { error } = await supabase
       .from("dev_profiles")
       .update({
@@ -305,8 +296,7 @@ export default function ProfilePage() {
         interests: interestsDraft,
         organization: organizationDraft
       })
-      .eq("id", user.id);  // Use the authenticated user's ID
-
+      .eq("id", user.id);
     if (error) {
       setEditError(error.message || "Failed to update profile.");
     } else {
@@ -327,8 +317,6 @@ export default function ProfilePage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-  const [signoutConfirmed, setSignoutConfirmed] = useState(false);
-  const avatarUrl = profile?.avatar_url || currentUser?.user_metadata?.avatar_url || "/empty-pic.webp";
 
   // Sign out handler
   const handleSignOut = async () => {
@@ -353,7 +341,7 @@ export default function ProfilePage() {
     return () => window.removeEventListener("click", handleClick);
   }, [dropdownOpen]);
 
-  // Fetch the logged-in user's profile (by id) from dev_profiles when currentUser changes
+  // Fetch the logged-in user's profile
   useEffect(() => {
     if (currentUser) {
       supabase
@@ -366,6 +354,33 @@ export default function ProfilePage() {
       setMyProfile(null);
     }
   }, [currentUser]);
+
+  // Follow/Unfollow system - using Supabase functions
+  async function handleFollow() {
+    if (!profile?.id || !currentUser) return;
+    await supabase.rpc("dev_follow_user", { p_followed_id: profile.id });
+    setIsFollowing(true);
+    // Re-fetch profile to update computed columns
+    const { data: updated } = await supabase
+      .from("dev_profiles")
+      .select("*")
+      .eq("id", profile.id)
+      .single();
+    setProfile(updated || profile);
+  }
+
+  async function handleUnfollow() {
+    if (!profile?.id || !currentUser) return;
+    await supabase.rpc("dev_unfollow_user", { p_followed_id: profile.id });
+    setIsFollowing(false);
+    // Re-fetch profile to update computed columns
+    const { data: updated } = await supabase
+      .from("dev_profiles")
+      .select("*")
+      .eq("id", profile.id)
+      .single();
+    setProfile(updated || profile);
+  }
 
   if (loading) {
     return (
@@ -384,7 +399,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
-      {/* Navbar */}
       <Navbar>
         <NavBody>
           <div className="flex items-center w-full">
@@ -403,7 +417,6 @@ export default function ProfilePage() {
             </div>
             {/* Spacer */}
             <div className="flex-grow" />
-            {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
             <MessageBadge />
             <NotificationBadge />
@@ -432,7 +445,6 @@ export default function ProfilePage() {
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
-          {/* Main Profile Card */}
           <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
             {/* Banner */}
             <div className="p-4">
@@ -503,24 +515,33 @@ export default function ProfilePage() {
                       )}
                     </span>
                   </div>
-                  {/* Show Follow button only if not own profile and user is authenticated */}
+                  {/* Follow/Unfollow only if not own profile and authenticated */}
                   {currentUser && !isOwnProfile && profile?.id && (
-                    <>
-                      <FollowButton userId={profile.id} />
-                      <button
-                        className="ml-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 cursor-pointer"
-                        title="Message"
-                        onClick={() => router.push(`/messages?user=${profile.username}`)}
-                        aria-label="Message"
-                        type="button"
-                      >
-                        <span className="font-semibold text-[#2a2a2a]">Message</span>
-                        <MessageCircleIcon className="w-6 h-6" style={{ color: '#2a2a2a' }} />
-                      </button>
-                    </>
+                    <button
+                      className={`ml-2 px-4 py-2 rounded-full font-semibold transition flex items-center gap-2 justify-center
+                        ${isFollowing ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-blue-600 text-white hover:bg-blue-700"}
+                      `}
+                      style={{ minWidth: 96 }}
+                      onClick={isFollowing ? handleUnfollow : handleFollow}
+                    >
+                      {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                  )}
+                  {/* Message Button */}
+                  {currentUser && !isOwnProfile && profile?.id && (
+                    <button
+                      className="ml-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 cursor-pointer"
+                      title="Message"
+                      onClick={() => router.push(`/messages?user=${profile.username}`)}
+                      aria-label="Message"
+                      type="button"
+                    >
+                      <span className="font-semibold text-[#2a2a2a]">Message</span>
+                      <MessageCircleIcon className="w-6 h-6" style={{ color: '#2a2a2a' }} />
+                    </button>
                   )}
                 </div>
-                {/* Bio/Title (dynamic) */}
+                {/* Bio/Title */}
                 <div className="text-lg text-neutral-600 mb-1">
                   {profile?.bio
                     ? (profile.bio.length > 90 ? profile.bio.slice(0, 90) + '…' : profile.bio)
@@ -534,7 +555,7 @@ export default function ProfilePage() {
                 <div className="w-full flex mb-6 gap-6">
                   <ProfileStatsCard
                     followers={profile?.followers_count || 0}
-                    following={followingCount}
+                    following={profile?.following_count || 0}
                     contributions={profile?.contribution_count || 0}
                     noShadow
                     className="!mx-0"
@@ -549,7 +570,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          {/* Posts Section Placeholder (Replace with actual posts) */}
+          {/* Posts Section */}
           <div className="bg-white rounded-xl min-h-[800px] flex flex-col p-6 w-full overflow-x-auto border border-gray-200">
             <Tabs
               tabs={[
@@ -615,7 +636,6 @@ export default function ProfilePage() {
                             link="https://example.com/open-science"
                           />
                         </div>
-                        {/* Fade-out effect at the bottom */}
                         <div className="pointer-events-none absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent" />
                       </div>
                     </div>
@@ -731,7 +751,6 @@ export default function ProfilePage() {
                   </div>
                 );
               })()}
-
               <div className="text-right text-xs text-neutral-400 mb-2">
                 {interestsDraft.length}/3 selected
               </div>
@@ -768,7 +787,7 @@ export default function ProfilePage() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        {/* Sidebar: People Also Viewed */}
+        {/* Sidebar */}
         <div className="flex flex-col gap-6">
           <div className="bg-white rounded-xl p-6 min-h-[300px] flex flex-col border border-gray-200">
             <div className="flex items-center gap-2 text-lg font-semibold text-neutral-800 mb-4">
