@@ -17,40 +17,22 @@ const SignupPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [usernameAvailable, setUsernameAvailable] = useState<null | boolean>(null);
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const tiltLogo = use3dTilt();
 
-  // Function to check username availability
-  async function checkUsernameAvailability(username: string) {
-    const { data, error } = await supabase.rpc('is_username_available', { username_to_check: username });
-    if (error) {
-      setError('Error checking username: ' + error.message);
-      return false;
-    }
-    return data;
-  }
-
-  // Handler for username input blur
-  async function handleUsernameBlur() {
-    setError("");
-    setUsernameAvailable(null);
-    if (username.length >= 3) {
-      const isAvailable = await checkUsernameAvailability(username.toLowerCase());
-      setUsernameAvailable(isAvailable);
-    }
-  }
+  // Minimal username validation: lowercase, 3+, a-z0-9_
+  const validateUsername = (name: string) => {
+    const un = name.toLowerCase().trim();
+    return /^[a-z0-9_]{3,}$/.test(un);
+  };
 
   // Handler for form submission
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
-    // Basic validation
     if (!email || !password || !confirmPassword || !username) {
       setError("Please fill in all fields.");
       setLoading(false);
@@ -61,39 +43,19 @@ const SignupPage: React.FC = () => {
       setLoading(false);
       return;
     }
-    if (username.length < 3) {
-      setError("Username must be at least 3 characters long.");
+    if (!validateUsername(username)) {
+      setError("Username must be at least 3 characters, lowercase, and only include numbers and underscores.");
       setLoading(false);
       return;
     }
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(username)) {
-      setError("Username can only contain letters, numbers, and underscores.");
-      setLoading(false);
-      return;
-    }
-
-    // Final check for username availability (lowercased)
-    const usernameLower = username.toLowerCase();
-    const isAvailable = await checkUsernameAvailability(usernameLower);
-    if (!isAvailable) {
-      setError("Username is already taken. Please choose another.");
-      setLoading(false);
-      setUsernameAvailable(false);
-      if (usernameInputRef.current) {
-        usernameInputRef.current.focus();
-      }
-      return;
-    }
-
-    // Proceed with registration (Supabase Auth will handle duplicate emails)
+    // Proceed with registration (Supabase Auth will handle duplicate email/username via backend)
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          username: usernameLower,
-          display_name: displayName || usernameLower,
+          username: username.toLowerCase().trim(),
+          full_name: displayName || username.toLowerCase().trim(),
         },
       },
     });
@@ -102,14 +64,7 @@ const SignupPage: React.FC = () => {
       setLoading(false);
       return;
     }
-
-    setSuccess(
-      "Signup successful! Please check your email to confirm your account."
-    );
-    setLoading(false);
-    setTimeout(() => {
-      router.push("/login");
-    }, 3500);
+    router.push("/login"); // Redirect on successful signup
   };
 
   return (
@@ -149,17 +104,10 @@ const SignupPage: React.FC = () => {
               placeholder="Username"
               value={username}
               ref={usernameInputRef}
-              onChange={e => { setUsername(e.target.value); setUsernameAvailable(null); }}
-              onBlur={handleUsernameBlur}
+              onChange={e => setUsername(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
               required
             />
-            {username.length >= 3 && usernameAvailable === true && (
-              <div className="text-sm w-full max-w-mda text-left" style={{ color: '#2a2a2a', marginTop: '-13px', marginLeft: '13px' }}>Nice! Username is available!</div>
-            )}
-            {username.length >= 3 && usernameAvailable === false && (
-              <div className="text-sm w-full max-w-md text-left" style={{ color: '#2a2a2a', marginTop: '-13px', marginLeft: '13px' }}>Oops! Username is already taken!</div>
-            )}
             <input
               type="text"
               placeholder="Full Name"
@@ -171,7 +119,7 @@ const SignupPage: React.FC = () => {
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
               required
             />
@@ -179,7 +127,7 @@ const SignupPage: React.FC = () => {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
               required
             />
@@ -187,7 +135,7 @@ const SignupPage: React.FC = () => {
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={e => setConfirmPassword(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
               required
             />
@@ -195,7 +143,7 @@ const SignupPage: React.FC = () => {
               type="submit"
               className="w-full max-w-md bg-neutral-800 text-white border-black rounded-full cursor-pointer hover:bg-neutral-700 transition-colors duration-300 text-center justify-center group"
               disabled={loading}
-              subscribeStatus={!!success}
+              subscribeStatus={false}
             >
               <span className="inline-flex items-center group">
                 {loading ? "Signing up..." : "Sign Up"}
@@ -210,11 +158,6 @@ const SignupPage: React.FC = () => {
           {error && (
             <p className="mt-6 text-left w-full max-w-md text-[15px] font-medium" style={{ color: '#2a2a2a', marginTop: '0px' }}>
               {error}
-            </p>
-          )}
-          {success && (
-            <p className="mt-6 text-left w-full max-w-md text-[15px] font-medium" style={{ color: '#2a2a2a', marginTop: '0px' }}>
-              {success}
             </p>
           )}
           <div className="w-full max-w-md flex justify-center mt-4">
