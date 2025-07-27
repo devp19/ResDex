@@ -112,35 +112,35 @@
       }
       
       console.log('User authenticated, fetching notifications for:', user.id);
-      fetchNotificationCount();
+      // fetchNotificationCount();
       
     }, [user, authLoading]);
 
-    const fetchNotificationCount = async () => {
-      if (!user) return;
+    // const fetchNotificationCount = async () => {
+    //   if (!user) return;
       
-      try {
-        console.log('Fetching notification count for user:', user.id);
-        setIsLoading(true);
+    //   try {
+    //     console.log('Fetching notification count for user:', user.id);
+    //     setIsLoading(true);
         
-        const { data, error } = await supabase.rpc(
-          'get_notifications_count_for_user',
-          { user_id: user.id }
-        );
+    //     const { data, error } = await supabase.rpc(
+    //       'get_notifications_count_for_user',
+    //       { user_id: user.id }
+    //     );
         
-        if (error) {
-          console.error('Error fetching notification count:', error);
-          return;
-        }
+    //     if (error) {
+    //       console.error('Error fetching notification count:', error);
+    //       return;
+    //     }
         
-        console.log('Notification count received:', data);
-        setNotificationCount(data);
-      } catch (err) {
-        console.error('Unexpected error fetching notifications:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    //     console.log('Notification count received:', data);
+    //     setNotificationCount(data);
+    //   } catch (err) {
+    //     console.error('Unexpected error fetching notifications:', err);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
 
     // If we're still loading auth, show a loading indicator
     if (authLoading) {

@@ -1,20 +1,36 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Navbar, NavBody, NavbarLogo, NavItems, NotificationBadge, MessageBadge } from "@/components/ui/navbar";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Pencil, MessageCircleIcon, TrendingUp } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
+// @ts-ignore
+import ColorThief from "colorthief";
+import { Building, Tag, Search as SearchIcon, TrendingUp, Sparkles, ChevronDown, Check, Pencil, MessageCircleIcon } from "lucide-react";
+import { ChartCard } from "@/components/ChartCard";
+import { Tabs } from "@/components/ui/tabs";
 import CardPost from "@/components/customized/card/card-06";
 import PaginationWithSecondaryButton from "@/components/customized/pagination/pagination-03";
-import { Tabs } from "@/components/ui/tabs";
 import BlogCard from "@/components/customized/card/blog-card";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { useParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { AnimatePresence, motion } from "framer-motion";
+import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
+import { FollowButton } from "@/components/ui/FollowButton";
 import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
 import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
-import { FollowButton } from "@/components/ui/FollowButton";
-import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 
 const navItems = [
   { name: "Home", link: "/" },
@@ -22,78 +38,349 @@ const navItems = [
   { name: "Jobs", link: "/jobs" },
 ];
 
-// -- REMOVE supabase logic, we'll just use mock data for demo
+// Responsive hook for small screens
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const check = () => setIsSmall(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isSmall;
+}
+
+// List of available interests
 const INTEREST_OPTIONS = [
-  "Automation", "AI", "Finance", "Web Development", "Healthcare",
-  "Education", "Design", "Research", "Data Science", "Blockchain",
-  "Biotech", "Climate", "Product Management", "Cloud Computing",
-  "Marketing", "Energy"
+  "Automation",
+  "AI",
+  "Finance",
+  "Web Development",
+  "Healthcare",
+  "Education",
+  "Design",
+  "Research",
+  "Data Science",
+  "Blockchain",
+  "Biotech",
+  "Climate",
+  "Product Management",
+  "Cloud Computing",
+  "Marketing",
+  "Energy",
 ];
 
-const demoProfile = {
-  username: "jesselyn",
-  display_name: "Jesselyn Wang",
-  full_name: "Jesselyn Wang",
-  bio: "Lead Product Designer at Apple. I love music and mentoring junior engineers.",
-  location: "Toronto, Ontario",
-  avatar_url: "https://randomuser.me/api/portraits/women/44.jpg",
-  followers_count: 1245,
-  interests: ["AI", "Design", "Product Management"],
-  organization: "Apple",
-  contribution_count: 8,
-};
-
-const demoCurrentUser = { user_metadata: { username: "jesselyn" } };
-
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(demoProfile); // Could be prop/context in real app
-  const [currentUser] = useState<any>(demoCurrentUser);      // Could be prop/context in real app
+  const params = useParams();
+  const usernameParam = params.username as string;
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [gradient, setGradient] = useState("linear-gradient(to right, #fbe6b2, #f6b47b)");
+  const imgRef = useRef<HTMLImageElement>(null);
+  const profileImgSrc = "/jess-avatar.jpeg";
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
-  const [aboutDraft, setAboutDraft] = useState(profile.bio || "");
-  const [locationDraft, setLocationDraft] = useState(profile.location || "");
-  const [interestsDraft, setInterestsDraft] = useState<string[]>(profile.interests || []);
-  const [interestSearch, setInterestSearch] = useState("");
-  const [organizationDraft, setOrganizationDraft] = useState(profile.organization || "");
+  const [aboutDraft, setAboutDraft] = useState("");
+  const [locationDraft, setLocationDraft] = useState("");
+  const [interestsDraft, setInterestsDraft] = useState<string[]>([]);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
-  const [page, setPage] = useState(1);
+  const [interestSearch, setInterestSearch] = useState("");
+  const [myProfile, setMyProfile] = useState<any>(null);
+  const [followingCount, setFollowingCount] = useState<number>(0);
+  const [organizationDraft, setOrganizationDraft] = useState("");
 
+  // Posts data and pagination state
+  const [page, setPage] = useState(1);
   const posts = [
-    <CardPost key={0} avatar={profile.avatar_url} name="Cathie Woods" username="@cathiewoods" title="AI in Healthcare" content="Our latest research explores how machine learning models can predict patient outcomes and personalize treatment plans. #AI #Healthcare #Research" hashtags={["#AI", "#Healthcare", "#Research"]} />,
-    <CardPost key={1} avatar={profile.avatar_url} name="Cathie Woods" username="@cathiewoods" title="Quantum Computing Breakthrough" content="We achieved a new milestone in quantum error correction, paving the way for more reliable quantum computers. #QuantumComputing #Innovation" hashtags={["#QuantumComputing", "#Innovation"]} />,
+    <CardPost
+      key={0}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="AI in Healthcare"
+      content="Our latest research explores how machine learning models can predict patient outcomes and personalize treatment plans. #AI #Healthcare #Research"
+      hashtags={["#AI", "#Healthcare", "#Research"]}
+    />,
+    <CardPost
+      key={1}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Quantum Computing Breakthrough"
+      content="We achieved a new milestone in quantum error correction, paving the way for more reliable quantum computers. #QuantumComputing #Innovation"
+      hashtags={["#QuantumComputing", "#Innovation"]}
+    />,
+    <CardPost
+      key={2}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Renewable Energy Storage"
+      content="Our team developed a new battery technology that increases storage capacity for solar and wind energy. #Renewables #EnergyStorage"
+      hashtags={["#Renewables", "#EnergyStorage"]}
+    />,
+    <CardPost
+      key={3}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Blockchain for Scientific Data Integrity"
+      content="Exploring how blockchain technology can ensure the integrity and reproducibility of scientific research data. #Blockchain #Science #DataIntegrity"
+      hashtags={["#Blockchain", "#Science", "#DataIntegrity"]}
+    />,
+    <CardPost
+      key={4}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="CRISPR and the Future of Gene Editing"
+      content="A review of recent advances in CRISPR technology and its implications for medicine and agriculture. #CRISPR #GeneEditing #Biotech"
+      hashtags={["#CRISPR", "#GeneEditing", "#Biotech"]}
+    />,
+    <CardPost
+      key={5}
+      avatar="/jess-avatar.jpeg"
+      name="Cathie Woods"
+      username="@cathiewoods"
+      title="Climate Modeling with AI"
+      content="How artificial intelligence is improving the accuracy of climate models and predictions. #ClimateChange #AI #Modeling"
+      hashtags={["#ClimateChange", "#AI", "#Modeling"]}
+    />
   ];
-  const isSmallScreen = false;
+  const isSmallScreen = useIsSmallScreen();
   const postsPerPage = isSmallScreen ? 1 : 2;
   const totalPages = Math.ceil(posts.length / postsPerPage);
   const start = (page - 1) * postsPerPage;
   const end = start + postsPerPage;
 
-  // Fake sidebar profiles
+  const postsTabContent = (
+    <div className="w-full h-full p-4 text-lg">
+      <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Research Papers</h2>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        {posts.slice(start, end)}
+      </div>
+      <div className="flex justify-center">
+        <PaginationWithSecondaryButton
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+        />
+      </div>
+    </div>
+  );
+
+  // Fetch current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUser(data.user);
+    });
+  }, []);
+
+  // Fetch profile from dev_profiles
+  useEffect(() => {
+    async function fetchProfile() {
+      setLoading(true);
+      setNotFound(false);
+      const { data, error } = await supabase
+        .from("dev_profiles")
+        .select("*")
+        .eq("username", usernameParam)
+        .single();
+      if (error || !data) {
+        setNotFound(true);
+        setProfile(null);
+        setFollowingCount(0);
+      } else {
+        setProfile(data);
+        // Fetch following count for this user
+        const { count, error: followingError } = await supabase
+          .from("followers")
+          .select("id", { count: "exact", head: true })
+          .eq("follower_id", data.id)
+          .eq("status", "accepted");
+        setFollowingCount(followingError ? 0 : (count || 0));
+      }
+      setLoading(false);
+    }
+    if (usernameParam) fetchProfile();
+  }, [usernameParam]);
+
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      extractColors();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileImgSrc]);
+
+  const darkenColor = (rgbArr: number[], amount = 0.15): number[] => {
+    // amount: 0.15 means 15% darker
+    return rgbArr.map((c: number) => Math.max(0, Math.floor(c * (1 - amount))));
+  };
+
+  const extractColors = () => {
+    const colorThief = new ColorThief();
+    const img = imgRef.current;
+    if (img && img.complete) {
+      try {
+        const dominant = colorThief.getColor(img);
+        const rgb1 = `rgb(${dominant.join(",")})`;
+        const darker = darkenColor(dominant, 0.15);
+        const rgb2 = `rgb(${darker.join(",")})`;
+        setGradient(`linear-gradient(to right, ${rgb1}, ${rgb2})`);
+      } catch (e) {
+        // fallback in case of error
+        setGradient("linear-gradient(to right, #fbe6b2, #f6b47b)");
+      }
+    }
+  };
+
+  // Example avatar URLs from randomuser.me for demo purposes
   const recommendedProfiles = [
-    { name: "Amanda Reyes", title: "Marketing Manager at Alibaba Group", avatar: "https://randomuser.me/api/portraits/women/65.jpg" },
-    { name: "Han Ryujin", title: "CTO at Google", avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
-    { name: "Paul Arriola", title: "Lead Engineer at Tesla", avatar: "https://randomuser.me/api/portraits/men/41.jpg" },
+    {
+      name: "Jesselyn Wang",
+      title: "Lead Product Designer at Apple",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    {
+      name: "Amanda Reyes",
+      title: "Marketing Manager at Alibaba Group",
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+    },
+    {
+      name: "Han Ryujin",
+      title: "CTO at Google",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
+    {
+      name: "Paul Arriola",
+      title: "Lead Engineer at Tesla",
+      avatar: "https://randomuser.me/api/portraits/men/41.jpg",
+    },
+    {
+      name: "Tafari Sans",
+      title: "Principal Designer at Spotify",
+      avatar: "https://randomuser.me/api/portraits/men/76.jpg",
+    },
+    {
+      name: "Velasco Timmbber",
+      title: "Sr. Product Designer at Netflix",
+      avatar: "https://randomuser.me/api/portraits/men/85.jpg",
+    },
   ];
 
-  // Checks if profile is my own
+  // Helper: is this my profile?
   const isOwnProfile = currentUser && profile && currentUser.user_metadata?.username === profile.username;
+
+  // When opening edit modal, prefill interests
+  useEffect(() => {
+    if (editOpen && profile) {
+      setInterestsDraft(Array.isArray(profile.interests) ? profile.interests : []);
+      setOrganizationDraft(profile.organization || "");
+    }
+  }, [editOpen, profile]);
 
   const handleEditAbout = async () => {
     setEditLoading(true);
-    setTimeout(() => {
+    setEditError("");
+    setEditSuccess("");
+
+    // Get the current user's ID
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      setEditError("You must be logged in to update your profile.");
+      setEditLoading(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("dev_profiles")
+      .update({
+        bio: aboutDraft,
+        location: locationDraft,
+        interests: interestsDraft,
+        organization: organizationDraft
+      })
+      .eq("id", user.id);  // Use the authenticated user's ID
+
+    if (error) {
+      setEditError(error.message || "Failed to update profile.");
+    } else {
       setEditSuccess("Profile updated!");
       setProfile({
         ...profile,
         bio: aboutDraft,
         location: locationDraft,
         interests: interestsDraft,
-        organization: organizationDraft,
+        organization: organizationDraft
       });
       setEditOpen(false);
-      setEditLoading(false);
-    }, 700); // Fake saving
+    }
+    setEditLoading(false);
   };
+
+  const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signoutConfirmed, setSignoutConfirmed] = useState(false);
+  const avatarUrl = profile?.avatar_url || currentUser?.user_metadata?.avatar_url || "/empty-pic.webp";
+
+  // Sign out handler
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    setTimeout(async () => {
+      await supabase.auth.signOut();
+      setSigningOut(false);
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+      router.push("/");
+    }, 900);
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      setDropdownOpen(false);
+      setConfirmSignOut(false);
+    }
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, [dropdownOpen]);
+
+  // Fetch the logged-in user's profile (by id) from dev_profiles when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      supabase
+        .from("dev_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single()
+        .then(({ data }) => setMyProfile(data));
+    } else {
+      setMyProfile(null);
+    }
+  }, [currentUser]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#f5f6fa]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  if (notFound) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#f5f6fa]">
+        <div className="text-2xl font-bold text-neutral-700">User not found</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
@@ -101,47 +388,89 @@ export default function ProfilePage() {
       <Navbar>
         <NavBody>
           <div className="flex items-center w-full">
+            {/* Left group: Logo + Search */}
             <div className="flex items-center gap-6 min-w-0">
               <NavbarLogo />
               <div className="relative w-full max-w-xs">
-                <Input type="text" placeholder="Search" className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12" />
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
+                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
+                />
+                <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
             </div>
+            {/* Spacer */}
             <div className="flex-grow" />
+            {/* Nav items on the right */}
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
             <MessageBadge />
             <NotificationBadge />
-            {/* Avatar/Login button (no logic) */}
+            {/* Avatar/Login button */}
             <div className="relative ml-4 flex items-center gap-2">
-              <AvatarDropdown
-                userProfile={profile}
-                displayName={profile.display_name || profile.full_name || profile.username}
-                username={profile.username}
-                avatarUrl={profile.avatar_url}
-                onSignOut={() => {}} // No-op
-              />
+              {currentUser ? (
+                <AvatarDropdown
+                  userProfile={myProfile}
+                  displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
+                  username={myProfile?.username || currentUser.email?.split("@")[0]}
+                  avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
+                  onSignOut={handleSignOut}
+                />
+              ) : (
+                <button
+                  className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
+                  onClick={() => router.push("/login")}
+                >
+                  Login
+                </button>
+              )}
             </div>
           </div>
         </NavBody>
       </Navbar>
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
+        {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
+          {/* Main Profile Card */}
           <div className="w-full bg-white rounded-xl overflow-hidden flex flex-col border border-gray-200" style={{ minHeight: 420 }}>
+            {/* Banner */}
             <div className="p-4">
-              <div className="w-full h-40 rounded-xl" style={{ background: "linear-gradient(to right, #fbe6b2, #f6b47b)" }} />
+              <div
+                className="w-full h-40 rounded-xl"
+                style={{ background: gradient }}
+              />
             </div>
+            {/* Avatar - left-aligned and overlapping banner & info */}
             <div className="relative w-full">
               <div className="absolute -top-20 left-10 z-10">
-                <div className="w-36 h-36 rounded-full border-8 border-white overflow-hidden bg-gray-300">
-                  <Image src={profile.avatar_url} alt="Profile Avatar" width={144} height={144} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+                <div className={`w-36 h-36 ${((profile?.username || '').toLowerCase() === 'resdex') ? 'rounded-xl' : 'rounded-full'} border-8 border-white overflow-hidden bg-gray-300`}>
+                  <Image
+                    src={profile.avatar_url || "/empty-pic.webp"}
+                    alt="Profile Avatar"
+                    width={144}
+                    height={144}
+                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                  />
+                  {/* Hidden img for color extraction */}
+                  <img
+                    ref={imgRef}
+                    src={profile?.avatar_url || "/empty-pic.webp"}
+                    alt="Profile Avatar Color Extract"
+                    crossOrigin="anonymous"
+                    style={{ display: "none" }}
+                    onLoad={extractColors}
+                  />
                 </div>
               </div>
+              {/* Info Section - left-aligned below avatar */}
               <div className="flex flex-col items-start w-full mt-16 ml-12 pr-25 pb-8">
+                {/* Name and Follow/Edit button row */}
                 <div className="flex w-full items-center mb-2">
                   <div className="text-3xl font-bold text-neutral-800 flex-1 flex items-center gap-2">
                     <span className="flex items-center">
                       <span>
-                        {profile.display_name || profile.full_name || profile.username}
+                        {profile?.display_name || profile?.full_name || profile?.username}
                       </span>
                       {isOwnProfile && (
                         <Tooltip>
@@ -149,7 +478,11 @@ export default function ProfilePage() {
                             <button
                               className="p-1 rounded-full hover:bg-zinc-100 transition flex items-center ml-2 justify-center cursor-pointer group"
                               style={{ color: '#2a2a2a' }}
-                              onClick={() => setEditOpen(true)}
+                              onClick={() => {
+                                setAboutDraft(profile.bio || "");
+                                setLocationDraft(profile.location || "");
+                                setEditOpen(true);
+                              }}
                               aria-label="Edit Profile"
                             >
                               <Pencil className="w-5 h-5" />
@@ -158,15 +491,26 @@ export default function ProfilePage() {
                           <TooltipContent sideOffset={6}>Edit Profile</TooltipContent>
                         </Tooltip>
                       )}
+                      {['dev','tirth','deep','bhavi','kush','jay','aaryan','darsh','fenil','resdex'].includes((profile?.username || '').toLowerCase()) && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center">
+                              <Image src="/beige-logo.png" alt="ResDex Staff" width={24} height={24} className="ml-1 rounded-md" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={6}>ResDex Team Member</TooltipContent>
+                        </Tooltip>
+                      )}
                     </span>
                   </div>
-                  {/* Show Follow button if desired */}
-                  {!isOwnProfile && (
+                  {/* Show Follow button only if not own profile and user is authenticated */}
+                  {currentUser && !isOwnProfile && profile?.id && (
                     <>
-                      <FollowButton userId={1234} />
+                      <FollowButton userId={profile.id} />
                       <button
                         className="ml-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center gap-2 cursor-pointer"
                         title="Message"
+                        onClick={() => router.push(`/messages?user=${profile.username}`)}
                         aria-label="Message"
                         type="button"
                       >
@@ -176,72 +520,102 @@ export default function ProfilePage() {
                     </>
                   )}
                 </div>
+                {/* Bio/Title (dynamic) */}
                 <div className="text-lg text-neutral-600 mb-1">
-                  {profile.bio ? (profile.bio.length > 90 ? profile.bio.slice(0, 90) + '…' : profile.bio)
+                  {profile?.bio
+                    ? (profile.bio.length > 90 ? profile.bio.slice(0, 90) + '…' : profile.bio)
                     : (isOwnProfile ? <span className="italic text-neutral-400">Add your title or bio</span> : <span className="italic text-neutral-400"></span>)}
                 </div>
+                {/* Location */}
                 <div className="text-md text-neutral-400 mb-4">
-                  {profile.location ? profile.location
-                    : (isOwnProfile ? <span className="italic text-neutral-400">Add your location</span> : <span className="italic text-neutral-400"></span>)}
+                  {profile?.location ? profile.location : (isOwnProfile ? <span className="italic text-neutral-400">Add your location</span> : <span className="italic text-neutral-400"></span>)}
                 </div>
+                {/* Stats row replaced with ProfileStatsCard */}
                 <div className="w-full flex mb-6 gap-6">
                   <ProfileStatsCard
-                    followers={profile.followers_count || 0}
-                    following={42} // Example value; use real data as needed
-                    contributions={profile.contribution_count || 0}
+                    followers={profile?.followers_count || 0}
+                    following={followingCount}
+                    contributions={profile?.contribution_count || 0}
                     noShadow
                     className="!mx-0"
                     disableTilt={true}
                   />
                   <ProfileOrgInterestsCard
-                    organization={profile.organization}
-                    interests={profile.interests}
+                    organization={profile?.organization || "Google"}
+                    interests={profile?.interests || []}
                     disableTilt={true}
                   />
                 </div>
               </div>
             </div>
           </div>
-          {/* Posts Section */}
+          {/* Posts Section Placeholder (Replace with actual posts) */}
           <div className="bg-white rounded-xl min-h-[800px] flex flex-col p-6 w-full overflow-x-auto border border-gray-200">
             <Tabs
               tabs={[
                 {
                   title: "Research",
                   value: "posts",
-                  content: (
-                    <div className="w-full h-full p-4 text-lg">
-                      <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Research Papers</h2>
-                      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        {posts.slice(start, end)}
-                      </div>
-                      <div className="flex justify-center">
-                        <PaginationWithSecondaryButton page={page} setPage={setPage} totalPages={totalPages} />
-                      </div>
-                    </div>
-                  ),
+                  content: postsTabContent,
                 },
                 {
                   title: "Blogs",
                   value: "blogs",
                   content: (
                     <div className="w-full h-full p-4 text-lg">
-                      {/* ... as before ... */}
                       <h2 className="text-2xl font-bold mb-4" style={{ color: '#2a2a2a' }}>Blogs</h2>
                       <div className="relative">
                         <div className="max-h-[600px] overflow-y-auto pr-2">
-                          {[1,2,3].map(i => (
-                            <BlogCard
-                              key={i}
-                              avatar={profile.avatar_url}
-                              title={`Blog Title ${i}`}
-                              excerpt="Short blog summary here."
-                              author={profile.display_name}
-                              date="May 2024"
-                              link="#"
-                            />
-                          ))}
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="The Future of AI in Everyday Life"
+                            excerpt="Exploring how artificial intelligence is shaping our daily routines, from smart assistants to personalized recommendations."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="May 2024"
+                            link="https://example.com/ai-in-everyday-life"
+                          />
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="5 Breakthroughs in Renewable Energy"
+                            excerpt="A look at the most exciting advancements in solar, wind, and battery technology this year."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="April 2024"
+                            link="https://example.com/renewable-energy-breakthroughs"
+                          />
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="How Quantum Computing Will Change Research"
+                            excerpt="Quantum computers are set to revolutionize data analysis and scientific discovery. Here's what you need to know."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="March 2024"
+                            link="https://example.com/quantum-computing-research"
+                          />
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="The Ethics of AI: What Researchers Need to Know"
+                            excerpt="A discussion on the ethical considerations and responsibilities of AI researchers in 2024."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="February 2024"
+                            link="https://example.com/ethics-of-ai"
+                          />
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="Data Visualization Best Practices for Scientists"
+                            excerpt="Tips and tools for creating clear, impactful data visualizations in scientific publications."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="January 2024"
+                            link="https://example.com/data-visualization"
+                          />
+                          <BlogCard
+                            avatar={profile?.avatar_url || "/empty-pic.webp"}
+                            title="Open Science: Sharing Research for Greater Impact"
+                            excerpt="How open access and data sharing are transforming the research landscape."
+                            author={profile?.display_name || profile?.full_name || profile?.username || ""}
+                            date="December 2023"
+                            link="https://example.com/open-science"
+                          />
                         </div>
+                        {/* Fade-out effect at the bottom */}
                         <div className="pointer-events-none absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent" />
                       </div>
                     </div>
@@ -262,7 +636,10 @@ export default function ProfilePage() {
           </div>
           {/* Edit Bio Modal */}
           <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
-            <AlertDialogContent style={{ maxHeight: 620, minWidth: 360, overflowY: 'auto' }} className="!p-6">
+            <AlertDialogContent
+              style={{ maxHeight: 620, minWidth: 360, overflowY: 'auto' }}
+              className="!p-6"
+            >
               <AlertDialogHeader>
                 <AlertDialogTitle>Edit Profile</AlertDialogTitle>
               </AlertDialogHeader>
@@ -314,32 +691,47 @@ export default function ProfilePage() {
                   ))
                 )}
               </div>
-              <div className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-3" style={{ maxHeight: 200, overflowY: 'auto', minHeight: 40 }}>
-                {INTEREST_OPTIONS.filter(opt => !interestsDraft.includes(opt)).map(option => {
-                  const selected = interestsDraft.includes(option);
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      className={
-                        `px-4 py-2 rounded-full border text-sm font-medium transition ` +
-                        (selected
-                          ? 'bg-[#2a2a2a] text-white border-[#2a2a2a] shadow'
-                          : 'bg-white text-[#2a2a2a] border-gray-300 hover:bg-gray-100')
-                      }
-                      disabled={selected || interestsDraft.length >= 3}
-                      onClick={() => {
-                        if (!selected && interestsDraft.length < 3) {
-                          setInterestsDraft([...interestsDraft, option]);
-                          setInterestSearch("");
-                        }
-                      }}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
-              </div>
+              {(() => {
+                const search = interestSearch.trim().toLowerCase();
+                const notSelected = INTEREST_OPTIONS.filter(opt => !interestsDraft.includes(opt));
+                const matches = search
+                  ? notSelected.filter(opt => opt.toLowerCase().includes(search))
+                  : [];
+                const rest = notSelected.filter(opt => !matches.includes(opt));
+                const display = [...matches, ...rest];
+                return (
+                  <div
+                    className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-3"
+                    style={{ maxHeight: 200, overflowY: 'auto', minHeight: 40 }}
+                  >
+                    {display.map(option => {
+                      const selected = interestsDraft.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          className={
+                            `px-4 py-2 rounded-full border text-sm font-medium transition ` +
+                            (selected
+                              ? 'bg-[#2a2a2a] text-white border-[#2a2a2a] shadow'
+                              : 'bg-white text-[#2a2a2a] border-gray-300 hover:bg-gray-100')
+                          }
+                          disabled={selected || interestsDraft.length >= 3}
+                          onClick={() => {
+                            if (!selected && interestsDraft.length < 3) {
+                              setInterestsDraft([...interestsDraft, option]);
+                              setInterestSearch("");
+                            }
+                          }}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
               <div className="text-right text-xs text-neutral-400 mb-2">
                 {interestsDraft.length}/3 selected
               </div>
@@ -354,10 +746,19 @@ export default function ProfilePage() {
               />
               <AlertDialogFooter>
                 <AlertDialogCancel asChild>
-                  <button className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300" disabled={editLoading}>Cancel</button>
+                  <button
+                    className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    disabled={editLoading}
+                  >
+                    Cancel
+                  </button>
                 </AlertDialogCancel>
                 <AlertDialogAction asChild>
-                  <button className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white hover:bg-[#444] disabled:opacity-60" onClick={handleEditAbout} disabled={editLoading}>
+                  <button
+                    className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white hover:bg-[#444] disabled:opacity-60"
+                    onClick={handleEditAbout}
+                    disabled={editLoading}
+                  >
                     {editLoading ? "Saving..." : "Save"}
                   </button>
                 </AlertDialogAction>
@@ -420,6 +821,7 @@ export default function ProfilePage() {
           </div>
           <div className="bg-white rounded-xl p-6 mt-2 border border-gray-200">
             <div className="text-lg font-semibold text-neutral-800 mb-4">Recommended for you</div>
+            {/* List of recommended profiles */}
             <div className="flex flex-col">
               {recommendedProfiles.map((profile, i) => (
                 <React.Fragment key={i}>

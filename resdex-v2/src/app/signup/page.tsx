@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import { ChevronRightIcon, CheckIcon } from "lucide-react";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { use3dTilt } from "@/hooks/use3dTilt";
 
-const SignupPage: React.FC = () => {
+export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +18,7 @@ const SignupPage: React.FC = () => {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const tiltLogo = use3dTilt();
 
@@ -26,6 +27,22 @@ const SignupPage: React.FC = () => {
     const un = name.toLowerCase().trim();
     return /^[a-z0-9_]{3,}$/.test(un);
   };
+
+  // Memoized heading to avoid rerunning animation
+  const memoizedHeading = useMemo(
+    () => (
+      <TextAnimate
+        animation="fadeIn"
+        by="line"
+        as="h1"
+        className="text-4xl md:text-3xl font-bold text-center leading-tight text-gray-900 mb-4 max-w-xl mx-auto"
+        style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}
+      >
+        Create your account
+      </TextAnimate>
+    ),
+    []
+  );
 
   // Handler for form submission
   const handleSignup = async (e: React.FormEvent) => {
@@ -64,7 +81,13 @@ const SignupPage: React.FC = () => {
       setLoading(false);
       return;
     }
-    router.push("/login"); // Redirect on successful signup
+
+    setSignupSuccess(true);
+    setTimeout(() => {
+      router.push("/login");
+    }, 1200);
+
+    setLoading(false);
   };
 
   return (
@@ -82,18 +105,15 @@ const SignupPage: React.FC = () => {
         <div className="w-full max-w-md mx-auto rounded-2xl p-8 flex flex-col items-center">
           {/* Top content: logo, heading, description */}
           <div className="mb-6 w-full flex flex-col items-center">
-            <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-6 inline-block">
+            <div
+              ref={tiltLogo.ref}
+              onMouseMove={tiltLogo.onMouseMove}
+              onMouseLeave={tiltLogo.onMouseLeave}
+              className="mb-6 inline-block"
+            >
               <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl" />
             </div>
-            <TextAnimate
-              animation="fadeIn"
-              by="line"
-              as="h1"
-              className="text-4xl md:text-3xl font-bold text-center leading-tight text-gray-900 mb-4 max-w-xl mx-auto"
-              style={{ fontFamily: 'Satoshi-Bold, sans-serif' }}
-            >
-              Create your account
-            </TextAnimate>
+            {memoizedHeading}
             <p className="text-md text-gray-600 text-center max-w-md mb-4 satoshi-medium">
               Join the largest growing community of ResDex users. Sign up to discover, connect, and share with others.
             </p>
@@ -143,7 +163,7 @@ const SignupPage: React.FC = () => {
               type="submit"
               className="w-full max-w-md bg-neutral-800 text-white border-black rounded-full cursor-pointer hover:bg-neutral-700 transition-colors duration-300 text-center justify-center group"
               disabled={loading}
-              subscribeStatus={false}
+              subscribeStatus={signupSuccess}
             >
               <span className="inline-flex items-center group">
                 {loading ? "Signing up..." : "Sign Up"}
@@ -161,7 +181,9 @@ const SignupPage: React.FC = () => {
             </p>
           )}
           <div className="w-full max-w-md flex justify-center mt-4">
-            <a href="/login" className="text-sm text-neutral-500 hover:text-black underline transition-colors duration-200">Already have an account? Login</a>
+            <a href="/login" className="text-sm text-neutral-500 hover:text-black underline transition-colors duration-200">
+              Already have an account? Login
+            </a>
           </div>
         </div>
       </div>
@@ -178,6 +200,4 @@ const SignupPage: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default SignupPage;
+}

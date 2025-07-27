@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const tiltLogo = use3dTilt();
 
-  // Memoized animated heading ensures the animation runs only once (on mount)
+  // Memoize animated heading so animation doesn't restart each render
   const memoizedHeading = useMemo(
     () => (
       <TextAnimate
@@ -39,42 +39,34 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     setLoginSuccess(false);
-
-    // Sign in with Supabase Auth
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
     if (signInError) {
       setError(signInError.message || "Login failed");
       setLoading(false);
       return;
     }
-
-    setLoginSuccess(true);
-
-    // Get logged-in user id
+    // Fetch the user's profile to get the username
     const userId = data.user?.id;
+    let username = null;
     if (userId) {
-      // Fetch username from dev_profiles
-      const { data: profile } = await supabase
-        .from("dev_profiles")
+      const { data: profileData } = await supabase
+        .from("profiles")
         .select("username")
         .eq("id", userId)
         .single();
-
-      if (profile && profile.username) {
-        console.log("Logged in user's username:", profile.username);
-      } else {
-        console.log("Username not found for user id:", userId);
-      }
+      username = profileData?.username;
     }
-
+    setLoginSuccess(true);
     setTimeout(() => {
-      router.push("/");
-    }, 1200);
-
+      if (username) {
+        router.push(`/profile/${username}`);
+      } else {
+        router.push("/");
+      }
+    }, 1500);
     setLoading(false);
   };
 
@@ -92,8 +84,10 @@ export default function LoginPage() {
           <path d="M0 600 Q720 800 1440 600" stroke="#f5f5f5" strokeWidth="2" fill="none" />
         </svg>
       </div>
+      {/* Right vertical split (now on the left) */}
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 relative z-10 order-1 md:order-2 bg-[#f5f5f5]">
         <div className="w-full max-w-md mx-auto rounded-2xl p-8 flex flex-col items-center">
+          {/* Top content: logo, heading, description */}
           <div className="mb-6 w-full flex flex-col items-center">
             <div ref={tiltLogo.ref} onMouseMove={tiltLogo.onMouseMove} onMouseLeave={tiltLogo.onMouseLeave} className="mb-6 inline-block">
               <Image src="/beige-logo.png" alt="ResDex Logo" width={56} height={56} className="rounded-xl" />
@@ -184,6 +178,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      {/* Left vertical split (now empty, appears on the right for md+) */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-gray-50 to-white border-l border-gray-200 relative z-10 order-2 md:order-1">
         <img
           src="/logincover.webp"
