@@ -5,35 +5,145 @@ import Image from "next/image";
 import { Navbar, NavBody, NavbarLogo, NavItems, MessageBadge, NotificationBadge } from "@/components/ui/navbar";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { useSearchParams } from "next/navigation";
 
-export type User = { id: string; name: string; avatar_url?: string; username?: string };
+// Types for convenience
+type UserProfile = {
+  id: string;
+  full_name?: string;
+  username?: string;
+  avatar_url?: string;
+};
+type LastMessage = {
+  sender_id: string;
+  recipient_id: string;
+  content: string;
+  created_at: string;
+};
+
+type SidebarConvo = {
+  user: UserProfile;
+  lastMessage: LastMessage;
+};
 
 export default function MessagesPage() {
-  const [currentUserProfile, setCurrentUserProfile] = useState<{ display_name: string; avatar_url: string; username: string; bio?: string; organization?: string; location?: string } | null>(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [gradient, setGradient] = useState("linear-gradient(to right, #fbe6b2, #f6b47b)");
   const imgRef = useRef<HTMLImageElement>(null);
-  const [search, setSearch] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const [sidebarConvos, setSidebarConvos] = useState<SidebarConvo[]>([]);
+  const [loadingConvos, setLoadingConvos] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+
+  const [messages, setMessages] = useState<any[]>([]);
+const [loadingMessages, setLoadingMessages] = useState(false);
+
 
   useEffect(() => {
-    // Example mock: you can fetch/set the current user profile from Supabase here if you wish
-    // You might need to update to real fetch logic for current user
-    setCurrentUserProfile({
-      display_name: "Jane Doe",
-      avatar_url: "/empty-pic.webp",
-      username: "janedoe",
-      bio: "Bio example",
-      organization: "ResDex",
-      location: "Toronto"
+  const fetchMessages = async () => {
+    setLoadingMessages(true);
+    setMessages([]);
+
+    if (!selectedUser || !currentUserId) {
+      setLoadingMessages(false);
+      return;
+    }
+
+    // Always sort for DM conversation_id consistency!
+    const ids = [currentUserId, selectedUser.id].sort();
+    const conversationId = `${ids[0]}_${ids[1]}`;
+
+    const { data, error } = await supabase
+      .from('dev_messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    setMessages(data || []);
+    setLoadingMessages(false);
+  };
+
+  fetchMessages();
+}, [selectedUser, currentUserId]);
+
+
+  // Navbar navigation items
+  const navItems = [
+    { name: "Home", link: "/" },
+    { name: "Network", link: "/network" },
+    { name: "Jobs", link: "/jobs" },
+  ];
+
+  // Get Supabase user and profile
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data: userData }) => {
+      if (!userData?.user?.id) return;
+      setCurrentUserId(userData.user.id);
+
+      // Profile fetch (customize as needed for your schema)
+      const { data: profile } = await supabase
+        .from("dev_profiles")
+        .select("id, full_name, username, avatar_url")
+        .eq("id", userData.user.id)
+        .single();
+      if (profile) setCurrentUserProfile(profile);
     });
   }, []);
 
-  // Color gradient helper
-  const darkenColor = (rgbArr: number[], amount = 0.15): number[] => {
-    return rgbArr.map((c: number) => Math.max(0, Math.floor(c * (1 - amount))));
-  };
+  // Sidebar: Fetch conversation partners and last messages
+  useEffect(() => {
+    if (!currentUserId) return;
+    setLoadingConvos(true);
+
+    async function fetchSidebarConvos() {
+      // Get last 100 messages involving this user, most recent first
+      const { data, error } = await supabase
+        .from('dev_messages')
+        .select('id, sender_id, recipient_id, content, created_at')
+        .or(`sender_id.eq.${currentUserId},recipient_id.eq.${currentUserId}`)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error || !data) {
+        setSidebarConvos([]);
+        setLoadingConvos(false);
+        return;
+      }
+
+      // Group by the chat partner (each DM per person, not per conversation)
+      const partnerMap: { [otherUserId: string]: LastMessage } = {};
+      data.forEach((msg: LastMessage) => {
+        const otherId = msg.sender_id === currentUserId ? msg.recipient_id : msg.sender_id;
+        if (!partnerMap[otherId]) partnerMap[otherId] = msg;
+      });
+
+      const partnerIds = Object.keys(partnerMap);
+      if (partnerIds.length === 0) {
+        setSidebarConvos([]);
+        setLoadingConvos(false);
+        return;
+      }
+
+      // Fetch sidebar user profiles
+      const { data: usersData } = await supabase
+        .from("dev_profiles")
+        .select("id, full_name, username, avatar_url")
+        .in("id", partnerIds);
+
+      const results: SidebarConvo[] = partnerIds.map((id) => ({
+        user: usersData?.find((u: UserProfile) => u.id === id) || { id },
+        lastMessage: partnerMap[id],
+      }));
+
+      setSidebarConvos(results);
+      setLoadingConvos(false);
+    }
+    fetchSidebarConvos();
+  }, [currentUserId]);
+
+  // Gradient helper (optional, for pretty profile cards)
+  const darkenColor = (rgbArr: number[], amount = 0.15): number[] =>
+    rgbArr.map((c: number) => Math.max(0, Math.floor(c * (1 - amount))));
   const extractColors = () => {
     // @ts-ignore
     const ColorThief = window.ColorThief || (globalThis as any).ColorThief;
@@ -52,11 +162,13 @@ export default function MessagesPage() {
     }
   };
 
-  const navItems = [
-    { name: "Home", link: "/" },
-    { name: "Network", link: "/network" },
-    { name: "Jobs", link: "/jobs" },
-  ];
+  // Helper for initials fallback
+  const getInitials = (name: string = "") =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
 
   return (
     <>
@@ -65,15 +177,6 @@ export default function MessagesPage() {
           <div className="flex items-center w-full">
             <div className="flex items-center gap-6 min-w-0">
               <NavbarLogo />
-              <div className="relative w-full max-w-xs">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search users..."
-                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
-                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
-                />
-              </div>
             </div>
             <div className="flex-grow" />
             <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
@@ -94,34 +197,124 @@ export default function MessagesPage() {
         </NavBody>
       </Navbar>
       <div className="flex h-[80vh] max-w-6xl mx-auto mt-10">
-        
+        {/* (Optional) Current user profile card at left, use if you wish */}
+        {/* <div className="w-80 flex flex-col items-center justify-start bg-transparent mr-4"> ... </div> */}
         <div className="flex flex-1 h-full border border-[var(--sidebar-border)] rounded-xl overflow-hidden shadow-lg bg-[var(--card)]">
+          {/* SIDEBAR: Chat List */}
           <div className="w-72 border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] flex flex-col">
             <h3 className="px-6 py-4 text-lg font-semibold text-[var(--sidebar-foreground)] border-b border-[var(--sidebar-border)]">Chat</h3>
-            <div className="px-4 py-2">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search users..."
-                className="w-full px-4 py-2 rounded-lg border border-[var(--input)] bg-[var(--muted)] text-[var(--sidebar-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--sidebar-ring)]"
-              />
-            </div>
             <div className="flex-1 overflow-y-auto">
-              {/* Placeholder for sidebar user list */}
-              <div className="text-center text-gray-400 py-8">No users found.</div>
+              {loadingConvos ? (
+                <div className="text-center text-gray-400 py-8">Loading...</div>
+              ) : sidebarConvos.length === 0 ? (
+                <div className="text-center text-gray-400 py-8">No conversations yet.</div>
+              ) : (
+                sidebarConvos.map(({ user, lastMessage }) => (
+                  <div
+                    key={user.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 ${selectedUser?.id === user.id ? "bg-gray-200" : ""
+                      }`}
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    {/* Avatar */}
+                    {user.avatar_url ? (
+                      <Image
+                        src={user.avatar_url}
+                        alt={user.full_name || user.username || "User"}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover border border-[var(--sidebar-border)]"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+                        {getInitials(user.full_name || user.username || "")}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="font-medium truncate">{user.full_name || user.username || "User"}</div>
+                      <div className="text-xs text-gray-500 truncate">{lastMessage.content}</div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-          {/* Empty chat area */}
+          {/* Placeholder chat area: will fill this in next step */}
           <div className="flex-1 flex flex-col bg-[var(--card)]">
-            <div className="flex flex-col items-center justify-center mt-50 h-full">
-              <img
-                src="/transparent-black.png"
-                alt="ResDex Logo"
-                className="w-24 h-24 mb-6 opacity-20 grayscale"
-              />
-              <div className="text-center text-gray-400 ml-20 mr-20">Start a conversation! ResDex is a place to share your thoughts and ideas with others.</div>
-            </div>
+  {!selectedUser ? (
+    <div className="flex flex-col items-center justify-center mt-50 h-full">
+      <img
+        src="/transparent-black.png"
+        alt="ResDex Logo"
+        className="w-24 h-24 mb-6 opacity-20 grayscale"
+      />
+      <div className="text-center text-gray-400 ml-20 mr-20">
+        Select a conversation to get started!
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col h-full">
+      {/* Chat header */}
+      <div className="flex items-center gap-3 p-4 border-b border-gray-200">
+        {selectedUser.avatar_url ? (
+          <Image
+            src={selectedUser.avatar_url}
+            alt={selectedUser.full_name || selectedUser.username || "User"}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+            {(selectedUser.full_name || selectedUser.username || "U")[0]}
           </div>
+        )}
+        <span className="text-lg font-semibold">{selectedUser.full_name || selectedUser.username}</span>
+      </div>
+      <div className="flex-1 overflow-y-auto p-6" style={{ background: "#fafbfc" }}>
+  {loadingMessages ? (
+    <div className="text-gray-400 text-center py-12">Loading messages…</div>
+  ) : messages.length === 0 ? (
+    <div className="text-gray-400 text-center py-12">No messages yet.</div>
+  ) : (
+    messages.map((msg) => {
+      const isMe = msg.sender_id === currentUserId;
+      return (
+        <div
+          key={msg.id}
+          className={`flex ${isMe ? "justify-end" : "justify-start"} mb-3 group items-end`}
+        >
+          {/* Timestamp on hover (left for sender, right for receiver) */}
+          {isMe ? (
+            <>
+              <span className="hidden group-hover:inline text-xs text-gray-400 mb-3 mr-2">
+                {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+              <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-800 text-white">
+                {msg.content}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-200 text-black">
+                {msg.content}
+              </div>
+              <span className="hidden group-hover:inline text-xs mb-3 text-gray-400 ml-2">
+                {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </>
+          )}
+        </div>
+      );
+    })
+  )}
+</div>
+
+      {/* Message composer input comes in next step */}
+    </div>
+  )}
+</div>
+
         </div>
       </div>
     </>
