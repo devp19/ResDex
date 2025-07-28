@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { Navbar, NavBody, NavbarLogo, NavItems, MessageBadge, NotificationBadge } from "@/components/ui/navbar";
 import Link from "next/link";
+import { FaPaperPlane } from 'react-icons/fa';
 
 // Types
 type UserProfile = {
@@ -37,7 +38,17 @@ export default function MessagesPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [messageContent, setMessageContent] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+
+  const chatScrollBoxRef = useRef<HTMLDivElement>(null);
+const messagesEndRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  if (chatScrollBoxRef.current) {
+    chatScrollBoxRef.current.scrollTop = chatScrollBoxRef.current.scrollHeight;
+  }
+}, [messages]);
+
 
   // Navbar navigation
   const navItems = [
@@ -168,13 +179,6 @@ export default function MessagesPage() {
     };
   }, [selectedUser, currentUserId]);
 
-  // Autoscroll to last message (only inside chat area now!)
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
   // Helper for initials fallback
   const getInitials = (name: string = "") =>
     name
@@ -210,7 +214,7 @@ export default function MessagesPage() {
         </NavBody>
       </Navbar>
       <div className="flex h-[80vh] max-w-6xl mx-auto mt-10">
-        <div className="flex flex-1 h-full border border-[var(--sidebar-border)] rounded-xl overflow-hidden shadow-lg bg-[var(--card)] min-h-0">
+        <div className="flex flex-1 h-full border border-[var(--sidebar-border)] rounded-xl overflow-hidden shadow-lg bg-[var(--card)]">
           {/* SIDEBAR */}
           <div className="w-72 border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] flex flex-col">
             <h3 className="px-6 py-4 text-lg font-semibold text-[var(--sidebar-foreground)] border-b border-[var(--sidebar-border)]">Chat</h3>
@@ -252,118 +256,123 @@ export default function MessagesPage() {
           </div>
           {/* CHAT PANEL */}
           <div className="flex-1 flex flex-col bg-[var(--card)] min-h-0">
-            {!selectedUser ? (
-              <div className="flex flex-col items-center justify-center mt-50 h-full">
-                <img
-                  src="/transparent-black.png"
-                  alt="ResDex Logo"
-                  className="w-24 h-24 mb-6 opacity-20 grayscale"
-                />
-                <div className="text-center text-gray-400 ml-20 mr-20">
-                  Select a conversation to get started!
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col h-full min-h-0">
-                {/* Header */}
-                <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-                  {selectedUser.avatar_url ? (
-                    <Image
-                      src={selectedUser.avatar_url}
-                      alt={selectedUser.full_name || selectedUser.username || "User"}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
-                      {(selectedUser.full_name || selectedUser.username || "U")[0]}
+  {!selectedUser ? (
+    <div className="flex flex-col items-center justify-center mt-50 h-full">
+      <img
+        src="/transparent-black.png"
+        alt="ResDex Logo"
+        className="w-24 h-24 mb-6 opacity-20 grayscale"
+      />
+      <div className="text-center text-gray-400 ml-20 mr-20">
+        Select a conversation to get started!
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col h-full min-h-0">
+      {/* Chat header */}
+      <div className="flex items-center gap-3 p-4 border-b border-gray-200">
+        {selectedUser.avatar_url ? (
+          <Image
+            src={selectedUser.avatar_url}
+            alt={selectedUser.full_name || selectedUser.username || "User"}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+            {(selectedUser.full_name || selectedUser.username || "U")[0]}
+          </div>
+        )}
+        <span className="text-lg font-semibold">{selectedUser.full_name || selectedUser.username}</span>
+      </div>
+      {/* Chat messages with proper scroll-to-bottom */}
+      <div
+        className="flex-1 overflow-y-auto p-6 min-h-0"
+        style={{ background: "#fafbfc" }}
+        ref={chatScrollBoxRef}
+      >
+        {loadingMessages ? (
+          <div className="text-gray-400 text-center py-12">Loading messages…</div>
+        ) : messages.length === 0 ? (
+          <div className="text-gray-400 text-center py-12">No messages yet.</div>
+        ) : (
+          messages.map((msg) => {
+            const isMe = msg.sender_id === currentUserId;
+            return (
+              <div
+                key={msg.id}
+                className={`flex ${isMe ? "justify-end" : "justify-start"} mb-3 group items-end`}
+              >
+                {isMe ? (
+                  <>
+                    <span className="hidden group-hover:inline text-xs text-gray-400 mb-3 mr-2">
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-[#2a2a2a] gray-800 text-white">
+                      {msg.content}
                     </div>
-                  )}
-                  <span className="text-lg font-semibold">{selectedUser.full_name || selectedUser.username}</span>
-                </div>
-                {/* Chat messages */}
-                <div className="flex-1 overflow-y-auto p-6" style={{ background: "#fafbfc" }}>
-                  {loadingMessages ? (
-                    <div className="text-gray-400 text-center py-12">Loading messages…</div>
-                  ) : messages.length === 0 ? (
-                    <div className="text-gray-400 text-center py-12">No messages yet.</div>
-                  ) : (
-                    messages.map((msg) => {
-                      const isMe = msg.sender_id === currentUserId;
-                      return (
-                        <div
-                          key={msg.id}
-                          className={`flex ${isMe ? "justify-end" : "justify-start"} mb-3 group items-end`}
-                        >
-                          {/* Timestamp on hover (left for sender, right for receiver) */}
-                          {isMe ? (
-                            <>
-                              <span className="hidden group-hover:inline text-xs text-gray-400 mb-3 mr-2">
-                                {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                              </span>
-                              <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-800 text-white">
-                                {msg.content}
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-200 text-black">
-                                {msg.content}
-                              </div>
-                              <span className="hidden group-hover:inline text-xs mb-3 text-gray-400 ml-2">
-                                {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-                {/* Composer */}
-                {selectedUser && (
-                  <form
-                    className="flex gap-2 px-6 py-4 border-t border-gray-200 bg-white"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!messageContent.trim()) return;
-                      if (!currentUserId || !selectedUser) return;
-                      const ids = [currentUserId, selectedUser.id].sort();
-                      const conversationId = `${ids[0]}_${ids[1]}`;
-
-                      const { error } = await supabase.from('dev_messages').insert([
-                        {
-                          sender_id: currentUserId,
-                          recipient_id: selectedUser.id,
-                          content: messageContent,
-                          conversation_id: conversationId,
-                        },
-                      ]);
-                      if (!error) setMessageContent("");
-                    }}
-                    autoComplete="off"
-                  >
-                    <input
-                      className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      placeholder="Type a message…"
-                      value={messageContent}
-                      onChange={e => setMessageContent(e.target.value)}
-                      disabled={!currentUserId}
-                    />
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition disabled:opacity-40"
-                      disabled={!messageContent.trim()}
-                    >
-                      Send
-                    </button>
-                  </form>
+                  </>
+                ) : (
+                  <>
+                    <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-200 text-black">
+                      {msg.content}
+                    </div>
+                    <span className="hidden group-hover:inline text-xs mb-3 text-gray-400 ml-2">
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </>
                 )}
               </div>
-            )}
-          </div>
+            );
+          })
+        )}
+        {/* End-of-messages anchor */}
+        <div ref={messagesEndRef} />
+      </div>
+      {/* Composer */}
+      {selectedUser && (
+        <form
+          className="flex gap-2 px-6 py-4 border-t border-gray-200 bg-white"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!messageContent.trim()) return;
+            if (!currentUserId || !selectedUser) return;
+            const ids = [currentUserId, selectedUser.id].sort();
+            const conversationId = `${ids[0]}_${ids[1]}`;
+
+            const { error } = await supabase.from('dev_messages').insert([
+              {
+                sender_id: currentUserId,
+                recipient_id: selectedUser.id,
+                content: messageContent,
+                conversation_id: conversationId,
+              },
+            ]);
+            if (!error) setMessageContent("");
+          }}
+          autoComplete="off"
+        >
+          <input
+            className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-gray-300"
+            placeholder="Type a message…"
+            value={messageContent}
+            onChange={e => setMessageContent(e.target.value)}
+            disabled={!currentUserId}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-[#2a2a2a] text-white rounded-full hover:bg-[#3a3a3a] hover:cursor-pointer transition"
+            disabled={!messageContent.trim()}
+          >
+            <FaPaperPlane className="inline-flex ml-2 mr-2 mb-1" />
+          </button>
+        </form>
+      )}
+    </div>
+  )}
+</div>
+
         </div>
       </div>
     </>
