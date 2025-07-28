@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Navbar, NavBody, NavbarLogo, NavItems, MessageBadge, NotificationBadge } from "@/components/ui/navbar";
 import Link from "next/link";
 import { FaPaperPlane } from 'react-icons/fa';
+import { FaLink } from "react-icons/fa";
+
 
 // Types
 type UserProfile = {
@@ -41,7 +43,35 @@ export default function MessagesPage() {
 
 
   const chatScrollBoxRef = useRef<HTMLDivElement>(null);
-const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  useEffect(() => {
+  if (!searchTerm || !currentUserId) {
+    setSearchResults([]);
+    setSearchLoading(false);
+    return;
+  }
+  setSearchLoading(true);
+
+  // Search by full_name or username match (case-insensitive)
+  supabase
+    .from('dev_profiles')
+    .select('id, full_name, username, avatar_url')
+    .or(
+      `full_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`
+    )
+    .neq('id', currentUserId)
+    .limit(10)
+    .then(({ data }) => {
+      setSearchResults(data || []);
+      setSearchLoading(false);
+    });
+}, [searchTerm, currentUserId]);
+
 
 useEffect(() => {
   if (chatScrollBoxRef.current) {
@@ -217,43 +247,89 @@ useEffect(() => {
         <div className="flex flex-1 h-full border border-[var(--sidebar-border)] rounded-xl overflow-hidden shadow-lg bg-[var(--card)]">
           {/* SIDEBAR */}
           <div className="w-72 border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] flex flex-col">
-            <h3 className="px-6 py-4 text-lg font-semibold text-[var(--sidebar-foreground)] border-b border-[var(--sidebar-border)]">Chat</h3>
-            <div className="flex-1 overflow-y-auto">
-              {loadingConvos ? (
-                <div className="text-center text-gray-400 py-8">Loading...</div>
-              ) : sidebarConvos.length === 0 ? (
-                <div className="text-center text-gray-400 py-8">No conversations yet.</div>
-              ) : (
-                sidebarConvos.map(({ user, lastMessage }) => (
-                  <div
-                    key={user.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 ${
-                      selectedUser?.id === user.id ? "bg-gray-200" : ""
-                    }`}
-                    onClick={() => setSelectedUser(user)}
-                  >
-                    {user.avatar_url ? (
-                      <Image
-                        src={user.avatar_url}
-                        alt={user.full_name || user.username || "User"}
-                        width={40}
-                        height={40}
-                        className="rounded-full object-cover border border-[var(--sidebar-border)]"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
-                        {getInitials(user.full_name || user.username || "")}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <div className="font-medium truncate">{user.full_name || user.username || "User"}</div>
-                      <div className="text-xs text-gray-500 truncate">{lastMessage.content}</div>
-                    </div>
-                  </div>
-                ))
-              )}
+  <h3 className="px-6 pt-4 pb-2 text-lg font-semibold text-[var(--sidebar-foreground)] border-b border-[var(--sidebar-border)]">Chat</h3>
+  {/* Search box */}
+  <div className="px-6 pb-2 pt-2 bg-[var(--sidebar)] border-b border-[var(--sidebar-border)]">
+    <input
+      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm bg-gray-50 focus:border-gray-400 focus:outline-none"
+      type="text"
+      placeholder="Search users…"
+      value={searchTerm}
+      onChange={e => setSearchTerm(e.target.value)}
+    />
+  </div>
+  <div className="flex-1 overflow-y-auto">
+    {/* If searching, show user results */}
+    {searchTerm ? (
+      searchLoading ? (
+        <div className="text-center text-gray-400 py-8">Searching…</div>
+      ) : searchResults.length === 0 ? (
+        <div className="text-center text-gray-400 py-8">No users found.</div>
+      ) : (
+        searchResults.map(user => (
+          <div
+            key={user.id}
+            className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 ${
+              selectedUser?.id === user.id ? "bg-gray-200" : ""
+            }`}
+            onClick={() => setSelectedUser(user)}
+          >
+            {user.avatar_url ? (
+              <Image
+                src={user.avatar_url}
+                alt={user.full_name || user.username || "User"}
+                width={40}
+                height={40}
+                className="rounded-full object-cover border border-[var(--sidebar-border)]"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+                {getInitials(user.full_name || user.username || "")}
+              </div>
+            )}
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="font-medium truncate">{user.full_name || user.username || "User"}</div>
+              <div className="text-xs text-gray-500 truncate">Start conversation</div>
             </div>
           </div>
+        ))
+      )
+    ) : loadingConvos ? (
+      <div className="text-center text-gray-400 py-8">Loading...</div>
+    ) : sidebarConvos.length === 0 ? (
+      <div className="text-center text-gray-400 py-8">No conversations yet.</div>
+    ) : (
+      sidebarConvos.map(({ user, lastMessage }) => (
+        <div
+          key={user.id}
+          className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 ${
+            selectedUser?.id === user.id ? "bg-gray-200" : ""
+          }`}
+          onClick={() => setSelectedUser(user)}
+        >
+          {user.avatar_url ? (
+            <Image
+              src={user.avatar_url}
+              alt={user.full_name || user.username || "User"}
+              width={40}
+              height={40}
+              className="rounded-full object-cover border border-[var(--sidebar-border)]"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+              {getInitials(user.full_name || user.username || "")}
+            </div>
+          )}
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            <div className="font-medium truncate">{user.full_name || user.username || "User"}</div>
+            <div className="text-xs text-gray-500 truncate">{lastMessage.content}</div>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
           {/* CHAT PANEL */}
           <div className="flex-1 flex flex-col bg-[var(--card)] min-h-0">
   {!selectedUser ? (
@@ -271,21 +347,44 @@ useEffect(() => {
     <div className="flex flex-col h-full min-h-0">
       {/* Chat header */}
       <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-        {selectedUser.avatar_url ? (
-          <Image
-            src={selectedUser.avatar_url}
-            alt={selectedUser.full_name || selectedUser.username || "User"}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
-            {(selectedUser.full_name || selectedUser.username || "U")[0]}
-          </div>
-        )}
-        <span className="text-lg font-semibold">{selectedUser.full_name || selectedUser.username}</span>
-      </div>
+  {selectedUser.avatar_url ? (
+    <Image
+      src={selectedUser.avatar_url}
+      alt={selectedUser.full_name || selectedUser.username || "User"}
+      width={40}
+      height={40}
+      className="rounded-full object-cover"
+    />
+  ) : (
+    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 font-bold border border-[var(--sidebar-border)]">
+      {(selectedUser.full_name || "Loading...")[0]}
+    </div>
+  )}
+  <div className="flex flex-col">
+    <Link
+  href={`/profile/${selectedUser.username}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex flex-col group cursor-pointer"
+  style={{ textDecoration: "none" }}
+>
+  <span className="flex items-center">
+    <span className="text-lg font-semibold">{selectedUser.full_name || selectedUser.username}</span>
+    {/* Link icon on hover */}
+    <FaLink
+      size={14}
+      className="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+    />
+  </span>
+  {selectedUser.username && (
+    <span className="text-xs text-gray-400">@{selectedUser.username}</span>
+  )}
+</Link>
+
+  </div>
+  
+</div>
+
       {/* Chat messages with proper scroll-to-bottom */}
       <div
         className="flex-1 overflow-y-auto p-6 min-h-0"
