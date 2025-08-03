@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect} from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe
 import { ChevronRightIcon, CheckIcon } from "lucide-react";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { use3dTilt } from "@/hooks/use3dTilt";
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const tiltLogo = use3dTilt();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hasDevAccess = localStorage.getItem("devAccess") === "true";
+      if (!hasDevAccess) {
+        router.push("/waitlist");
+      }
+    }
+  }, []);
 
   // Memoize animated heading so animation doesn't restart each render
   const memoizedHeading = useMemo(

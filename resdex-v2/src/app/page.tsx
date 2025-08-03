@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { delay, motion } from "framer-motion";
 import { FaEnvelope, FaRegSadTear, FaUserGraduate, FaUser, FaBook, FaRegLightbulb } from "react-icons/fa";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { NumberTicker } from "@/components/magicui/number-ticker";
@@ -248,8 +248,27 @@ export default function CanopyDemo() {
         </div>
         {/* Right side: Discord + Wallet */}
         <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-          <button className="rounded-full p-2 hover:bg-gray-100 transition">
-            {/* Discord icon (placeholder) */}
+          <button onClick={async () => {
+    const pw = prompt("Enter developer password:");
+    if (!pw) return;
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (res.ok) {
+        localStorage.setItem("devAccess", "true");
+        alert("Access granted! Redirecting to signup page...");
+        router.push("/signup");
+      } else {
+        alert("Incorrect password!");
+      }
+    } catch (err) {
+      alert("Something went wrong.");
+    }
+  }} className="rounded-full p-2 hover:bg-gray-100 transition">
+
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#23272A"/><path d="M8.5 15.5C8.5 15.5 9.5 16 12 16C14.5 16 15.5 15.5 15.5 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><ellipse cx="9.5" cy="12" rx="1" ry="1.5" fill="#fff"/><ellipse cx="14.5" cy="12" rx="1" ry="1.5" fill="#fff"/></svg>
           </button>
           <button  onClick={handleClick} className="rounded-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-medium transition" style={{ fontFamily: 'GellixMedium, sans-serif', cursor: 'pointer' }}>

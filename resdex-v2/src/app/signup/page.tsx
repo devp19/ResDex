@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -21,6 +21,34 @@ export default function SignupPage() {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const tiltLogo = use3dTilt();
+
+
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    const hasDevAccess = localStorage.getItem("devAccess") === "true";
+    if (!hasDevAccess) {
+      router.push("/waitlist");
+    }
+  }
+}, []);
+
+  // REMOVVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
 
   // Minimal username validation: lowercase, 3+, a-z0-9_
   const validateUsername = (name: string) => {

@@ -142,6 +142,9 @@ export default function WaitlistPage() {
             </span>
             <span className="text-sm text-gray-500">{waitlistCount.toLocaleString()} people already have shown interest</span>
           </div>
+
+        
+
         </div>
       </section>
     </div>
