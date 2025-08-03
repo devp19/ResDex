@@ -9,6 +9,17 @@ import { NumberTicker } from "@/components/magicui/number-ticker";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { use3dTilt } from "@/hooks/use3dTilt";
 import { useRouter } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 // Custom color for primary button
 const PRIMARY_BTN_BG = '#101828';
@@ -207,6 +218,13 @@ export default function CanopyDemo() {
   const [bgColor, setBgColor] = useState('#fff'); // initial white
   const tiltLogo = use3dTilt();
 
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(true);
+  }, []);
+
+
   useEffect(() => {
     const section = productsRef.current;
     if (!section) return;
@@ -230,8 +248,31 @@ export default function CanopyDemo() {
     router.push('/waitlist');
   };
 
+
+
+
+
   return (
+    
     <div className="min-h-screen bg-white relative overflow-hidden">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+      {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <img src="/beige-logo.png" alt="ResDex Logo" width={64} height={64} className="mb-4 rounded" />
+          <AlertDialogTitle>Thanks for visiting early!</AlertDialogTitle>
+          <AlertDialogDescription>
+            We appreciate your interest in ResDex. As we are still in development, we currently have limited access. Until then, feel free to check out the site and what ResDex is all about! <br></br> <br></br>Please join our <a href="/waitlist" style={{textDecoration: 'underline'}}>waitlist</a> to be notified when we launch and gain access to the platform as soon as we are ready to go public!
+            <br></br>
+            <br></br>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setOpen(false)}>View Site</AlertDialogCancel>
+          <AlertDialogAction onClick={() => router.push("/waitlist")}>Join Waitlist</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
       {/* Navbar */}  
       <nav className="relative z-10 flex items-center py-6 px-8 w-full max-w-7xl mx-auto">
         {/* Logo */}
