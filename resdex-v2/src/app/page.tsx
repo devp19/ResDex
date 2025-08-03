@@ -619,7 +619,7 @@ export default function CanopyDemo() {
           <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
             <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
               <video
-          src="https://mhnughbveavfihztvfvb.supabase.co/storage/v1/object/sign/video/video-shortform.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lM2U5NzhjNy0wODE4LTRmNjItOTA3Mi0wYTMyYzJjMzA5NGEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ2aWRlby92aWRlby1zaG9ydGZvcm0ubXA0IiwiaWF0IjoxNzUzMzc1ODU3LCJleHAiOjE5MTEwNTU4NTd9.r5SSLsi8tszAkq0VM2YDW8tr7tEhZINzvg0eRjwG4y0"
+          src="/video-shortform-home.mp4"
           width={220}
           height={400}
           className="w-[220px] h-[400px] object-cover rounded-xl"
@@ -641,7 +641,7 @@ We know you love scrolling, so we made it easy to share and discover research vi
           <div className="flex-1 bg-[#F5F5F5] rounded-2xl flex flex-col items-center p-8 min-w-[320px]">
             <div className="w-[220px] h-[400px] bg-black rounded-xl flex items-center justify-center mb-8 overflow-hidden">
               <video
-          src="https://mhnughbveavfihztvfvb.supabase.co/storage/v1/object/sign/video/topics.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lM2U5NzhjNy0wODE4LTRmNjItOTA3Mi0wYTMyYzJjMzA5NGEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ2aWRlby90b3BpY3MubXA0IiwiaWF0IjoxNzUzNTYxMTM5LCJleHAiOjE4NDgxNjkxMzl9.MW_8tJJ3VBf4iYV0NwjODJhFfSIMwI9CceAg0NVqigk"
+          src="/topics-shortform-home.mp4"
           width={220}
           height={400}
           className="w-[220px] h-[400px] object-cover rounded-xl"

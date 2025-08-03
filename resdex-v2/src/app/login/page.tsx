@@ -19,6 +19,16 @@ export default function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const tiltLogo = use3dTilt();
 
+
+   // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
   useEffect(() => {
     if (typeof window !== "undefined") {
       const hasDevAccess = localStorage.getItem("devAccess") === "true";
@@ -27,6 +37,15 @@ export default function LoginPage() {
       }
     }
   }, []);
+   // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
 
   // Memoize animated heading so animation doesn't restart each render
   const memoizedHeading = useMemo(
