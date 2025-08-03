@@ -58,9 +58,9 @@ const defaultSections = [
 ];
 
 const defaultSocialLinks = [
-  { icon: <FaInstagram className="size-5" />, href: "#", label: "Instagram" },
-  { icon: <SiX className="size-5" />, href: "#", label: "Twitter/X" },
-  { icon: <FaLinkedin className="size-5" />, href: "#", label: "LinkedIn" },
+  { icon: <FaInstagram className="size-5" />, href: "https://www.instagram.com/resdexco", label: "Instagram" },
+  { icon: <SiX className="size-5" />, href: "https://x.com/resdexco", label: "Twitter/X" },
+  { icon: <FaLinkedin className="size-5" />, href: "https://www.linkedin.com/company/resdex/", label: "LinkedIn" },
 ];
 
 const defaultLegalLinks = [
