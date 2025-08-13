@@ -29,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=1, minimum-scale=1" />
         <link rel="icon" href="/beige-logo.png" />
       </head>
       <body

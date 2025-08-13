@@ -2,130 +2,148 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { getAISummaries, mergeAISummariesWithArticles, getSummaryStats } from '../../lib/aiSummaryService';
+import { getUiScale } from '../../lib/uiScale';
 import Image from 'next/image';
 import './DailyDigest.css';
 
 // arXiv categories and their mappings to high-level categories
 const ARXIV_CATEGORIES = [
-  { query: 'cs.AI', category: 'AI / ML', maxResults: 8 },
-  { query: 'cs.LG', category: 'AI / ML', maxResults: 8 },
-  { query: 'stat.ML', category: 'AI / ML', maxResults: 5 },
-  { query: 'physics.space-ph', category: 'Space / Physics', maxResults: 6 },
-  { query: 'astro-ph', category: 'Space / Physics', maxResults: 6 },
-  { query: 'q-bio', category: 'Biology / Health', maxResults: 6 },
-  { query: 'quant-ph', category: 'Quantum', maxResults: 6 },
-  { query: 'econ.GN', category: 'Economics', maxResults: 4 },
-  { query: 'econ.TH', category: 'Economics', maxResults: 4 },
-  { query: 'cond-mat', category: 'Materials / Chemistry', maxResults: 5 },
-  { query: 'math.PR', category: 'Mathematics', maxResults: 4 },
-  { query: 'cs.CR', category: 'Cybersecurity', maxResults: 4 },
-  { query: 'cs.CV', category: 'Computer Vision', maxResults: 5 },
-  { query: 'cs.NE', category: 'AI / ML', maxResults: 4 },
-  { query: 'cs.RO', category: 'Robotics', maxResults: 4 },
-  { query: 'cs.SE', category: 'Software Engineering', maxResults: 4 },
-  { query: 'physics.app-ph', category: 'Applied Physics', maxResults: 4 },
-  { query: 'physics.chem-ph', category: 'Chemistry / Physics', maxResults: 4 },
-  { query: 'physics.comp-ph', category: 'Computational Physics', maxResults: 4 },
-  { query: 'physics.flu-dyn', category: 'Fluid Dynamics', maxResults: 3 },
-  { query: 'physics.optics', category: 'Optics / Photonics', maxResults: 3 },
-  { query: 'physics.plasm-ph', category: 'Plasma Physics', maxResults: 3 },
-  { query: 'physics.soc-ph', category: 'Social Physics', maxResults: 3 },
-  { query: 'q-bio.BM', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.CB', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.GN', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.NC', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.PE', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.QM', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.SC', category: 'Biology / Health', maxResults: 3 },
-  { query: 'q-bio.TO', category: 'Biology / Health', maxResults: 3 },
-  { query: 'math.AP', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.AT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.CA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.CO', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.CT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.DG', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.DS', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.FA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.GM', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.GN', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.GR', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.GT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.HO', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.IT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.KT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.LO', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.MP', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.NA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.NT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.OA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.OC', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.PR', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.QA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.RA', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.RT', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.SG', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.SP', category: 'Mathematics', maxResults: 3 },
-  { query: 'math.ST', category: 'Mathematics', maxResults: 3 },
-  { query: 'stat.AP', category: 'Statistics', maxResults: 3 },
-  { query: 'stat.CO', category: 'Statistics', maxResults: 3 },
-  { query: 'stat.ME', category: 'Statistics', maxResults: 3 },
-  { query: 'stat.ML', category: 'AI / ML', maxResults: 3 },
-  { query: 'stat.OT', category: 'Statistics', maxResults: 3 },
-  { query: 'stat.TH', category: 'Statistics', maxResults: 3 },
-  { query: 'econ.EM', category: 'Economics', maxResults: 3 },
-  { query: 'econ.GN', category: 'Economics', maxResults: 3 },
-  { query: 'econ.TH', category: 'Economics', maxResults: 3 },
-  { query: 'q-fin.CP', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.EC', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.GN', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.MF', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.PM', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.PR', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.RM', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.ST', category: 'Finance', maxResults: 3 },
-  { query: 'q-fin.TR', category: 'Finance', maxResults: 3 },
-  { query: 'cond-mat.dis-nn', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.mes-hall', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.mtrl-sci', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.other', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.quant-gas', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.soft', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.stat-mech', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.str-el', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'cond-mat.supr-con', category: 'Materials / Chemistry', maxResults: 3 },
-  { query: 'hep-th', category: 'Theoretical Physics', maxResults: 3 },
-  { query: 'hep-ph', category: 'Theoretical Physics', maxResults: 3 },
-  { query: 'hep-ex', category: 'Theoretical Physics', maxResults: 3 },
-  { query: 'hep-lat', category: 'Theoretical Physics', maxResults: 3 },
-  { query: 'nucl-ex', category: 'Nuclear Physics', maxResults: 3 },
-  { query: 'nucl-th', category: 'Nuclear Physics', maxResults: 3 },
-  { query: 'gr-qc', category: 'Gravitation / Cosmology', maxResults: 3 },
-  { query: 'cs.DC', category: 'Distributed Computing', maxResults: 3 },
-  { query: 'cs.DS', category: 'Data Structures', maxResults: 3 },
-  { query: 'cs.DB', category: 'Databases', maxResults: 3 },
-  { query: 'cs.DM', category: 'Discrete Mathematics', maxResults: 3 },
-  { query: 'cs.ET', category: 'Emerging Technologies', maxResults: 3 },
-  { query: 'cs.FL', category: 'Formal Languages', maxResults: 3 },
-  { query: 'cs.GL', category: 'General Literature', maxResults: 3 },
-  { query: 'cs.GR', category: 'Graphics', maxResults: 3 },
-  { query: 'cs.GT', category: 'Game Theory', maxResults: 3 },
-  { query: 'cs.HC', category: 'Human-Computer Interaction', maxResults: 3 },
-  { query: 'cs.IR', category: 'Information Retrieval', maxResults: 3 },
-  { query: 'cs.IT', category: 'Information Theory', maxResults: 3 },
-  { query: 'cs.LO', category: 'Logic in Computer Science', maxResults: 3 },
-  { query: 'cs.MA', category: 'Multiagent Systems', maxResults: 3 },
-  { query: 'cs.MM', category: 'Multimedia', maxResults: 3 },
-  { query: 'cs.MS', category: 'Mathematical Software', maxResults: 3 },
-  { query: 'cs.NA', category: 'Numerical Analysis', maxResults: 3 },
-  { query: 'cs.NI', category: 'Networking', maxResults: 3 },
-  { query: 'cs.OH', category: 'Other Computer Science', maxResults: 3 },
-  { query: 'cs.OS', category: 'Operating Systems', maxResults: 3 },
-  { query: 'cs.PF', category: 'Performance', maxResults: 3 },
-  { query: 'cs.PL', category: 'Programming Languages', maxResults: 3 },
-  { query: 'cs.SC', category: 'Symbolic Computation', maxResults: 3 },
-  { query: 'cs.SD', category: 'Sound', maxResults: 3 },
-  { query: 'cs.SI', category: 'Social and Information Networks', maxResults: 3 },
-  { query: 'cs.SY', category: 'Systems and Control', maxResults: 3 }
+  // AI / Machine Learning (High Priority)
+  { query: 'cs.AI', category: 'AI / ML', maxResults: 1 },
+  { query: 'cs.LG', category: 'AI / ML', maxResults: 1 },
+  { query: 'stat.ML', category: 'AI / ML', maxResults: 0 },
+  { query: 'cs.NE', category: 'AI / ML', maxResults: 0 },
+  
+  // Computer Vision & Robotics
+  { query: 'cs.CV', category: 'Computer Vision', maxResults: 1 },
+  { query: 'cs.RO', category: 'Robotics', maxResults: 0 },
+  
+  // Cybersecurity
+  { query: 'cs.CR', category: 'Cybersecurity', maxResults: 0 },
+  
+  // Quantum Computing
+  { query: 'quant-ph', category: 'Quantum', maxResults: 2 },
+  
+  // Space & Astrophysics
+  { query: 'physics.space-ph', category: 'Space / Physics', maxResults: 0 },
+  { query: 'astro-ph', category: 'Space / Physics', maxResults: 2 },
+  
+  // Biology & Health
+  { query: 'q-bio', category: 'Biology / Health', maxResults: 2 },
+  
+  // Economics & Finance
+  { query: 'econ.GN', category: 'Economics', maxResults: 1 },
+  { query: 'econ.TH', category: 'Economics', maxResults: 0 },
+  { query: 'q-fin.CP', category: 'Finance', maxResults: 1 },
+  
+  // Materials & Chemistry
+  { query: 'cond-mat', category: 'Materials / Chemistry', maxResults: 1 },
+  
+  // Applied Physics
+  { query: 'physics.app-ph', category: 'Applied Physics', maxResults: 0 },
+  
+  // Software Engineering
+  { query: 'cs.SE', category: 'Software Engineering', maxResults: 1 },
+  
+  // All other categories set to 0 (disabled)
+  { query: 'physics.chem-ph', category: 'Chemistry / Physics', maxResults: 0 },
+  { query: 'physics.comp-ph', category: 'Computational Physics', maxResults: 0 },
+  { query: 'physics.flu-dyn', category: 'Fluid Dynamics', maxResults: 0 },
+  { query: 'physics.optics', category: 'Optics / Photonics', maxResults: 0 },
+  { query: 'physics.plasm-ph', category: 'Plasma Physics', maxResults: 0 },
+  { query: 'physics.soc-ph', category: 'Social Physics', maxResults: 0 },
+  { query: 'q-bio.BM', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.CB', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.GN', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.NC', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.PE', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.QM', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.SC', category: 'Biology / Health', maxResults: 0 },
+  { query: 'q-bio.TO', category: 'Biology / Health', maxResults: 0 },
+  { query: 'math.PR', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.AP', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.AT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.CA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.CO', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.CT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.DG', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.DS', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.FA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.GM', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.GN', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.GR', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.GT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.HO', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.IT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.KT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.LO', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.MP', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.NA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.NT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.OA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.OC', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.QA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.RA', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.RT', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.SG', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.SP', category: 'Mathematics', maxResults: 0 },
+  { query: 'math.ST', category: 'Mathematics', maxResults: 0 },
+  { query: 'stat.AP', category: 'Statistics', maxResults: 0 },
+  { query: 'stat.CO', category: 'Statistics', maxResults: 0 },
+  { query: 'stat.ME', category: 'Statistics', maxResults: 0 },
+  { query: 'stat.OT', category: 'Statistics', maxResults: 0 },
+  { query: 'stat.TH', category: 'Statistics', maxResults: 0 },
+  { query: 'econ.EM', category: 'Economics', maxResults: 0 },
+  { query: 'q-fin.EC', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.GN', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.MF', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.PM', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.PR', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.RM', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.ST', category: 'Finance', maxResults: 0 },
+  { query: 'q-fin.TR', category: 'Finance', maxResults: 0 },
+  { query: 'cond-mat.dis-nn', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.mes-hall', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.mtrl-sci', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.other', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.quant-gas', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.soft', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.stat-mech', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.str-el', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'cond-mat.supr-con', category: 'Materials / Chemistry', maxResults: 0 },
+  { query: 'hep-th', category: 'Theoretical Physics', maxResults: 0 },
+  { query: 'hep-ph', category: 'Theoretical Physics', maxResults: 0 },
+  { query: 'hep-ex', category: 'Theoretical Physics', maxResults: 0 },
+  { query: 'hep-lat', category: 'Theoretical Physics', maxResults: 0 },
+  { query: 'nucl-ex', category: 'Nuclear Physics', maxResults: 0 },
+  { query: 'nucl-th', category: 'Nuclear Physics', maxResults: 0 },
+  { query: 'gr-qc', category: 'Gravitation / Cosmology', maxResults: 0 },
+  { query: 'cs.DC', category: 'Distributed Computing', maxResults: 0 },
+  { query: 'cs.DS', category: 'Data Structures', maxResults: 0 },
+  { query: 'cs.DB', category: 'Databases', maxResults: 0 },
+  { query: 'cs.DM', category: 'Discrete Mathematics', maxResults: 0 },
+  { query: 'cs.ET', category: 'Emerging Technologies', maxResults: 0 },
+  { query: 'cs.FL', category: 'Formal Languages', maxResults: 0 },
+  { query: 'cs.GL', category: 'General Literature', maxResults: 0 },
+  { query: 'cs.GR', category: 'Graphics', maxResults: 0 },
+  { query: 'cs.GT', category: 'Game Theory', maxResults: 0 },
+  { query: 'cs.HC', category: 'Human-Computer Interaction', maxResults: 0 },
+  { query: 'cs.IR', category: 'Information Retrieval', maxResults: 0 },
+  { query: 'cs.IT', category: 'Information Theory', maxResults: 0 },
+  { query: 'cs.LO', category: 'Logic in Computer Science', maxResults: 0 },
+  { query: 'cs.MA', category: 'Multiagent Systems', maxResults: 0 },
+  { query: 'cs.MM', category: 'Multimedia', maxResults: 0 },
+  { query: 'cs.MS', category: 'Mathematical Software', maxResults: 0 },
+  { query: 'cs.NA', category: 'Numerical Analysis', maxResults: 0 },
+  { query: 'cs.NI', category: 'Networking', maxResults: 0 },
+  { query: 'cs.OH', category: 'Other Computer Science', maxResults: 0 },
+  { query: 'cs.OS', category: 'Operating Systems', maxResults: 0 },
+  { query: 'cs.PF', category: 'Performance', maxResults: 0 },
+  { query: 'cs.PL', category: 'Programming Languages', maxResults: 0 },
+  { query: 'cs.SC', category: 'Symbolic Computation', maxResults: 0 },
+  { query: 'cs.SD', category: 'Sound', maxResults: 0 },
+  { query: 'cs.SI', category: 'Social and Information Networks', maxResults: 0 },
+  { query: 'cs.SY', category: 'Systems and Control', maxResults: 0 }
 ];
 
 interface Article {
@@ -458,6 +476,15 @@ export default function DailyDigestPage() {
   useEffect(() => {
     loadUserPreferences();
     loadDigest();
+    
+    // Log UI scale for verification
+    if (typeof window !== 'undefined') {
+      const scale = getUiScale();
+      const htmlFontSize = getComputedStyle(document.documentElement).fontSize;
+      console.log('Digest Page UI Scale:', scale);
+      console.log('HTML Font Size:', htmlFontSize);
+      console.log('Expected Font Size:', `${16 * scale}px`);
+    }
   }, []);
 
   // Filter articles based on selected category and favorites
@@ -784,7 +811,7 @@ export default function DailyDigestPage() {
             </main>
 
             {/* Right Sidebar */}
-            <aside className="lg:col-span-3">
+            <aside className="lg:col-span-2">
               <div className="sticky top-24 space-y-6">
                 {/* Search Bar */}
                 <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
