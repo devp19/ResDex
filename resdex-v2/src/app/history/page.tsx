@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { getUiScale } from '../../lib/uiScale';
 
 interface Article {
   id: string;
@@ -22,7 +24,21 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Apply UI scale for history page
+    if (typeof window !== 'undefined') {
+      document.documentElement.style.setProperty('--ui-scale', '0.8');
+      document.documentElement.style.fontSize = `${16 * 0.8}px`;
+    }
+
     loadHistory();
+
+    // Cleanup function to reset UI scale when component unmounts
+    return () => {
+      if (typeof window !== 'undefined') {
+        document.documentElement.style.removeProperty('--ui-scale');
+        document.documentElement.style.fontSize = '16px';
+      }
+    };
   }, []);
 
   const loadHistory = () => {
@@ -171,6 +187,19 @@ export default function HistoryPage() {
 
           {/* Center Column */}
           <main className="lg:col-span-7">
+            {/* Back to Digest Button - Top Left */}
+            <div className="mb-6">
+              <Link 
+                href="/digest"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-medium rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Digest
+              </Link>
+            </div>
+
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Reading History</h1>
               {historyArticles.length > 0 && (
