@@ -49,9 +49,10 @@ export default function DigestLayout({
           ) : (
             // Grid layout for digest page
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Sidebar */}
+              {/* Left Sidebar - Navigation Only */}
               <aside className="lg:col-span-3">
                 <div className="sticky top-24 space-y-6">
+                  {/* Navigation */}
                   <nav className="space-y-2">
                     <Link href="/digest" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900/20 text-black dark:text-gray-300 font-medium">
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,8 +81,8 @@ export default function DigestLayout({
                 {children}
               </main>
 
-              {/* Right Sidebar - Only show on digest page */}
-              <aside className="lg:col-span-2">
+              {/* Right Sidebar - Using the RightSidebar Component */}
+              <aside className="lg:col-span-3">
                 <RightSidebar />
               </aside>
             </div>

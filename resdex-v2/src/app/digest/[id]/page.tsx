@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArticleDetail } from './ArticleDetail';
+import Article from './Article';
 
 interface Article {
   id: string;
@@ -70,5 +70,5 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  return <ArticleDetail article={article} />;
+  return <Article article={article} />;
 } 
