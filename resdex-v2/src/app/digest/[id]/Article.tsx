@@ -157,6 +157,19 @@ export default function Article({ article }: ArticleProps) {
           {/* MAIN content - hero + About */}
           <main className="col-span-12 lg:col-span-6 xl:col-span-8">
             <div className="max-w-4xl mx-auto">
+              {/* Back to Digest Button */}
+              <div className="mb-6">
+                <Link 
+                  href="/digest"
+                  className="inline-flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back to Digest
+                </Link>
+              </div>
+              
               {/* HERO (taller + uses image_url if present) */}
               <div className="mb-12">
                 <div className="relative w-full rounded-3xl border border-neutral-200 dark:border-neutral-800 overflow-hidden
