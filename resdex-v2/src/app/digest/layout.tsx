@@ -38,16 +38,14 @@ export default function DigestLayout({
 
       {/* Main Layout */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-12xl mx-auto">
-          {isArticlePage ? (
-            // Centered layout for article pages
-            <div className="flex justify-center">
-              <div className="w-full max-w-4xl">
-                {children}
-              </div>
-            </div>
-          ) : (
-            // Grid layout for digest page
+        {isArticlePage ? (
+          // Article pages - no max-width constraint for fixed positioning
+          <div className="w-full">
+            {children}
+          </div>
+        ) : (
+          // Digest page - with max-width constraint
+          <div className="max-w-12xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Sidebar - Navigation Only */}
               <aside className="lg:col-span-3">
@@ -86,8 +84,8 @@ export default function DigestLayout({
                 <RightSidebar />
               </aside>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
