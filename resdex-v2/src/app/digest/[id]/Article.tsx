@@ -156,7 +156,7 @@ export default function Article({ article }: ArticleProps) {
               return false;
             })
             .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())
-            .slice(0, 4); // Limit to 4 related articles
+            .slice(0, 3); // Limit to 3 related articles
 
           setRelatedArticles(related);
         }
@@ -183,7 +183,7 @@ export default function Article({ article }: ArticleProps) {
           {/* LEFT sidebar - Key Details */}
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
             <div className="sticky top-24">
-              <div className="bg-white/30 dark:bg-neutral-800/30 backdrop-blur-sm rounded-xl p-6">
+              <div className="bg-white/30 dark:bg-neutral-800/30 backdrop-blur-sm rounded-xl p-6 mt-6">
                 {/* Metadata */}
                 <div className="mb-6 space-y-2">
                   <div className="flex items-start">
@@ -239,7 +239,7 @@ export default function Article({ article }: ArticleProps) {
           </aside>
 
           {/* MAIN content - hero + About */}
-          <main className="col-span-12 lg:col-span-6 xl:col-span-8">
+          <main className="col-span-12 lg:col-span-5 xl:col-span-7">
             <div className="max-w-4xl mx-auto">
               {/* Back to Digest Button */}
               <div className="mb-6">
@@ -325,17 +325,17 @@ export default function Article({ article }: ArticleProps) {
           </main>
 
           {/* RIGHT sidebar - Related Articles */}
-          <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
+          <aside className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24">
               <div className="bg-white/30 dark:bg-neutral-800/30 backdrop-blur-sm rounded-xl p-6">
                 <h2 className="text-sm font-semibold uppercase tracking-wide mb-3">Related Articles</h2>
 
                 {loading ? (
                   <div className="animate-pulse space-y-4">
-                    {[...Array(4)].map((_, i) => (
+                    {[...Array(3)].map((_, i) => (
                       <div key={i} className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
                         <div className="aspect-[16/9] bg-neutral-200 dark:bg-neutral-700" />
-                        <div className="p-4 space-y-2">
+                        <div className="p-5 space-y-2">
                           <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded" />
                           <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-2/3" />
                         </div>
@@ -348,9 +348,9 @@ export default function Article({ article }: ArticleProps) {
                   <div className="space-y-4">
                     {relatedArticles.map((ra) => (
                       <Link key={ra.id} href={`/digest/${encodeURIComponent(ra.id)}`} className="block">
-                        <article className="group bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col">
+                        <article className="group bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col min-w-0">
                           {/* Card Image with Fixed Aspect Ratio */}
-                          <div className="relative aspect-[16/9] overflow-hidden flex-shrink-0">
+                          <div className="relative aspect-[16/10] overflow-hidden flex-shrink-0">
                             <div 
                               className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                               style={{
@@ -378,9 +378,9 @@ export default function Article({ article }: ArticleProps) {
                           </div>
                           
                           {/* Card Content - Fixed Height */}
-                          <div className="p-4 flex-1 flex flex-col">
+                          <div className="p-5 flex-1 flex flex-col">
                             {/* Meta Information */}
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
                                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <circle cx="12" cy="12" r="10"/>
@@ -397,20 +397,20 @@ export default function Article({ article }: ArticleProps) {
                             </div>
                             
                             {/* Title */}
-                            <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-2 line-clamp-2 group-hover:text-black dark:group-hover:text-gray-300 transition-colors flex-1">
+                            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 group-hover:text-black dark:group-hover:text-gray-300 transition-colors flex-1 leading-tight">
                               {ra.title}
                             </h2>
                             
                             {/* Summary */}
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3 line-clamp-2">
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3 leading-relaxed">
                               {ra.summary}
                             </p>
                             
                             {/* Footer */}
-                            <div className="flex items-center justify-between mt-auto">
+                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-neutral-100 dark:border-neutral-800">
                               <div className="flex items-center gap-1 text-neutral-400 group-hover:text-black-500 transition-colors">
-                                <span className="text-xs font-medium">Read more</span>
-                                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span className="text-sm font-medium">Read more</span>
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                                 </svg>
                               </div>

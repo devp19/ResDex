@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { RightSidebar } from './components/RightSidebar';
 import { DigestProvider } from './context/DigestContext';
+import './DailyDigest.css';
 
 // Context for sharing category data between main page and sidebar
 interface CategoryContextType {

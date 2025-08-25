@@ -6,6 +6,7 @@ import { getDigestForDay, getRecentIfEmpty, torontoDayISO } from '@/lib/digest';
 import { createClient } from '@supabase/supabase-js';
 import { useDigest } from './context/DigestContext';
 import { useCategoryContext } from './layout';
+import './DailyDigest.css';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -68,8 +69,8 @@ export default function DigestPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(0);
   const [allArticles, setAllArticles] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   // Page-level 80% UI scale to match your other pages
   useEffect(() => {
@@ -200,15 +201,17 @@ export default function DigestPage() {
 
         // Fetch a reasonable initial dataset for display and category counts
         console.log('Fetching initial dataset for display and category counts...');
-        const { data: initialArticles, error } = await supabase
+        const { data: initialArticles, count, error } = await supabase
           .from('dev_articles')
-          .select('*')
+          .select('*', { count: 'exact' })
           .order('published_at', { ascending: false })
           .limit(100); // Fetch 100 articles initially for better UX
         
         if (error) {
           console.error('Error fetching initial articles:', error);
         }
+        
+        if (count !== null) setTotalCount(count);
         
         let finalArticles = uniqueArticles;
         if (initialArticles && initialArticles.length > 0) {
@@ -320,15 +323,20 @@ export default function DigestPage() {
     try {
       setLoadingMore(true);
       
-      // Fetch more articles from Supabase with pagination
-      const { data: moreArticles, error } = await supabase
+      const PAGE_SIZE = 30;
+      const from = allArticles.length;
+      const to = from + PAGE_SIZE - 1;
+
+      // Fetch more articles from Supabase with pagination and count
+      const { data: moreArticles, count, error } = await supabase
         .from('dev_articles')
-        .select('*')
+        .select('*', { count: 'exact' })
         .order('published_at', { ascending: false })
-        .range(page * 20 + 20, page * 20 + 39); // Fetch next 20 articles
+        .range(from, to);
 
       if (error) {
         console.error('Error loading more articles:', error);
+        setLoadingMore(false);
         return;
       }
 
@@ -349,29 +357,27 @@ export default function DigestPage() {
           };
         });
 
-        // Combine existing and new articles, then deduplicate by ID
-        const combinedArticles = [...allArticles, ...transformedArticles];
-        const uniqueArticles = combinedArticles.filter((article, index, self) => 
-          index === self.findIndex(a => a.id === article.id)
-        );
-        
-        // Update all articles state
-        setAllArticles(uniqueArticles);
+        // De-dupe by id just in case
+        setAllArticles(prev => {
+          const map = new Map(prev.map(a => [a.id, a]));
+          for (const r of transformedArticles) map.set(r.id, r);
+          return Array.from(map.values());
+        });
         
         // Update grouped articles with unique articles
-        const updatedGrouped = uniqueArticles.reduce((acc: Record<string, any[]>, article: any) => {
-          const category = article.tag;
-          if (!acc[category]) {
-            acc[category] = [];
-          }
-          acc[category].push(article);
-          return acc;
-        }, {});
+        const updatedGrouped = Array.from(new Map([...allArticles, ...transformedArticles].map(a => [a.id, a])).values())
+          .reduce((acc: Record<string, any[]>, article: any) => {
+            const category = article.tag;
+            if (!acc[category]) {
+              acc[category] = [];
+            }
+            acc[category].push(article);
+            return acc;
+          }, {});
         setGroupedArticles(updatedGrouped);
         
-        // Update pagination state
-        setPage(prev => prev + 1);
-        setHasMore(moreArticles.length === 20); // If we got less than 20, we've reached the end
+        if (count !== null) setTotalCount(count);
+        setHasMore(to + 1 < (count ?? 0));
       } else {
         setHasMore(false);
       }
@@ -455,8 +461,8 @@ export default function DigestPage() {
       {heroArticle && (
         <div className="mb-8">
           <Link href={`/digest/${heroArticle.id}`} className="block">
-            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
-              <div className="relative aspect-[7/3] w-full">
+            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg hover:shadow-neutral-200/50 dark:hover:shadow-neutral-800/50 transition-all duration-300 cursor-pointer group">
+              <div className="relative aspect-[21/9] w-full">
                 <div 
                   className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                   style={{ background: '#E5E3DF' }}
@@ -464,65 +470,65 @@ export default function DigestPage() {
                   aria-label={`Featured research in ${heroArticle.tag}`}
                 >
                   <div className="text-center p-4">
-                    <div className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+                    <div className="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-2">
                       {heroArticle.tag}
                     </div>
-                    <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                    <div className="text-sm text-neutral-600 dark:text-neutral-400">
                       Featured Research
                     </div>
                   </div>
                 </div>
-                <div className="absolute top-3 left-3">
-                  <span className="px-2 py-1 bg-white/90 dark:bg-neutral-900/90 text-xs font-medium text-neutral-700 dark:text-neutral-300 rounded-full">
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1.5 bg-white/90 dark:bg-neutral-900/90 text-sm font-medium text-neutral-700 dark:text-neutral-300 rounded-full">
                     {heroArticle.tag}
                   </span>
                 </div>
-                <div className="absolute top-3 right-3">
-                  <span className="px-2 py-1 bg-black/90 text-white text-xs font-medium rounded-full">
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1.5 bg-black/90 text-white text-sm font-medium rounded-full">
                     {heroArticle.source || 'arXiv'}
                   </span>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
-                  <div className="flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-6 md:p-8">
+                <div className="flex items-center gap-4 mb-4 text-sm text-neutral-500 dark:text-neutral-400">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10"/>
                       <path d="M12 6v6l4 2"/>
                     </svg>
-                    {heroArticle.published ? timeSince(new Date(heroArticle.published)) : 'Recent'}
+                    <span>{heroArticle.published ? timeSince(new Date(heroArticle.published)) : 'Recent'}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                    {heroArticle.author}
+                    <span className="truncate max-w-[200px]">{heroArticle.author}</span>
                   </div>
-                  <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-xs font-medium rounded-full">
+                  <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-sm font-medium rounded-full">
                     {heroArticle.source || 'arXiv'}
                   </span>
                 </div>
                 
-                <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-4 line-clamp-2 transition-colors leading-tight">
                   {heroArticle.title}
                 </h2>
                 
-                <p className="text-base text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3">
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6 line-clamp-3 leading-relaxed">
                   {heroArticle.summary}
                 </p>
                 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                  <div className="flex items-center gap-3">
                     <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-                      <svg className="h-4 w-4 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                       </svg>
                     </button>
                   </div>
-                  <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors">
-                    <span className="text-sm font-medium">Read full article</span>
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 text-neutral-400 transition-colors group-hover:text-neutral-600 dark:group-hover:text-neutral-300">
+                    <span className="text-base font-medium">Read full article</span>
+                    <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                     </svg>
                   </div>
@@ -535,12 +541,13 @@ export default function DigestPage() {
 
       {/* Grid Articles */}
       {gridArticlesToShow.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {gridArticlesToShow.map((article) => (
             <div key={article.id} className="group">
               <Link href={`/digest/${article.id}`} className="block">
                 <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col">
-                  <div className="relative aspect-[4/3] w-full">
+                  {/* Image/Header Section */}
+                  <div className="relative aspect-[5/3] w-full">
                     <div 
                       className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                       style={{ background: '#E5E3DF' }}
@@ -563,7 +570,9 @@ export default function DigestPage() {
                     </div>
                   </div>
                   
+                  {/* Content Section */}
                   <div className="p-4 flex-1 flex flex-col">
+                    {/* Meta Information */}
                     <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
                       <div className="flex items-center gap-1">
                         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -580,14 +589,17 @@ export default function DigestPage() {
                       </div>
                     </div>
                     
-                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0">
+                    {/* Title */}
+                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 transition-colors flex-shrink-0">
                       {article.title}
                     </h3>
                     
+                    {/* Summary */}
                     <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 flex-1">
                       {article.summary}
                     </p>
                     
+                    {/* Footer Actions */}
                     <div className="flex items-center justify-between mt-auto flex-shrink-0">
                       <div className="flex items-center gap-2">
                         <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
@@ -596,8 +608,8 @@ export default function DigestPage() {
                           </svg>
                         </button>
                       </div>
-                      <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors">
-                        <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors cursor-pointer hover:text-blue-500">
+                      <div className="flex items-center gap-1 text-neutral-400 transition-colors">
+                        <div className="flex items-center gap-1 text-neutral-400 transition-colors cursor-pointer hover:text-blue-500">
                           <span className="text-sm font-medium">Read more</span>
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
@@ -618,25 +630,13 @@ export default function DigestPage() {
         <div className="mt-8 text-center">
           <button
             onClick={loadMore}
-            disabled={loadingMore}
-            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+            disabled={loadingMore || !hasMore}
+            className="px-6 py-3 rounded-xl bg-black text-white disabled:opacity-50"
           >
-            {loadingMore ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Loading...
-              </>
-            ) : (
-              <>
-                Load More Articles
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l7 7-7 7"/>
-                </svg>
-              </>
-            )}
+            {loadingMore ? 'Loading…' : hasMore ? 'Load More Articles' : 'No more articles'}
           </button>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-            Showing {displayArticles.length} articles
+          <p className="mt-3 text-sm text-neutral-500">
+            Showing {displayArticles.length}{totalCount ? ` of ${totalCount}` : ''} articles
           </p>
         </div>
       )}
@@ -649,7 +649,7 @@ export default function DigestPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span className="text-sm text-neutral-600 dark:text-neutral-400">
-              All articles loaded ({displayArticles.length} total)
+              All articles loaded ({displayArticles.length}{totalCount ? ` of ${totalCount}` : ''} total)
             </span>
           </div>
         </div>

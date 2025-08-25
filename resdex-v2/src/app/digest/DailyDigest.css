@@ -741,6 +741,24 @@ html {
   color: #666;
 }
 
+/* Hover-reveal scrollbar for the right sidebar */
+.hover-scroll {
+  max-height: calc(100vh - 96px); /* match your sticky offset (top-24 ~= 96px) */
+  overflow-y: hidden;
+  padding-right: 6px;             /* room for scrollbar so content doesn't shift */
+}
+.hover-scroll:hover {
+  overflow-y: auto;
+}
+
+/* nice, subtle scrollbar (optional) */
+.hover-scroll::-webkit-scrollbar { width: 8px; }
+.hover-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.2);
+  border-radius: 8px;
+}
+.hover-scroll::-webkit-scrollbar-track { background: transparent; }
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .digest-layout {
