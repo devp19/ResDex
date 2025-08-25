@@ -1,21 +1,18 @@
 // src/lib/supabase.ts
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Keep this module side-effect free (no queries at import time).
+// This avoids Vercel/TS issues with PromiseLike.catch and speeds builds.
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables:');
-  console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✓' : '✗');
-  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓' : '✗');
-  throw new Error('Missing required Supabase environment variables');
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// Don't throw during build; just warn in dev if missing.
+if (process.env.NODE_ENV !== 'production') {
+  if (!url) console.warn('[supabase] Missing NEXT_PUBLIC_SUPABASE_URL')
+  if (!anon) console.warn('[supabase] Missing NEXT_PUBLIC_SUPABASE_ANON_KEY')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Test connection
-supabase.from('_dummy_').select('*').limit(1).then(() => {
-  console.log('Supabase client initialized successfully');
-}).catch((error) => {
-  console.warn('Supabase connection test failed (this is normal for missing tables):', error.message);
-}); 
+export const supabase = createClient(url!, anon!)
+// Optional: pass options here if you need auth persistence etc.
+// export const supabase = createClient(url!, anon!, { auth: { persistSession: true, autoRefreshToken: true } }) 

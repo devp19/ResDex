@@ -122,7 +122,7 @@ export default function Article({ article }: ArticleProps) {
               return false;
             })
             .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())
-            .slice(0, 6);
+            .slice(0, 4); // Limit to 4 related articles
 
           setRelatedArticles(related);
         }
@@ -296,7 +296,7 @@ export default function Article({ article }: ArticleProps) {
 
                 {loading ? (
                   <div className="animate-pulse space-y-4">
-                    {[...Array(3)].map((_, i) => (
+                    {[...Array(4)].map((_, i) => (
                       <div key={i} className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
                         <div className="aspect-[16/9] bg-neutral-200 dark:bg-neutral-700" />
                         <div className="p-4 space-y-2">

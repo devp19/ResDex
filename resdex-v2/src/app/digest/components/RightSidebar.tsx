@@ -31,6 +31,7 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
   const [favoriteCategories, setFavoriteCategories] = useState<string[]>([]);
   const [categorySearch, setCategorySearch] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,39 +49,44 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
           NEXT_PUBLIC_USE_DEV: process.env.NEXT_PUBLIC_USE_DEV
         });
         
-        // Fetch digest items to get categories and article counts
-        const { data: digestItems, error } = await supabase
-          .from(`${tablePrefix}daily_digest_items`)
-          .select(`
-            topic,
-            ${tablePrefix}articles!inner(
-              id,
-              title,
-              abstract,
-              authors,
-              published_at,
-              link_abs
-            )
-          `);
+        // Fetch all articles to get complete category coverage
+        const { data: articles, error } = await supabase
+          .from(`${tablePrefix}articles`)
+          .select('topic, id')
+          .not('topic', 'is', null);
 
         console.log('RightSidebar: Supabase query result:', {
-          digestItems: digestItems?.length || 0,
+          articles: articles?.length || 0,
           error,
-          sampleTopics: digestItems?.slice(0, 3).map(item => item.topic)
+          sampleTopics: articles?.slice(0, 3).map(item => item.topic)
         });
 
         if (error) {
-          console.error('Error fetching digest data:', error);
+          console.error('Error fetching articles data:', error);
           return;
         }
 
         // Count articles by category
         const counts: Record<string, number> = {};
-        digestItems?.forEach(item => {
-          if (item.topic) {
-            counts[item.topic] = (counts[item.topic] || 0) + 1;
+        articles?.forEach(article => {
+          if (article.topic) {
+            counts[article.topic] = (counts[article.topic] || 0) + 1;
           }
         });
+
+        // If no categories found, show some default ones
+        if (Object.keys(counts).length === 0) {
+          counts['Computer Vision'] = 0;
+          counts['Natural Language Processing'] = 0;
+          counts['Machine Learning'] = 0;
+          counts['Artificial Intelligence'] = 0;
+          counts['Statistics'] = 0;
+          counts['Mathematics'] = 0;
+          counts['Physics'] = 0;
+          counts['Biology'] = 0;
+          counts['Economics'] = 0;
+          counts['Computer Science'] = 0;
+        }
 
         console.log('RightSidebar: Category counts:', counts);
 
@@ -105,6 +111,11 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
     }
   }, []);
 
+  // Reset showAllCategories when search changes
+  useEffect(() => {
+    setShowAllCategories(false);
+  }, [categorySearch]);
+
   const toggleFavorite = (category: string) => {
     const newFavorites = favoriteCategories.includes(category)
       ? favoriteCategories.filter(c => c !== category)
@@ -123,7 +134,7 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
   // Get trending categories
   const trendingCategories = Object.entries(categoryCounts)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+    .slice(0, 8); // Show top 8 instead of 5
 
   // Get all available categories
   const allCategories = Object.keys(categoryCounts).sort();
@@ -189,7 +200,12 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
 
       {/* Category Filter */}
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Categories</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Categories</h3>
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            {Object.keys(categoryCounts).length} total
+          </span>
+        </div>
         
         {/* Search Categories */}
         <div className="mb-4">
@@ -224,47 +240,71 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
         <div className="max-h-64 overflow-y-auto">
           <div className="space-y-2">
             {filteredCategories.length > 0 ? (
-              filteredCategories.map((category) => (
-                <div 
-                  key={category} 
-                  className={`flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer ${
-                    selectedCategory === category 
-                      ? 'bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800' 
-                      : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                  }`}
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(category);
-                      }}
-                      className="p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                    >
-                      <svg 
-                        className={`h-4 w-4 ${favoriteCategories.includes(category) ? 'text-yellow-500 fill-current' : 'text-neutral-400 dark:text-neutral-500'}`} 
-                        fill={favoriteCategories.includes(category) ? 'currentColor' : 'none'} 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
+              <>
+                {/* Show categories based on showAllCategories state */}
+                {(showAllCategories ? filteredCategories : filteredCategories.slice(0, 10)).map((category) => (
+                  <div 
+                    key={category} 
+                    className={`flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer ${
+                      selectedCategory === category 
+                        ? 'bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800' 
+                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+                    onClick={() => handleCategoryClick(category)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(category);
+                        }}
+                        className="p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                    </button>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                        {category}
-                      </span>
-                      <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                        {categoryCounts[category] || 0} articles
-                      </span>
+                        <svg 
+                          className={`h-4 w-4 ${favoriteCategories.includes(category) ? 'text-yellow-500 fill-current' : 'text-neutral-400 dark:text-neutral-500'}`} 
+                          fill={favoriteCategories.includes(category) ? 'currentColor' : 'none'} 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                      </button>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          {category}
+                        </span>
+                        <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                          {categoryCounts[category] || 0} articles
+                        </span>
+                      </div>
                     </div>
+                    {selectedCategory === category && (
+                      <div className="w-2 h-2 bg-black dark:bg-gray-300 rounded-full"></div>
+                    )}
                   </div>
-                  {selectedCategory === category && (
-                    <div className="w-2 h-2 bg-black dark:bg-gray-300 rounded-full"></div>
-                  )}
-                </div>
-              ))
+                ))}
+                
+                {/* Show expand/collapse button */}
+                {filteredCategories.length > 10 && (
+                  <div className="pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                    {!showAllCategories ? (
+                      <button
+                        onClick={() => setShowAllCategories(true)}
+                        className="w-full text-center py-3 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                      >
+                        View All {filteredCategories.length} Categories
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowAllCategories(false)}
+                        className="w-full text-center py-3 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                      >
+                        Show Less
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-sm text-neutral-500 dark:text-neutral-400 text-center py-4">
                 {categorySearch.trim() ? 'No categories match your search' : 'No categories available'}
