@@ -49,6 +49,44 @@ function timeSince(date: Date): string {
   return Math.floor(seconds) + ' seconds ago';
 }
 
+// Component for displaying authors with expand/collapse functionality
+function AuthorDisplay({ authors }: { authors: string }) {
+  const [expanded, setExpanded] = useState(false);
+  
+  if (!authors) return <span>Unknown Author</span>;
+  
+  const authorList = authors.split(',').map(a => a.trim()).filter(Boolean);
+  
+  if (authorList.length <= 4) {
+    return <span>{authorList.join(', ')}</span>;
+  }
+  
+  const displayedAuthors = expanded ? authorList : authorList.slice(0, 4);
+  const remainingCount = authorList.length - 4;
+  
+  return (
+    <div>
+      <span>{displayedAuthors.join(', ')}</span>
+      {!expanded && remainingCount > 0 && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="ml-1 text-black-600 dark:text-black-400 hover:text-black-800 dark:hover:text-black-300 underline text-sm"
+        >
+          +{remainingCount} more
+        </button>
+      )}
+      {expanded && (
+        <button
+          onClick={() => setExpanded(false)}
+          className="ml-1 text-black-600 dark:text-black-400 hover:text-black-800 dark:hover:text-black-300 underline text-sm"
+        >
+          Show less
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function Article({ article }: ArticleProps) {
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,9 +186,11 @@ export default function Article({ article }: ArticleProps) {
               <div className="bg-white/30 dark:bg-neutral-800/30 backdrop-blur-sm rounded-xl p-6">
                 {/* Metadata */}
                 <div className="mb-6 space-y-2">
-                  <div className="flex items-center">
-                    <span className="font-medium mr-2">Author:</span>
-                    <span>{article.author}</span>
+                  <div className="flex items-start">
+                    <span className="font-medium mr-2 flex-shrink-0">Author:</span>
+                    <div className="text-sm">
+                      <AuthorDisplay authors={article.author} />
+                    </div>
                   </div>
                   <div className="flex items-center">
                     <span className="font-medium mr-2">Published:</span>
