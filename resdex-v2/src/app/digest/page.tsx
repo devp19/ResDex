@@ -87,25 +87,10 @@ export default function DigestPage() {
 
   // Calculate and update category counts whenever allArticles changes
   useEffect(() => {
-    const counts: Record<string, number> = {};
-    allArticles.forEach(article => {
-      if (article.tag) {
-        const normalizedTag = article.tag.trim();
-        counts[normalizedTag] = (counts[normalizedTag] || 0) + 1;
-      }
-    });
-    
-    console.log('=== CATEGORY COUNT DEBUG ===');
-    console.log('Total articles for category calculation:', allArticles.length);
-    console.log('Sample articles:', allArticles.slice(0, 3).map(a => ({ id: a.id, tag: a.tag })));
-    console.log('Updated category counts:', counts);
-    console.log('Number of unique categories:', Object.keys(counts).length);
-    console.log('Category count entries:', Object.entries(counts));
-    console.log('=== END DEBUG ===');
-    
-    setCategoryCounts(counts);
+    // Category counts are now calculated during initial data loading
+    // and stored in the context, so we don't need to recalculate here
     setSidebarLoading(false);
-  }, [allArticles, setCategoryCounts, setSidebarLoading]);
+  }, [allArticles, setSidebarLoading, setCategoryCounts]);
 
   // Filter articles based on selected category, favorites, and search term
   const getFilteredArticles = () => {
@@ -213,21 +198,21 @@ export default function DigestPage() {
 
         console.log('Initial unique articles:', uniqueArticles.length);
 
-        // Always fetch comprehensive data for category counts
-        console.log('Fetching comprehensive dataset for accurate category counts...');
-        const { data: comprehensiveArticles, error } = await supabase
+        // Fetch a reasonable initial dataset for display and category counts
+        console.log('Fetching initial dataset for display and category counts...');
+        const { data: initialArticles, error } = await supabase
           .from('dev_articles')
           .select('*')
           .order('published_at', { ascending: false })
-          .limit(500); // Fetch 500 articles for comprehensive category representation
+          .limit(100); // Fetch 100 articles initially for better UX
         
         if (error) {
-          console.error('Error fetching comprehensive articles:', error);
+          console.error('Error fetching initial articles:', error);
         }
         
         let finalArticles = uniqueArticles;
-        if (comprehensiveArticles && comprehensiveArticles.length > 0) {
-          const transformedComprehensive = comprehensiveArticles.map((article: any) => {
+        if (initialArticles && initialArticles.length > 0) {
+          const transformedInitial = initialArticles.map((article: any) => {
             const topic = article.topic || 'Research';
             return {
               id: article.id,
@@ -243,12 +228,56 @@ export default function DigestPage() {
           });
           
           // Combine and deduplicate
-          const combined = [...uniqueArticles, ...transformedComprehensive];
+          const combined = [...uniqueArticles, ...transformedInitial];
           finalArticles = combined.filter((article, index, self) => 
             index === self.findIndex(a => a.id === article.id)
           );
-          console.log(`Fetched ${comprehensiveArticles.length} comprehensive articles, total unique: ${finalArticles.length}`);
+          console.log(`Fetched ${initialArticles.length} initial articles, total unique: ${finalArticles.length}`);
         }
+
+        // Also fetch additional articles for comprehensive category counts (but don't display them all)
+        console.log('Fetching additional articles for comprehensive category counts...');
+        const { data: additionalArticles, error: additionalError } = await supabase
+          .from('dev_articles')
+          .select('*')
+          .order('published_at', { ascending: false })
+          .range(100, 499); // Fetch articles 100-499 for category counts
+        
+        if (additionalError) {
+          console.error('Error fetching additional articles for category counts:', additionalError);
+        }
+        
+        // Create comprehensive category counts from all articles
+        let allArticlesForCounts = [...finalArticles];
+        if (additionalArticles && additionalArticles.length > 0) {
+          const transformedAdditional = additionalArticles.map((article: any) => {
+            const topic = article.topic || 'Research';
+            return {
+              id: article.id,
+              title: article.title,
+              summary: toSnippet(article),
+              tag: topic,
+              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
+              author: fmtAuthors(article.authors),
+              published: article.published_at,
+              source: article.source || 'arXiv',
+              arxivCategory: article.id
+            };
+          });
+          allArticlesForCounts = [...allArticlesForCounts, ...transformedAdditional];
+        }
+        
+        // Calculate category counts from comprehensive dataset
+        const comprehensiveCounts: Record<string, number> = {};
+        allArticlesForCounts.forEach(article => {
+          if (article.tag) {
+            const normalizedTag = article.tag.trim();
+            comprehensiveCounts[normalizedTag] = (comprehensiveCounts[normalizedTag] || 0) + 1;
+          }
+        });
+        
+        console.log('Comprehensive category counts calculated from', allArticlesForCounts.length, 'articles');
+        setCategoryCounts(comprehensiveCounts);
 
         // Group articles by category for display
         const grouped = finalArticles.reduce((acc: Record<string, any[]>, article: any) => {
@@ -585,7 +614,7 @@ export default function DigestPage() {
       )}
 
       {/* Load More Button */}
-      {hasMore && selectedCategory === 'all' && !showFavoritesOnly && (
+      {hasMore && (
         <div className="mt-8 text-center">
           <button
             onClick={loadMore}
@@ -607,13 +636,13 @@ export default function DigestPage() {
             )}
           </button>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-            Showing {displayArticles.length} articles • Click to load more from Supabase
+            Showing {displayArticles.length} articles
           </p>
         </div>
       )}
 
       {/* No More Articles Message */}
-      {!hasMore && displayArticles.length > 0 && selectedCategory === 'all' && !showFavoritesOnly && (
+      {!hasMore && displayArticles.length > 0 && (
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
             <svg className="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
