@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import Article from './Article';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface Article {
   id: string;
@@ -24,25 +30,50 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
 
   useEffect(() => {
     // Resolve params and fetch article data
-    params.then(resolvedParams => {
+    params.then(async (resolvedParams) => {
       setArticleId(resolvedParams.id);
       
-      // Get article data from localStorage
-      if (typeof window !== 'undefined') {
-        const allArticles = localStorage.getItem('allArticles');
-        if (allArticles) {
-          try {
-            const articles: Article[] = JSON.parse(allArticles);
-            const foundArticle = articles.find(a => a.id === resolvedParams.id);
-            if (foundArticle) {
-              setArticle(foundArticle);
-            }
-          } catch (error) {
-            console.error('Error parsing articles from localStorage:', error);
-          }
+      try {
+        // Determine table prefix based on environment
+        const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
+        const tablePrefix = useDev ? 'dev_' : '';
+        
+        // Fetch article from Supabase
+        const { data: articleData, error } = await supabase
+          .from(`${tablePrefix}articles`)
+          .select('*')
+          .eq('id', resolvedParams.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching article:', error);
+          setLoading(false);
+          return;
         }
+
+        if (articleData) {
+          // Transform Supabase data to match your Article interface
+          const transformedArticle: Article = {
+            id: articleData.id,
+            title: articleData.title,
+            summary: articleData.abstract || '',
+            tag: articleData.topic || 'Research',
+            link: articleData.link_abs || `https://arxiv.org/abs/${articleData.id}`,
+            author: articleData.authors ? (Array.isArray(articleData.authors) ? articleData.authors.join(', ') : articleData.authors) : 'Unknown',
+            published: articleData.published_at,
+            source: articleData.source || 'arXiv',
+            arxivCategory: articleData.id,
+            aiSummary: articleData.ai_summary
+          };
+          
+          setArticle(transformedArticle);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error in ArticlePage:', error);
+        setLoading(false);
       }
-      setLoading(false);
     });
   }, [params]);
 

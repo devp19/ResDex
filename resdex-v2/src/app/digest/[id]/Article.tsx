@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import '../DailyDigest.css';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface Article {
   id: string;
@@ -61,32 +67,74 @@ export default function Article({ article }: ArticleProps) {
     };
   }, []);
 
-  // Related articles from localStorage
+  // Fetch related articles from Supabase
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const allArticles = localStorage.getItem('allArticles');
-      if (allArticles) {
-        try {
-          const articles: Article[] = JSON.parse(allArticles);
-          const related = articles
+    async function fetchRelatedArticles() {
+      try {
+        setLoading(true);
+        
+        // Determine table prefix based on environment
+        const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
+        const tablePrefix = useDev ? 'dev_' : '';
+        
+        // Fetch articles from Supabase to find related ones
+        const { data: articles, error } = await supabase
+          .from(`${tablePrefix}articles`)
+          .select('*')
+          .order('published_at', { ascending: false })
+          .limit(100); // Get a reasonable number to find related articles
+
+        if (error) {
+          console.error('Error fetching articles for related articles:', error);
+          setLoading(false);
+          return;
+        }
+
+        if (articles && articles.length > 0) {
+          // Transform Supabase data to match Article interface
+          const transformedArticles: Article[] = articles.map((articleData: any) => ({
+            id: articleData.id,
+            title: articleData.title,
+            summary: articleData.abstract || '',
+            tag: articleData.topic || 'Research',
+            link: articleData.link_abs || `https://arxiv.org/abs/${articleData.id}`,
+            author: articleData.authors ? (Array.isArray(articleData.authors) ? articleData.authors.join(', ') : articleData.authors) : 'Unknown',
+            published: articleData.published_at,
+            source: articleData.source || 'arXiv',
+            arxivCategory: articleData.id,
+            aiSummary: articleData.ai_summary
+          }));
+
+          // Find related articles based on similar criteria
+          const related = transformedArticles
             .filter(a => a.id !== article.id)
             .filter(a => {
+              // Match by author (if available)
               if (article.author && a.author &&
                   a.author.toLowerCase().includes(article.author.toLowerCase())) return true;
-              if (article.arxivCategory && a.arxivCategory === article.arxivCategory) return true;
+              
+              // Match by topic/category
               if (article.tag && a.tag === article.tag) return true;
+              
+              // Match by arxiv category
+              if (article.arxivCategory && a.arxivCategory === article.arxivCategory) return true;
+              
               return false;
             })
             .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())
             .slice(0, 6);
 
           setRelatedArticles(related);
-        } catch (e) {
-          console.error('Error parsing articles from localStorage:', e);
         }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error in fetchRelatedArticles:', error);
+        setLoading(false);
       }
-      setLoading(false);
     }
+
+    fetchRelatedArticles();
   }, [article.id, article.arxivCategory, article.tag, article.author]);
 
   const handleExternalLink = () => {
@@ -201,20 +249,42 @@ export default function Article({ article }: ArticleProps) {
                 </div>
               </div>
 
-              {/* ABOUT / SUMMARY (uncapped width) */}
-              <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Research Overview</h2>
-              <div className="max-w-none">
-                {article.summary && (
-                  <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-6">
-                    {article.summary}
+              {/* ABOUT / SUMMARY (uncapped width) - Only show if there's content */}
+              {(article.summary || article.aiSummary) ? (
+                <>
+                  <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Research Overview</h2>
+                  <div className="max-w-none">
+                    {article.summary && (
+                      <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-6">
+                        {article.summary}
+                      </p>
+                    )}
+                    {article.aiSummary && (
+                      <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-8">
+                        {article.aiSummary}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-2xl font-semibold text-neutral-400 dark:text-neutral-500 mb-2">
+                    No Summary Available
+                  </div>
+                  <p className="text-neutral-500 dark:text-neutral-400">
+                    This research paper doesn't have a summary or abstract available. 
+                    You can view the full paper on arXiv for complete details.
                   </p>
-                )}
-                {article.aiSummary && (
-                  <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-8">
-                    {article.aiSummary}
-                  </p>
-                )}
-              </div>
+                  <a 
+                    href={article.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    View Full Paper on arXiv
+                  </a>
+                </div>
+              )}
             </div>
           </main>
 

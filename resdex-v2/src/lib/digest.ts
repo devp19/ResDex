@@ -32,7 +32,7 @@ export async function getDigestForDay(dayISO?: string) {
     .select(`
       rank, topic,
       ${join} (
-        id, title, authors, topic, link_abs, image_url, published_at, popularity
+        id, title, authors, topic, link_abs, image_url, published_at, popularity, source, tag, ai_summary, abstract
       )
     `)
     .eq('day', day)
@@ -47,7 +47,7 @@ export async function getRecentIfEmpty(limit = 36) {
   const t = tables();
   const { data, error } = await supabase
     .from(t.articles)
-    .select('id, title, authors, topic, link_abs, image_url, published_at, popularity')
+    .select('id, title, authors, topic, link_abs, image_url, published_at, popularity, source, tag, ai_summary, abstract')
     .order('published_at', { ascending: false })
     .limit(limit);
   if (error) throw error;

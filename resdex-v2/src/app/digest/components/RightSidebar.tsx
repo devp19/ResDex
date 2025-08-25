@@ -42,6 +42,12 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
         const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
         const tablePrefix = useDev ? 'dev_' : '';
         
+        console.log('RightSidebar: Environment check:', {
+          useDev,
+          tablePrefix,
+          NEXT_PUBLIC_USE_DEV: process.env.NEXT_PUBLIC_USE_DEV
+        });
+        
         // Fetch digest items to get categories and article counts
         const { data: digestItems, error } = await supabase
           .from(`${tablePrefix}daily_digest_items`)
@@ -57,6 +63,12 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
             )
           `);
 
+        console.log('RightSidebar: Supabase query result:', {
+          digestItems: digestItems?.length || 0,
+          error,
+          sampleTopics: digestItems?.slice(0, 3).map(item => item.topic)
+        });
+
         if (error) {
           console.error('Error fetching digest data:', error);
           return;
@@ -69,6 +81,8 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
             counts[item.topic] = (counts[item.topic] || 0) + 1;
           }
         });
+
+        console.log('RightSidebar: Category counts:', counts);
 
         setCategoryCounts(counts);
         setLoading(false);
