@@ -1,143 +1,50 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-interface Article {
-  id: string;
-  title: string;
-  summary: string;
-  tag: string;
-  link: string;
-  author: string;
-  published: string;
-  source: string;
-  arxivCategory: string;
-  aiSummary?: string;
-}
+import { useDigest } from '../context/DigestContext';
 
 interface RightSidebarProps {
-  onCategoryChange?: (category: string) => void;
-  selectedCategory?: string;
+  categoryCounts: Record<string, number>;
+  loading?: boolean;
 }
 
-export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: RightSidebarProps) {
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
-  const [favoriteCategories, setFavoriteCategories] = useState<string[]>([]);
+export function RightSidebar({ categoryCounts, loading = false }: RightSidebarProps) {
+  const { 
+    selectedCategory, 
+    showFavoritesOnly, 
+    favoriteCategories,
+    setSelectedCategory, 
+    setShowFavoritesOnly, 
+    toggleFavorite 
+  } = useDigest();
+
   const [categorySearch, setCategorySearch] = useState('');
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchCategoryData() {
-      try {
-        setLoading(true);
-        
-        // Determine table prefix based on environment
-        const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
-        const tablePrefix = useDev ? 'dev_' : '';
-        
-        console.log('RightSidebar: Environment check:', {
-          useDev,
-          tablePrefix,
-          NEXT_PUBLIC_USE_DEV: process.env.NEXT_PUBLIC_USE_DEV
-        });
-        
-        // Fetch all articles to get complete category coverage
-        const { data: articles, error } = await supabase
-          .from(`${tablePrefix}articles`)
-          .select('topic, id')
-          .not('topic', 'is', null);
-
-        console.log('RightSidebar: Supabase query result:', {
-          articles: articles?.length || 0,
-          error,
-          sampleTopics: articles?.slice(0, 3).map(item => item.topic)
-        });
-
-        if (error) {
-          console.error('Error fetching articles data:', error);
-          return;
-        }
-
-        // Count articles by category
-        const counts: Record<string, number> = {};
-        articles?.forEach(article => {
-          if (article.topic) {
-            counts[article.topic] = (counts[article.topic] || 0) + 1;
-          }
-        });
-
-        // If no categories found, show some default ones
-        if (Object.keys(counts).length === 0) {
-          counts['Computer Vision'] = 0;
-          counts['Natural Language Processing'] = 0;
-          counts['Machine Learning'] = 0;
-          counts['Artificial Intelligence'] = 0;
-          counts['Statistics'] = 0;
-          counts['Mathematics'] = 0;
-          counts['Physics'] = 0;
-          counts['Biology'] = 0;
-          counts['Economics'] = 0;
-          counts['Computer Science'] = 0;
-        }
-
-        console.log('RightSidebar: Category counts:', counts);
-
-        setCategoryCounts(counts);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error in RightSidebar:', error);
-        setLoading(false);
-      }
-    }
-
-    fetchCategoryData();
-  }, []);
-
-  useEffect(() => {
-    // Load user preferences from localStorage
-    if (typeof window !== 'undefined') {
-      const storedFavorites = localStorage.getItem('favoriteCategories');
-      if (storedFavorites) {
-        setFavoriteCategories(JSON.parse(storedFavorites));
-      }
-    }
-  }, []);
 
   // Reset showAllCategories when search changes
   useEffect(() => {
     setShowAllCategories(false);
   }, [categorySearch]);
 
-  const toggleFavorite = (category: string) => {
-    const newFavorites = favoriteCategories.includes(category)
-      ? favoriteCategories.filter(c => c !== category)
-      : [...favoriteCategories, category];
-    
-    setFavoriteCategories(newFavorites);
-    localStorage.setItem('favoriteCategories', JSON.stringify(newFavorites));
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(selectedCategory === category ? 'all' : category);
+    setShowFavoritesOnly(false); // Reset favorites filter when category changes
   };
 
-  const handleCategoryClick = (category: string) => {
-    if (onCategoryChange) {
-      onCategoryChange(selectedCategory === category ? 'all' : category);
+  const handleFavoritesToggle = (checked: boolean) => {
+    setShowFavoritesOnly(checked);
+    if (checked) {
+      setSelectedCategory('all'); // Reset category filter when showing favorites
     }
   };
 
-  // Get trending categories
-  const trendingCategories = Object.entries(categoryCounts)
+  // Get trending categories - safely handle undefined categoryCounts
+  const trendingCategories = Object.entries(categoryCounts || {})
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8); // Show top 8 instead of 5
 
   // Get all available categories
-  const allCategories = Object.keys(categoryCounts).sort();
+  const allCategories = Object.keys(categoryCounts || {}).sort();
 
   // Filter categories based on search
   const filteredCategories = categorySearch.trim() 
@@ -203,7 +110,7 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Categories</h3>
           <span className="text-sm text-neutral-500 dark:text-neutral-400">
-            {Object.keys(categoryCounts).length} total
+            {Object.keys(categoryCounts || {}).length} total
           </span>
         </div>
         
@@ -229,7 +136,7 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
             <input
               type="checkbox"
               checked={showFavoritesOnly}
-              onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+              onChange={(e) => handleFavoritesToggle(e.target.checked)}
               className="w-4 h-4 text-black bg-neutral-100 border-neutral-300 rounded focus:ring-black dark:focus:ring-gray-300 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
             />
             <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Show Favorites Only</span>
@@ -274,7 +181,7 @@ export function RightSidebar({ onCategoryChange, selectedCategory = 'all' }: Rig
                           {category}
                         </span>
                         <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                          {categoryCounts[category] || 0} articles
+                          {categoryCounts?.[category] || 0} articles
                         </span>
                       </div>
                     </div>

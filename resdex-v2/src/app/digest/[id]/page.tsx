@@ -34,13 +34,9 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
       setArticleId(resolvedParams.id);
       
       try {
-        // Determine table prefix based on environment
-        const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
-        const tablePrefix = useDev ? 'dev_' : '';
-        
         // Fetch article from Supabase
         const { data: articleData, error } = await supabase
-          .from(`${tablePrefix}articles`)
+          .from('dev_articles')
           .select('*')
           .eq('id', resolvedParams.id)
           .single();

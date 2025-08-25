@@ -16,13 +16,7 @@ export async function getDigestForDay(dayISO?: string) {
   const t = tables();
   const day = dayISO ?? torontoDayISO();
 
-  // Debug: log the table names being used
-  console.log('Environment check:', {
-    NEXT_PUBLIC_USE_DEV: process.env.NEXT_PUBLIC_USE_DEV,
-    tablePrefix: process.env.NEXT_PUBLIC_USE_DEV === '1' ? 'dev_' : '',
-    digestTable: t.digest,
-    articlesTable: t.articles
-  });
+
 
   // Build the join string matching the actual table name
   const join = t.articles; // e.g., "dev_articles" or "articles"

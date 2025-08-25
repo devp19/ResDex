@@ -1,6 +1,7 @@
 // src/lib/tables.ts
 export function tablePrefix() {
-  return process.env.NEXT_PUBLIC_USE_DEV === '1' ? 'dev_' : '';
+  // Always use dev_ prefix since that's what the Supabase tables are named
+  return 'dev_';
 }
 
 export function tables() {

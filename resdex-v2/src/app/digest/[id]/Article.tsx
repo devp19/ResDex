@@ -73,13 +73,9 @@ export default function Article({ article }: ArticleProps) {
       try {
         setLoading(true);
         
-        // Determine table prefix based on environment
-        const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
-        const tablePrefix = useDev ? 'dev_' : '';
-        
         // Fetch articles from Supabase to find related ones
         const { data: articles, error } = await supabase
-          .from(`${tablePrefix}articles`)
+          .from('dev_articles')
           .select('*')
           .order('published_at', { ascending: false })
           .limit(100); // Get a reasonable number to find related articles

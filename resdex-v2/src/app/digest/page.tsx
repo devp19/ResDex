@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getDigestForDay, getRecentIfEmpty, torontoDayISO } from '@/lib/digest';
 import { createClient } from '@supabase/supabase-js';
+import { useDigest } from './context/DigestContext';
+import { useCategoryContext } from './layout';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -57,6 +59,9 @@ function timeSince(date: Date): string {
 }
 
 export default function DigestPage() {
+  const { selectedCategory, showFavoritesOnly, favoriteCategories, clearFilters } = useDigest();
+  const { setCategoryCounts, setSidebarLoading } = useCategoryContext();
+  
   const [gridArticles, setGridArticles] = useState<any[]>([]);
   const [groupedArticles, setGroupedArticles] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
@@ -80,10 +85,67 @@ export default function DigestPage() {
     };
   }, []);
 
+  // Calculate and update category counts whenever allArticles changes
+  useEffect(() => {
+    const counts: Record<string, number> = {};
+    allArticles.forEach(article => {
+      if (article.tag) {
+        const normalizedTag = article.tag.trim();
+        counts[normalizedTag] = (counts[normalizedTag] || 0) + 1;
+      }
+    });
+    
+    console.log('=== CATEGORY COUNT DEBUG ===');
+    console.log('Total articles for category calculation:', allArticles.length);
+    console.log('Sample articles:', allArticles.slice(0, 3).map(a => ({ id: a.id, tag: a.tag })));
+    console.log('Updated category counts:', counts);
+    console.log('Number of unique categories:', Object.keys(counts).length);
+    console.log('Category count entries:', Object.entries(counts));
+    console.log('=== END DEBUG ===');
+    
+    setCategoryCounts(counts);
+    setSidebarLoading(false);
+  }, [allArticles, setCategoryCounts, setSidebarLoading]);
+
+  // Filter articles based on selected category and favorites
+  const getFilteredArticles = () => {
+    let filtered = allArticles;
+
+    // Debug logging
+    console.log('Filtering articles:', {
+      totalArticles: allArticles.length,
+      selectedCategory,
+      showFavoritesOnly,
+      favoriteCategories,
+      availableTags: [...new Set(allArticles.map(a => a.tag))]
+    });
+
+    // Filter by selected category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(article => article.tag.trim() === selectedCategory.trim());
+      console.log(`After category filter (${selectedCategory}): ${filtered.length} articles`);
+    }
+
+    // Filter by favorites if enabled
+    if (showFavoritesOnly && favoriteCategories.length > 0) {
+      filtered = filtered.filter(article => favoriteCategories.some(fav => fav.trim() === article.tag.trim()));
+      console.log(`After favorites filter: ${filtered.length} articles`);
+    }
+
+    return filtered;
+  };
+
+  // Update filtered articles when filters change
+  useEffect(() => {
+    const filtered = getFilteredArticles();
+    setGridArticles(filtered);
+  }, [selectedCategory, showFavoritesOnly, favoriteCategories, allArticles]);
+
   // Load digest data
   useEffect(() => {
     async function loadDigest() {
       try {
+        setSidebarLoading(true);
         const today = torontoDayISO();
         console.log('Toronto day:', today);
         
@@ -99,11 +161,13 @@ export default function DigestPage() {
           if (row.articles || row.dev_articles) {
             // This is a digest item with joined article
             const article = row.articles || row.dev_articles;
+            // Use the digest item's topic first, fallback to article's topic
+            const topic = (row.topic || article.topic || 'Research').trim();
             return {
               id: article.id,
               title: article.title,
               summary: toSnippet(article),
-              tag: row.topic,
+              tag: topic,
               link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
               author: fmtAuthors(article.authors),
               published: article.published_at,
@@ -112,11 +176,12 @@ export default function DigestPage() {
             };
           } else {
             // This is a direct article (fallback case)
+            const topic = (row.topic || 'Research').trim();
             return {
               id: row.id,
               title: row.title,
               summary: toSnippet(row),
-              tag: row.topic,
+              tag: topic,
               link: row.link_abs || `https://arxiv.org/abs/${row.id}`,
               author: fmtAuthors(row.authors),
               published: row.published_at,
@@ -131,8 +196,47 @@ export default function DigestPage() {
           index === self.findIndex(a => a.id === article.id)
         );
 
+        console.log('Initial unique articles:', uniqueArticles.length);
+
+        // Always fetch comprehensive data for category counts
+        console.log('Fetching comprehensive dataset for accurate category counts...');
+        const { data: comprehensiveArticles, error } = await supabase
+          .from('dev_articles')
+          .select('*')
+          .order('published_at', { ascending: false })
+          .limit(500); // Fetch 500 articles for comprehensive category representation
+        
+        if (error) {
+          console.error('Error fetching comprehensive articles:', error);
+        }
+        
+        let finalArticles = uniqueArticles;
+        if (comprehensiveArticles && comprehensiveArticles.length > 0) {
+          const transformedComprehensive = comprehensiveArticles.map((article: any) => {
+            const topic = article.topic || 'Research';
+            return {
+              id: article.id,
+              title: article.title,
+              summary: toSnippet(article),
+              tag: topic,
+              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
+              author: fmtAuthors(article.authors),
+              published: article.published_at,
+              source: article.source || 'arXiv',
+              arxivCategory: article.id
+            };
+          });
+          
+          // Combine and deduplicate
+          const combined = [...uniqueArticles, ...transformedComprehensive];
+          finalArticles = combined.filter((article, index, self) => 
+            index === self.findIndex(a => a.id === article.id)
+          );
+          console.log(`Fetched ${comprehensiveArticles.length} comprehensive articles, total unique: ${finalArticles.length}`);
+        }
+
         // Group articles by category for display
-        const grouped = uniqueArticles.reduce((acc: Record<string, any[]>, article: any) => {
+        const grouped = finalArticles.reduce((acc: Record<string, any[]>, article: any) => {
           const category = article.tag;
           if (!acc[category]) {
             acc[category] = [];
@@ -147,7 +251,10 @@ export default function DigestPage() {
           index === self.findIndex(a => a.id === article.id)
         );
         
-        setGridArticles(finalUniqueArticles);
+        console.log('Available categories in articles:', [...new Set(finalUniqueArticles.map(a => a.tag))]);
+        console.log('Sample articles with tags:', finalUniqueArticles.slice(0, 3).map(a => ({ title: a.title, tag: a.tag })));
+        console.log('Total articles loaded:', finalUniqueArticles.length);
+        
         setAllArticles(finalUniqueArticles);
         setGroupedArticles(grouped);
         setLoading(false);
@@ -155,11 +262,12 @@ export default function DigestPage() {
         console.error('Digest page error:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
         setLoading(false);
+        setSidebarLoading(false);
       }
     }
 
     loadDigest();
-  }, []);
+  }, [setSidebarLoading]);
 
   // Load more articles function
   const loadMore = async () => {
@@ -168,13 +276,9 @@ export default function DigestPage() {
     try {
       setLoadingMore(true);
       
-      // Determine table prefix based on environment
-      const useDev = process.env.NEXT_PUBLIC_USE_DEV === '1';
-      const tablePrefix = useDev ? 'dev_' : '';
-      
       // Fetch more articles from Supabase with pagination
       const { data: moreArticles, error } = await supabase
-        .from(`${tablePrefix}articles`)
+        .from('dev_articles')
         .select('*')
         .order('published_at', { ascending: false })
         .range(page * 20 + 20, page * 20 + 39); // Fetch next 20 articles
@@ -187,11 +291,12 @@ export default function DigestPage() {
       if (moreArticles && moreArticles.length > 0) {
         // Transform the new articles
         const transformedArticles = moreArticles.map((article: any) => {
+          const topic = article.topic || 'Research';
           return {
             id: article.id,
             title: article.title,
             summary: toSnippet(article),
-            tag: article.topic || 'Research',
+            tag: topic,
             link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
             author: fmtAuthors(article.authors),
             published: article.published_at,
@@ -208,9 +313,6 @@ export default function DigestPage() {
         
         // Update all articles state
         setAllArticles(uniqueArticles);
-        
-        // Update grid articles to show all unique articles
-        setGridArticles(uniqueArticles);
         
         // Update grouped articles with unique articles
         const updatedGrouped = uniqueArticles.reduce((acc: Record<string, any[]>, article: any) => {
@@ -236,6 +338,12 @@ export default function DigestPage() {
     }
   };
 
+  // Get filtered articles for display
+  const displayArticles = getFilteredArticles();
+  const heroArticle = displayArticles[0];
+  const gridArticlesToShow = displayArticles.slice(1);
+
+  // Render loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
@@ -247,6 +355,7 @@ export default function DigestPage() {
     );
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="w-full">
@@ -260,131 +369,138 @@ export default function DigestPage() {
     );
   }
 
+  // Render main content
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-      {/* Main Layout (uses global header & left rail) */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Center Column */}
-          <main className="lg:col-span-12">
-            {/* Hero Card - First Article */}
-            {gridArticles.length > 0 && (
-              <div className="mb-8">
-                <Link href={`/digest/${gridArticles[0].id}`} className="block">
-                  <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
-                    {/* Hero Image - Top */}
-                    <div className="relative aspect-[7/3] w-full">
-                      <div 
-                        className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
-                        style={{
-                          background: '#E5E3DF'
-                        }}
-                        role="img"
-                        aria-label={`Featured research in ${gridArticles[0].tag}`}
-                      >
-                        <div className="text-center p-4">
-                          <div className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-1">
-                            {gridArticles[0].tag}
-                          </div>
-                          <div className="text-xs text-neutral-600 dark:text-neutral-400">
-                            Featured Research
-                          </div>
-                        </div>
-                      </div>
-                      {/* Tag Badge - Left side */}
-                      <div className="absolute top-3 left-3">
-                        <span className="px-2 py-1 bg-white/90 dark:bg-neutral-900/90 text-xs font-medium text-neutral-700 dark:text-neutral-300 rounded-full">
-                          {gridArticles[0].tag}
-                        </span>
-                      </div>
-                      {/* Source Badge - Right side */}
-                      <div className="absolute top-3 right-3">
-                        <span className="px-2 py-1 bg-black/90 text-white text-xs font-medium rounded-full">
-                          {gridArticles[0].source || 'arXiv'}
-                        </span>
-                      </div>
+    <>
+      {/* Filter Status Display */}
+      {(selectedCategory !== 'all' || showFavoritesOnly) && (
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L6.293 13.586A1 1 0 016 12.879V4z" />
+              </svg>
+              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                {showFavoritesOnly && selectedCategory !== 'all' 
+                  ? `Showing ${selectedCategory} articles from favorites`
+                  : showFavoritesOnly 
+                  ? `Showing ${displayArticles.length} articles from favorites`
+                  : `Showing ${displayArticles.length} articles in ${selectedCategory}`
+                }
+              </span>
+            </div>
+            <button
+              onClick={clearFilters}
+              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hero Card - First Article */}
+      {heroArticle && (
+        <div className="mb-8">
+          <Link href={`/digest/${heroArticle.id}`} className="block">
+            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <div className="relative aspect-[7/3] w-full">
+                <div 
+                  className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                  style={{ background: '#E5E3DF' }}
+                  role="img"
+                  aria-label={`Featured research in ${heroArticle.tag}`}
+                >
+                  <div className="text-center p-4">
+                    <div className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+                      {heroArticle.tag}
                     </div>
-                    
-                    {/* Hero Content - Bottom */}
-                    <div className="p-6">
-                       {/* Metadata Row */}
-                       <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
-                         <div className="flex items-center gap-1">
-                           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <circle cx="12" cy="12" r="10"/>
-                             <path d="M12 6v6l4 2"/>
-                           </svg>
-                           {gridArticles[0].published ? timeSince(new Date(gridArticles[0].published)) : 'Recent'}
-                         </div>
-                         <div className="flex items-center gap-1">
-                           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                           </svg>
-                           {gridArticles[0].author}
-                         </div>
-                         <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-xs font-medium rounded-full">
-                           {gridArticles[0].tag}
-                         </span>
-                       </div>
-
-                       {/* Hero Headline */}
-                       <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                         {gridArticles[0].title}
-                       </h2>
-
-                       {/* Hero Summary */}
-                       <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 leading-relaxed">
-                         {gridArticles[0].summary || 'Research overview not available'}
-                       </p>
-
-                      {/* CTA Buttons - Save on left, Read more on right */}
-                      <div className="flex items-center justify-between">
-                        {/* Save Button - Left side */}
-                        <button 
-                          className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                        >
-                          <svg 
-                            className="h-4 w-4 text-neutral-500 dark:text-neutral-400" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                        </button>
-                        
-                        {/* Read More Button - Right side */}
-                        <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors">
-                          <span className="text-sm font-medium">Read more</span>
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                          </svg>
-                        </div>
-                      </div>
+                    <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                      Featured Research
                     </div>
                   </div>
-                </Link>
+                </div>
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-1 bg-white/90 dark:bg-neutral-900/90 text-xs font-medium text-neutral-700 dark:text-neutral-300 rounded-full">
+                    {heroArticle.tag}
+                  </span>
+                </div>
+                <div className="absolute top-3 right-3">
+                  <span className="px-2 py-1 bg-black/90 text-white text-xs font-medium rounded-full">
+                    {heroArticle.source || 'arXiv'}
+                  </span>
+                </div>
               </div>
-            )}
+              
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
+                  <div className="flex items-center gap-1">
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v6l4 2"/>
+                    </svg>
+                    {heroArticle.published ? timeSince(new Date(heroArticle.published)) : 'Recent'}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    {heroArticle.author}
+                  </div>
+                  <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-xs font-medium rounded-full">
+                    {heroArticle.source || 'arXiv'}
+                  </span>
+                </div>
+                
+                <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {heroArticle.title}
+                </h2>
+                
+                <p className="text-base text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3">
+                  {heroArticle.summary}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                      <svg className="h-4 w-4 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors">
+                    <span className="text-sm font-medium">Read full article</span>
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+      )}
 
-            {/* Stable Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-              {gridArticles.slice(1).map((article: any, index: number) => (
-                <div 
-                  key={`${article.id}-${index}`}
-                  className="group bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer h-[350px] flex flex-col w-full flex-shrink-0"
-                >
-                  {/* Card Image with Gradient */}
-                  <div className="relative aspect-[16/9] overflow-hidden flex-shrink-0">
+      {/* Grid Articles */}
+      {gridArticlesToShow.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {gridArticlesToShow.map((article) => (
+            <div key={article.id} className="group">
+              <Link href={`/digest/${article.id}`} className="block">
+                <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col">
+                  <div className="relative aspect-[4/3] w-full">
                     <div 
                       className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
-                      style={{
-                        background: '#E5E3DF'
-                      }}
+                      style={{ background: '#E5E3DF' }}
+                      role="img"
+                      aria-label={`Research in ${article.tag}`}
                     >
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">
+                      <div className="text-center p-4">
+                        <div className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                           {article.tag}
+                        </div>
+                        <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                          Research
                         </div>
                       </div>
                     </div>
@@ -393,23 +509,16 @@ export default function DigestPage() {
                         {article.tag}
                       </span>
                     </div>
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 bg-black/90 text-white text-xs font-medium rounded-full">
-                        {article.source}
-                      </span>
-                    </div>
                   </div>
                   
-                  {/* Card Content */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    {/* Meta Information */}
-                    <div className="flex items-center justify-between mb-3 flex-shrink-0">
-                      <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
+                      <div className="flex items-center gap-1">
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle cx="12" cy="12" r="10"/>
                           <path d="M12 6v6l4 2"/>
                         </svg>
-                        {article.published ? timeSince(new Date(article.published)) : ''}
+                        {article.published ? timeSince(new Date(article.published)) : 'Recent'}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -419,94 +528,80 @@ export default function DigestPage() {
                       </div>
                     </div>
                     
-                    {/* Title */}
                     <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-shrink-0">
                       {article.title}
                     </h3>
                     
-                    {/* Research Overview */}
                     <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 flex-1">
                       {article.summary}
                     </p>
                     
-                    {/* Footer */}
                     <div className="flex items-center justify-between mt-auto flex-shrink-0">
                       <div className="flex items-center gap-2">
-                        {/* Save Button */}
-                        <button 
-                          className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                        >
-                          <svg 
-                            className="h-4 w-4 text-neutral-500 dark:text-neutral-400" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                          >
+                        <button className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                          <svg className="h-4 w-4 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                           </svg>
                         </button>
                       </div>
                       <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors">
-                        <Link 
-                          href={`/digest/${article.id}`}
-                          className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors cursor-pointer hover:text-blue-500"
-                        >
+                        <div className="flex items-center gap-1 text-neutral-400 group-hover:text-blue-500 transition-colors cursor-pointer hover:text-blue-500">
                           <span className="text-sm font-medium">Read more</span>
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                           </svg>
-                        </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              </Link>
             </div>
-
-            {/* Load More Button */}
-            {hasMore && (
-              <div className="mt-8 text-center">
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
-                >
-                  {loadingMore ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      Load More Articles
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l7 7-7 7"/>
-                      </svg>
-                    </>
-                  )}
-                </button>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                  Showing {gridArticles.length - 1} grid articles + 1 hero article • Click to load more from Supabase
-                </p>
-              </div>
-            )}
-
-            {/* No More Articles Message */}
-            {!hasMore && gridArticles.length > 0 && (
-              <div className="mt-8 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
-                  <svg className="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                    All articles loaded ({gridArticles.length} total)
-                  </span>
-                </div>
-              </div>
-            )}
-          </main>
+          ))}
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* Load More Button */}
+      {hasMore && selectedCategory === 'all' && !showFavoritesOnly && (
+        <div className="mt-8 text-center">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+          >
+            {loadingMore ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Loading...
+              </>
+            ) : (
+              <>
+                Load More Articles
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l7 7-7 7"/>
+                </svg>
+              </>
+            )}
+          </button>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
+            Showing {displayArticles.length} articles • Click to load more from Supabase
+          </p>
+        </div>
+      )}
+
+      {/* No More Articles Message */}
+      {!hasMore && displayArticles.length > 0 && selectedCategory === 'all' && !showFavoritesOnly && (
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+            <svg className="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm text-neutral-600 dark:text-neutral-400">
+              All articles loaded ({displayArticles.length} total)
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 } 
