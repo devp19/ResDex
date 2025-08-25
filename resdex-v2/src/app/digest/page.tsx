@@ -59,7 +59,7 @@ function timeSince(date: Date): string {
 }
 
 export default function DigestPage() {
-  const { selectedCategory, showFavoritesOnly, favoriteCategories, clearFilters } = useDigest();
+  const { selectedCategory, showFavoritesOnly, favoriteCategories, searchTerm, clearFilters } = useDigest();
   const { setCategoryCounts, setSidebarLoading } = useCategoryContext();
   
   const [gridArticles, setGridArticles] = useState<any[]>([]);
@@ -107,7 +107,7 @@ export default function DigestPage() {
     setSidebarLoading(false);
   }, [allArticles, setCategoryCounts, setSidebarLoading]);
 
-  // Filter articles based on selected category and favorites
+  // Filter articles based on selected category, favorites, and search term
   const getFilteredArticles = () => {
     let filtered = allArticles;
 
@@ -117,8 +117,23 @@ export default function DigestPage() {
       selectedCategory,
       showFavoritesOnly,
       favoriteCategories,
+      searchTerm,
       availableTags: [...new Set(allArticles.map(a => a.tag))]
     });
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(article => {
+        return (
+          article.title.toLowerCase().includes(searchLower) ||
+          article.summary.toLowerCase().includes(searchLower) ||
+          article.author.toLowerCase().includes(searchLower) ||
+          article.tag.toLowerCase().includes(searchLower)
+        );
+      });
+      console.log(`After search filter ("${searchTerm}"): ${filtered.length} articles`);
+    }
 
     // Filter by selected category
     if (selectedCategory !== 'all') {
@@ -139,7 +154,7 @@ export default function DigestPage() {
   useEffect(() => {
     const filtered = getFilteredArticles();
     setGridArticles(filtered);
-  }, [selectedCategory, showFavoritesOnly, favoriteCategories, allArticles]);
+  }, [selectedCategory, showFavoritesOnly, favoriteCategories, searchTerm, allArticles]);
 
   // Load digest data
   useEffect(() => {
@@ -373,7 +388,7 @@ export default function DigestPage() {
   return (
     <>
       {/* Filter Status Display */}
-      {(selectedCategory !== 'all' || showFavoritesOnly) && (
+      {(selectedCategory !== 'all' || showFavoritesOnly || searchTerm.trim()) && (
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -381,7 +396,15 @@ export default function DigestPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L6.293 13.586A1 1 0 016 12.879V4z" />
               </svg>
               <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                {showFavoritesOnly && selectedCategory !== 'all' 
+                {searchTerm.trim() && showFavoritesOnly && selectedCategory !== 'all' 
+                  ? `Showing ${selectedCategory} articles from favorites matching "${searchTerm}"`
+                  : searchTerm.trim() && showFavoritesOnly 
+                  ? `Showing articles from favorites matching "${searchTerm}"`
+                  : searchTerm.trim() && selectedCategory !== 'all'
+                  ? `Showing ${selectedCategory} articles matching "${searchTerm}"`
+                  : searchTerm.trim()
+                  ? `Showing articles matching "${searchTerm}"`
+                  : showFavoritesOnly && selectedCategory !== 'all' 
                   ? `Showing ${selectedCategory} articles from favorites`
                   : showFavoritesOnly 
                   ? `Showing ${displayArticles.length} articles from favorites`

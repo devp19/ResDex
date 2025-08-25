@@ -13,8 +13,10 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
     selectedCategory, 
     showFavoritesOnly, 
     favoriteCategories,
+    searchTerm,
     setSelectedCategory, 
     setShowFavoritesOnly, 
+    setSearchTerm,
     toggleFavorite 
   } = useDigest();
 
@@ -36,6 +38,11 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
     if (checked) {
       setSelectedCategory('all'); // Reset category filter when showing favorites
     }
+  };
+
+  const handleArticleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    setSearchTerm(searchTerm);
   };
 
   // Get trending categories - safely handle undefined categoryCounts
@@ -77,6 +84,8 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
           <input
             type="text"
             placeholder="Search research articles..."
+            value={searchTerm}
+            onChange={handleArticleSearch}
             className="w-full px-4 py-2 pl-10 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
           />
           <svg className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

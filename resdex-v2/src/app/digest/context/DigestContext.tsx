@@ -6,8 +6,10 @@ interface DigestContextType {
   selectedCategory: string;
   showFavoritesOnly: boolean;
   favoriteCategories: string[];
+  searchTerm: string;
   setSelectedCategory: (category: string) => void;
   setShowFavoritesOnly: (show: boolean) => void;
+  setSearchTerm: (term: string) => void;
   toggleFavorite: (category: string) => void;
   clearFilters: () => void;
 }
@@ -18,6 +20,7 @@ export function DigestProvider({ children }: { children: React.ReactNode }) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [favoriteCategories, setFavoriteCategories] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Load user preferences from localStorage
   useEffect(() => {
@@ -41,14 +44,17 @@ export function DigestProvider({ children }: { children: React.ReactNode }) {
   const clearFilters = () => {
     setSelectedCategory('all');
     setShowFavoritesOnly(false);
+    setSearchTerm('');
   };
 
   const value = {
     selectedCategory,
     showFavoritesOnly,
     favoriteCategories,
+    searchTerm,
     setSelectedCategory,
     setShowFavoritesOnly,
+    setSearchTerm,
     toggleFavorite,
     clearFilters,
   };
