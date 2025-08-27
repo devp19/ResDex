@@ -67,6 +67,16 @@ export default function DigestLayout({
               <Link href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Brainwave</Link>
               <Link href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Discovery ↗</Link>
             </div>
+            
+            {/* Right side: Discord + Wallet - matching home page */}
+            <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+              <button className="rounded-full p-2 hover:bg-gray-100 transition">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#23272A"/><path d="M8.5 15.5C8.5 15.5 9.5 16 12 16C14.5 16 15.5 15.5 15.5 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><ellipse cx="9.5" cy="12" rx="1" ry="1.5" fill="#fff"/><ellipse cx="14.5" cy="12" rx="1" ry="1.5" fill="#fff"/></svg>
+              </button>
+              <Link href="/waitlist" className="rounded-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-medium transition" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+                Join Waitlist ↗
+              </Link>
+            </div>
           </nav>
 
           {/* Main Layout */}

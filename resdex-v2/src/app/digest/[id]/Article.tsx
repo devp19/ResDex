@@ -285,23 +285,22 @@ export default function Article({ article }: ArticleProps) {
                 </div>
               </div>
 
-              {/* ABOUT / SUMMARY (uncapped width) - Only show if there's content */}
+              {/* Article Title and Summary */}
+              <h1 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">{article.title}</h1>
+              
               {(article.summary || article.aiSummary) ? (
-                <>
-                  <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">Research Overview</h2>
-                  <div className="max-w-none">
-                    {article.summary && (
-                      <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-6">
-                        {article.summary}
-                      </p>
-                    )}
-                    {article.aiSummary && (
-                      <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-8">
-                        {article.aiSummary}
-                      </p>
-                    )}
-                  </div>
-                </>
+                <div className="max-w-none">
+                  {article.summary && (
+                    <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-6">
+                      {article.summary}
+                    </p>
+                  )}
+                  {article.aiSummary && (
+                    <p className="text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 mb-8">
+                      {article.aiSummary}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <div className="text-center py-12">
                   <div className="text-2xl font-semibold text-neutral-400 dark:text-neutral-500 mb-2">

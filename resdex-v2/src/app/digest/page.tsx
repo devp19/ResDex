@@ -424,13 +424,13 @@ export default function DigestPage() {
     <>
       {/* Filter Status Display */}
       {(selectedCategory !== 'all' || showFavoritesOnly || searchTerm.trim()) && (
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="mb-6 p-4 bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-neutral-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L6.293 13.586A1 1 0 016 12.879V4z" />
               </svg>
-              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                 {searchTerm.trim() && showFavoritesOnly && selectedCategory !== 'all' 
                   ? `Showing ${selectedCategory} articles from favorites matching "${searchTerm}"`
                   : searchTerm.trim() && showFavoritesOnly 
@@ -449,7 +449,7 @@ export default function DigestPage() {
             </div>
             <button
               onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline"
+              className="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 underline"
             >
               Clear filters
             </button>
@@ -547,7 +547,7 @@ export default function DigestPage() {
               <Link href={`/digest/${article.id}`} className="block">
                 <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col">
                   {/* Image/Header Section */}
-                  <div className="relative aspect-[5/3] w-full">
+                  <div className="relative aspect-[4/3] w-full">
                     <div 
                       className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                       style={{ background: '#E5E3DF' }}
@@ -608,14 +608,14 @@ export default function DigestPage() {
                           </svg>
                         </button>
                       </div>
-                      <div className="flex items-center gap-1 text-neutral-400 transition-colors">
-                        <div className="flex items-center gap-1 text-neutral-400 transition-colors cursor-pointer hover:text-blue-500">
-                          <span className="text-sm font-medium">Read more</span>
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                          </svg>
-                        </div>
-                      </div>
+                                             <div className="flex items-center gap-1 text-neutral-400 transition-colors">
+                         <div className="flex items-center gap-1 text-neutral-400 transition-colors cursor-pointer hover:text-neutral-700 dark:hover:text-neutral-200">
+                           <span className="text-sm font-medium">Read more</span>
+                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+                           </svg>
+                         </div>
+                       </div>
                     </div>
                   </div>
                 </div>
