@@ -60,7 +60,7 @@ function timeSince(date: Date): string {
 }
 
 export default function DigestPage() {
-  const { selectedCategory, showFavoritesOnly, favoriteCategories, searchTerm, clearFilters } = useDigest();
+  const { selectedCategory, showFavoritesOnly, favoriteCategories, searchTerm, clearFilters, setShowFavoritesOnly } = useDigest();
   const { setCategoryCounts, setSidebarLoading } = useCategoryContext();
   
   const [gridArticles, setGridArticles] = useState<any[]>([]);
@@ -71,6 +71,7 @@ export default function DigestPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [allArticles, setAllArticles] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [categoryOffset, setCategoryOffset] = useState<Record<string, number>>({});
 
   // Page-level 80% UI scale to match your other pages
   useEffect(() => {
@@ -141,6 +142,232 @@ export default function DigestPage() {
     const filtered = getFilteredArticles();
     setGridArticles(filtered);
   }, [selectedCategory, showFavoritesOnly, favoriteCategories, searchTerm, allArticles]);
+
+  // Auto-load all articles when category changes (except 'all')
+  useEffect(() => {
+    const loadCategoryArticles = async () => {
+      if (selectedCategory === 'all') {
+        setHasMore(true);
+        return;
+      }
+
+      try {
+        // Check total count first
+        const { count: totalCount, error: countError } = await supabase
+          .from('dev_articles')
+          .select('*', { count: 'exact', head: true })
+          .eq('topic', selectedCategory);
+
+        if (countError) {
+          console.error('Error getting category count:', countError);
+          return;
+        }
+
+        // If 10 or fewer articles, load all. If more than 10, load first batch with pagination
+        const shouldLoadAll = (totalCount ?? 0) <= 10;
+        const limit = shouldLoadAll ? undefined : 20; // Load 20 initially if >10 total
+
+        const { data: categoryArticles, error } = await supabase
+          .from('dev_articles')
+          .select('*')
+          .eq('topic', selectedCategory)
+          .order('published_at', { ascending: false })
+          .limit(limit || 1000); // Use large number if loading all
+
+        if (error) {
+          console.error('Error loading category articles:', error);
+          return;
+        }
+
+        if (categoryArticles && categoryArticles.length > 0) {
+          // Transform the articles
+          const transformedArticles = categoryArticles.map((article: any) => {
+            const topic = article.topic || 'Research';
+            return {
+              id: article.id,
+              title: article.title,
+              summary: toSnippet(article),
+              tag: topic,
+              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
+              author: fmtAuthors(article.authors),
+              published: article.published_at,
+              source: article.source || 'arXiv',
+              arxivCategory: article.id
+            };
+          });
+
+          // Update allArticles with category-specific articles (keep existing articles from other categories)
+          setAllArticles(prev => {
+            // Remove existing articles from this category and add new ones
+            const filtered = prev.filter(article => article.tag !== selectedCategory);
+            return [...filtered, ...transformedArticles];
+          });
+
+          // Set hasMore based on whether we loaded all articles or there are more
+          setHasMore(!shouldLoadAll && (totalCount ?? 0) > categoryArticles.length);
+          
+          // Update category offset for pagination
+          setCategoryOffset(prev => ({
+            ...prev,
+            [selectedCategory]: categoryArticles.length
+          }));
+          
+          console.log(`Loaded ${categoryArticles.length} of ${totalCount} articles for category: ${selectedCategory}`);
+          console.log(`Load more available: ${!shouldLoadAll && (totalCount ?? 0) > categoryArticles.length}`);
+        }
+      } catch (err) {
+        console.error('Error in loadCategoryArticles:', err);
+      }
+    };
+
+    if (selectedCategory !== 'all') {
+      loadCategoryArticles();
+    } else {
+      setHasMore(true);
+    }
+  }, [selectedCategory]);
+
+  // Auto-load articles when favorites filter changes
+  useEffect(() => {
+    const loadFavoritesArticles = async () => {
+      if (!showFavoritesOnly || favoriteCategories.length === 0) {
+        setHasMore(true);
+        return;
+      }
+
+      try {
+        // Check total count for favorites first
+        const { count: totalCount, error: countError } = await supabase
+          .from('dev_articles')
+          .select('*', { count: 'exact', head: true })
+          .in('topic', favoriteCategories);
+
+        if (countError) {
+          console.error('Error getting favorites count:', countError);
+          return;
+        }
+
+        // If 20 or fewer articles, load all. If more, load first batch with pagination
+        const shouldLoadAll = (totalCount ?? 0) <= 20;
+        const limit = shouldLoadAll ? undefined : 30; // Load 30 initially if >20 total
+
+        const { data: favoritesArticles, error } = await supabase
+          .from('dev_articles')
+          .select('*')
+          .in('topic', favoriteCategories)
+          .order('published_at', { ascending: false })
+          .limit(limit || 1000); // Use large number if loading all
+
+        if (error) {
+          console.error('Error loading favorites articles:', error);
+          return;
+        }
+
+        if (favoritesArticles && favoritesArticles.length > 0) {
+          // Transform the articles
+          const transformedArticles = favoritesArticles.map((article: any) => {
+            const topic = article.topic || 'Research';
+            return {
+              id: article.id,
+              title: article.title,
+              summary: toSnippet(article),
+              tag: topic,
+              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
+              author: fmtAuthors(article.authors),
+              published: article.published_at,
+              source: article.source || 'arXiv',
+              arxivCategory: article.id
+            };
+          });
+
+          // Update allArticles with favorites articles (replace existing)
+          setAllArticles(transformedArticles);
+
+          // Set hasMore based on whether we loaded all articles or there are more
+          setHasMore(!shouldLoadAll && (totalCount ?? 0) > favoritesArticles.length);
+          
+          // Update category offset for favorites pagination
+          setCategoryOffset(prev => ({
+            ...prev,
+            'favorites': favoritesArticles.length
+          }));
+          
+          console.log(`Loaded ${favoritesArticles.length} of ${totalCount} favorites articles from ${favoriteCategories.length} categories`);
+          console.log(`Favorite categories: ${favoriteCategories.join(', ')}`);
+          console.log(`Load more available: ${!shouldLoadAll && (totalCount ?? 0) > favoritesArticles.length}`);
+        } else {
+          // No articles found for favorites
+          setAllArticles([]);
+          setHasMore(false);
+        }
+      } catch (err) {
+        console.error('Error in loadFavoritesArticles:', err);
+      }
+    };
+
+    if (showFavoritesOnly && favoriteCategories.length > 0) {
+      loadFavoritesArticles();
+    } else if (!showFavoritesOnly) {
+      // When favorites is turned off, reload the normal view
+      reloadNormalView();
+    }
+  }, [showFavoritesOnly, favoriteCategories]);
+
+  // Function to reload normal view (either all articles or specific category)
+  const reloadNormalView = async () => {
+    try {
+      setLoadingMore(true);
+      
+      if (selectedCategory === 'all') {
+        // Reload initial articles for "all" view
+        const { data: initialArticles, count, error } = await supabase
+          .from('dev_articles')
+          .select('*', { count: 'exact' })
+          .order('published_at', { ascending: false })
+          .limit(100);
+        
+        if (error) {
+          console.error('Error reloading normal view:', error);
+          return;
+        }
+        
+        if (initialArticles) {
+          const transformedArticles = initialArticles.map((article: any) => {
+            const topic = article.topic || 'Research';
+            return {
+              id: article.id,
+              title: article.title,
+              summary: toSnippet(article),
+              tag: topic,
+              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
+              author: fmtAuthors(article.authors),
+              published: article.published_at,
+              source: article.source || 'arXiv',
+              arxivCategory: article.id
+            };
+          });
+          
+          setAllArticles(transformedArticles);
+          setHasMore(true);
+          
+          // Reset category offset when going back to normal view
+          setCategoryOffset({});
+          
+          if (count !== null) setTotalCount(count);
+        }
+      } else {
+        // Reload specific category (this will trigger the category effect)
+        // We don't need to do anything here as the category effect will handle it
+        setHasMore(true);
+      }
+      
+      console.log('Reloaded normal view');
+    } catch (err) {
+      console.error('Error in reloadNormalView:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Load digest data
   useEffect(() => {
@@ -238,49 +465,39 @@ export default function DigestPage() {
           console.log(`Fetched ${initialArticles.length} initial articles, total unique: ${finalArticles.length}`);
         }
 
-        // Also fetch additional articles for comprehensive category counts (but don't display them all)
-        console.log('Fetching additional articles for comprehensive category counts...');
-        const { data: additionalArticles, error: additionalError } = await supabase
+        // Fetch accurate category counts directly from database using aggregation
+        console.log('Fetching accurate category counts from database...');
+        try {
+          // Use a more efficient approach with RPC function if available, or fall back to client-side counting
+          const { data: categoryCountsData, error: countsError } = await supabase
           .from('dev_articles')
-          .select('*')
-          .order('published_at', { ascending: false })
-          .range(100, 499); // Fetch articles 100-499 for category counts
-        
-        if (additionalError) {
-          console.error('Error fetching additional articles for category counts:', additionalError);
-        }
-        
-        // Create comprehensive category counts from all articles
-        let allArticlesForCounts = [...finalArticles];
-        if (additionalArticles && additionalArticles.length > 0) {
-          const transformedAdditional = additionalArticles.map((article: any) => {
-            const topic = article.topic || 'Research';
-            return {
-              id: article.id,
-              title: article.title,
-              summary: toSnippet(article),
-              tag: topic,
-              link: article.link_abs || `https://arxiv.org/abs/${article.id}`,
-              author: fmtAuthors(article.authors),
-              published: article.published_at,
-              source: article.source || 'arXiv',
-              arxivCategory: article.id
-            };
-          });
-          allArticlesForCounts = [...allArticlesForCounts, ...transformedAdditional];
-        }
-        
-        // Calculate category counts from comprehensive dataset
-        const comprehensiveCounts: Record<string, number> = {};
-        allArticlesForCounts.forEach(article => {
-          if (article.tag) {
-            const normalizedTag = article.tag.trim();
-            comprehensiveCounts[normalizedTag] = (comprehensiveCounts[normalizedTag] || 0) + 1;
+            .select('topic')
+            .not('topic', 'is', null);
+          
+          if (countsError) {
+            console.error('Error fetching category counts:', countsError);
+            setCategoryCounts({});
+            return;
           }
-        });
-        
-        console.log('Comprehensive category counts calculated from', allArticlesForCounts.length, 'articles');
-        setCategoryCounts(comprehensiveCounts);
+          
+          // Calculate accurate category counts from all articles in database
+          const accurateCounts: Record<string, number> = {};
+          if (categoryCountsData) {
+            categoryCountsData.forEach((row: any) => {
+              if (row.topic) {
+                const normalizedTopic = row.topic.trim();
+                accurateCounts[normalizedTopic] = (accurateCounts[normalizedTopic] || 0) + 1;
+              }
+            });
+          }
+          
+          console.log('✅ Accurate category counts calculated from', categoryCountsData?.length || 0, 'total articles');
+          console.log('📊 Found', Object.keys(accurateCounts).length, 'unique categories');
+          setCategoryCounts(accurateCounts);
+        } catch (error) {
+          console.error('Failed to fetch category counts:', error);
+          setCategoryCounts({});
+        }
 
         // Group articles by category for display
         const grouped = finalArticles.reduce((acc: Record<string, any[]>, article: any) => {
@@ -323,16 +540,36 @@ export default function DigestPage() {
     try {
       setLoadingMore(true);
       
-      const PAGE_SIZE = 30;
-      const from = allArticles.length;
+      const PAGE_SIZE = selectedCategory !== 'all' ? 50 : 30; // Load more when filtering by category
+      
+      // Use filter-aware offset for pagination
+      const currentOffset = selectedCategory !== 'all' 
+        ? (categoryOffset[selectedCategory] || 0)
+        : showFavoritesOnly && favoriteCategories.length > 0
+        ? (categoryOffset['favorites'] || 0)
+        : allArticles.length;
+      
+      const from = currentOffset;
       const to = from + PAGE_SIZE - 1;
 
-      // Fetch more articles from Supabase with pagination and count
-      const { data: moreArticles, count, error } = await supabase
+      // Build query with optional filters
+      let query = supabase
         .from('dev_articles')
         .select('*', { count: 'exact' })
-        .order('published_at', { ascending: false })
-        .range(from, to);
+        .order('published_at', { ascending: false });
+
+      // Apply category filter if selected
+      if (selectedCategory !== 'all') {
+        query = query.eq('topic', selectedCategory);
+      }
+      
+      // Apply favorites filter if enabled
+      if (showFavoritesOnly && favoriteCategories.length > 0) {
+        query = query.in('topic', favoriteCategories);
+      }
+
+      // Apply pagination
+      const { data: moreArticles, count, error } = await query.range(from, to);
 
       if (error) {
         console.error('Error loading more articles:', error);
@@ -364,6 +601,20 @@ export default function DigestPage() {
           return Array.from(map.values());
         });
         
+        // Update category offset for pagination
+        if (selectedCategory !== 'all') {
+          setCategoryOffset(prev => ({
+            ...prev,
+            [selectedCategory]: (prev[selectedCategory] || 0) + transformedArticles.length
+          }));
+        } else if (showFavoritesOnly) {
+          // For favorites, track offset under 'favorites' key
+          setCategoryOffset(prev => ({
+            ...prev,
+            'favorites': (prev['favorites'] || 0) + transformedArticles.length
+          }));
+        }
+        
         // Update grouped articles with unique articles
         const updatedGrouped = Array.from(new Map([...allArticles, ...transformedArticles].map(a => [a.id, a])).values())
           .reduce((acc: Record<string, any[]>, article: any) => {
@@ -392,6 +643,9 @@ export default function DigestPage() {
   const displayArticles = getFilteredArticles();
   const heroArticle = displayArticles[0];
   const gridArticlesToShow = displayArticles.slice(1);
+
+  // Check if showing favorites but no categories are favorited
+  const showingFavoritesWithNone = showFavoritesOnly && favoriteCategories.length === 0;
 
   // Render loading state
   if (loading) {
@@ -457,8 +711,33 @@ export default function DigestPage() {
         </div>
       )}
 
+      {/* No Favorites Message */}
+      {showingFavoritesWithNone && (
+        <div className="mb-8 p-8 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="mb-4">
+              <svg className="h-16 w-16 text-neutral-400 dark:text-neutral-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+              No Favorite Categories
+            </h3>
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4">
+              You haven't favorited any categories yet. Star some categories in the sidebar to see your personalized feed here.
+            </p>
+            <button
+              onClick={() => setShowFavoritesOnly(false)}
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors text-sm font-medium"
+            >
+              Browse All Articles
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero Card - First Article */}
-      {heroArticle && (
+      {!showingFavoritesWithNone && heroArticle && (
         <div className="mb-8">
           <Link href={`/digest/${heroArticle.id}`} className="block">
             <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:shadow-lg hover:shadow-neutral-200/50 dark:hover:shadow-neutral-800/50 transition-all duration-300 cursor-pointer group">
@@ -540,7 +819,7 @@ export default function DigestPage() {
       )}
 
       {/* Grid Articles */}
-      {gridArticlesToShow.length > 0 && (
+      {!showingFavoritesWithNone && gridArticlesToShow.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {gridArticlesToShow.map((article) => (
             <div key={article.id} className="group">
@@ -626,7 +905,7 @@ export default function DigestPage() {
       )}
 
       {/* Load More Button */}
-      {hasMore && (
+      {!showingFavoritesWithNone && hasMore && (
         <div className="mt-8 text-center">
           <button
             onClick={loadMore}
@@ -642,14 +921,17 @@ export default function DigestPage() {
       )}
 
       {/* No More Articles Message */}
-      {!hasMore && displayArticles.length > 0 && (
+      {!showingFavoritesWithNone && !hasMore && displayArticles.length > 0 && (
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
             <svg className="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span className="text-sm text-neutral-600 dark:text-neutral-400">
-              All articles loaded ({displayArticles.length}{totalCount ? ` of ${totalCount}` : ''} total)
+              {selectedCategory === 'all' 
+                ? `All articles loaded (${displayArticles.length}${totalCount ? ` of ${totalCount}` : ''} total)`
+                : `All ${displayArticles.length} articles in ${selectedCategory} loaded`
+              }
             </span>
           </div>
         </div>
