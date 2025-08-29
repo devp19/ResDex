@@ -74,18 +74,18 @@ export default function DigestPage() {
   const [categoryOffset, setCategoryOffset] = useState<Record<string, number>>({});
 
   // Page-level 80% UI scale to match your other pages
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.style.setProperty('--ui-scale', '0.8');
-      document.documentElement.style.fontSize = `${16 * 0.8}px`;
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.documentElement.style.removeProperty('--ui-scale');
-        document.documentElement.style.fontSize = '16px';
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     document.documentElement.style.setProperty('--ui-scale', '0.8');
+  //     document.documentElement.style.fontSize = `${16 * 0.8}px`;
+  //   }
+  //   return () => {
+  //     if (typeof window !== 'undefined') {
+  //       document.documentElement.style.removeProperty('--ui-scale');
+  //       document.documentElement.style.fontSize = '16px';
+  //     }
+  //   };
+  // }, []);
 
   // Calculate and update category counts whenever allArticles changes
   useEffect(() => {
@@ -664,7 +664,7 @@ export default function DigestPage() {
     return (
       <div className="w-full">
         <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 py-6">
-          <h1 className="text-2xl font-bold text-red-600">Error Loading Digest</h1>
+          <h1 className="text-2xl font-regular text-red-600">Error Loading Digest</h1>
           <pre className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-sm overflow-auto">
             {error}
           </pre>
@@ -749,7 +749,7 @@ export default function DigestPage() {
                   aria-label={`Featured research in ${heroArticle.tag}`}
                 >
                   <div className="text-center p-4">
-                    <div className="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-2">
+                    <div className="text-3xl font-regular text-neutral-800 dark:text-neutral-200 mb-2">
                       {heroArticle.tag}
                     </div>
                     <div className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -776,24 +776,24 @@ export default function DigestPage() {
                       <circle cx="12" cy="12" r="10"/>
                       <path d="M12 6v6l4 2"/>
                     </svg>
-                    <span>{heroArticle.published ? timeSince(new Date(heroArticle.published)) : 'Recent'}</span>
+                    <span className='text-xs'>{heroArticle.published ? timeSince(new Date(heroArticle.published)) : 'Recent'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                    <span className="truncate max-w-[200px]">{heroArticle.author}</span>
+                    <span className="truncate max-w-[200px] text-xs">{heroArticle.author}</span>
                   </div>
-                  <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-sm font-medium rounded-full">
+                  <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-xs font-regulara rounded-full">
                     {heroArticle.source || 'arXiv'}
                   </span>
                 </div>
                 
-                <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-4 line-clamp-2 transition-colors leading-tight">
+                <h2 className="text-xl md:text-xl font-regular text-neutral-900 dark:text-neutral-100 mb-4 line-clamp-2 transition-colors leading-tight">
                   {heroArticle.title}
                 </h2>
                 
-                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-6 line-clamp-3 leading-relaxed">
                   {heroArticle.summary}
                 </p>
                 
@@ -806,7 +806,7 @@ export default function DigestPage() {
                     </button>
                   </div>
                   <div className="flex items-center gap-2 text-neutral-400 transition-colors group-hover:text-neutral-600 dark:group-hover:text-neutral-300">
-                    <span className="text-base font-medium">Read full article</span>
+                    <span className="text-sm font-regular">Read full article</span>
                     <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                     </svg>
@@ -834,7 +834,7 @@ export default function DigestPage() {
                       aria-label={`Research in ${article.tag}`}
                     >
                       <div className="text-center p-4">
-                        <div className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+                        <div className="text-lg font-regular text-neutral-800 dark:text-neutral-200 mb-1">
                           {article.tag}
                         </div>
                         <div className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -869,7 +869,7 @@ export default function DigestPage() {
                     </div>
                     
                     {/* Title */}
-                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 transition-colors flex-shrink-0">
+                    <h3 className="text-lg font-regular text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 transition-colors flex-shrink-0">
                       {article.title}
                     </h3>
                     

@@ -59,7 +59,7 @@ export default function DigestLayout({
                 <span className="ml-1 text-xl font-semibold">ResDex</span>
               </Link>
             </div>
-            
+              
             {/* Nav Links - centered absolutely */}
             <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
               <Link href="/" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Home</Link>
