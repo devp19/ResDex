@@ -874,7 +874,7 @@ export default function DigestPage() {
                     </h3>
                     
                     {/* Summary */}
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 flex-1">
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 flex-1">
                       {article.summary}
                     </p>
                     

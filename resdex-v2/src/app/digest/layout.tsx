@@ -49,36 +49,34 @@ export default function DigestLayout({
   return (
     <DigestProvider>
       <CategoryProvider>
-        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-          {/* Navbar */}  
-          <nav className="relative z-10 flex items-center py-6 px-8 w-full max-w-7xl mx-auto">
-            {/* Logo */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Link href="/" className="flex items-center gap-2">
-                <Image src="/beige-logo.png" alt="ResDex Logo" width={32} height={32} />
-                <span className="ml-1 text-xl font-semibold">ResDex</span>
-              </Link>
-            </div>
-              
-            {/* Nav Links - centered absolutely */}
-            <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-              <Link href="/" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Home</Link>
-              <Link href="/digest" className="px-3 py-2 rounded-full hover:bg-gray-100 transition text-black bg-white shadow">Digest</Link>
-              <Link href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Brainwave</Link>
-              <Link href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Discovery ↗</Link>
-            </div>
-            
-            {/* Right side: Discord + Wallet - matching home page */}
-            <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-              <button className="rounded-full p-2 hover:bg-gray-100 transition">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#23272A"/><path d="M8.5 15.5C8.5 15.5 9.5 16 12 16C14.5 16 15.5 15.5 15.5 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><ellipse cx="9.5" cy="12" rx="1" ry="1.5" fill="#fff"/><ellipse cx="14.5" cy="12" rx="1" ry="1.5" fill="#fff"/></svg>
-              </button>
-              <Link href="/waitlist" className="rounded-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-medium transition" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-                Join Waitlist ↗
-              </Link>
-            </div>
-          </nav>
+         <nav className="relative z-10 flex items-center py-6 px-8 w-full max-w-7xl mx-auto">
+                  {/* Logo */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Image src="/beige-logo.png" alt="ResDex Logo" width={32} height={32} />
+                    <span className="ml-1 text-xl font-semibold">ResDex</span>
+                  </div>
+                  {/* Nav Links - centered absolutely */}
+                  <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
+                    <a href="/" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Home</a>
+                    <a href="/digest" className="px-3 py-2 rounded-full hover:bg-gray-100 transition text-black shadow">Digest</a>
+                    <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Brainwave</a>
+                    <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Discovery ↗</a>
+                  </div>
+                  {/* Right side: Discord + Wallet */}
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+                    <button className="rounded-full p-2 hover:bg-gray-100 transition">
+          
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#23272A"/><path d="M8.5 15.5C8.5 15.5 9.5 16 12 16C14.5 16 15.5 15.5 15.5 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><ellipse cx="9.5" cy="12" rx="1" ry="1.5" fill="#fff"/><ellipse cx="14.5" cy="12" rx="1" ry="1.5" fill="#fff"/></svg>
+                    </button>
+                    <button className="rounded-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black font-medium transition" style={{ fontFamily: 'GellixMedium, sans-serif', cursor: 'pointer' }}>
+                      Join Waitlist ↗
+                    </button>
+                  </div>
+                </nav>
 
+        {/* previous: bg-neutral-50 dark:bg-neutral-950 */}
+        <div className="min-h-screen bg-white">
+         
           {/* Main Layout */}
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
             {isArticlePage ? (

@@ -17,10 +17,6 @@
   flex-shrink: 0;
   }
 
-/* Global UI Scale for Digest Page Only */
-:root {
-  --ui-scale: 0.8; /* 80% scale; can be tuned later */
-}
 
 html {
   font-size: calc(16px * var(--ui-scale));
