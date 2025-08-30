@@ -80,14 +80,14 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
       <div className="space-y-6">
         {/* Search Bar */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Search Articles</h3>
+          <h3 className="text-sm font-regular text-neutral-900 dark:text-neutral-100 mb-4">Search Articles</h3>
           <div className="relative">
             <input
               type="text"
               placeholder="Search research articles..."
               value={searchTerm}
               onChange={handleArticleSearch}
-              className="w-full px-4 py-2 pl-10 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className="text-sm w-full px-4 py-2 pl-10 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
             />
             <svg className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -97,14 +97,14 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
 
         {/* Trending Topics */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Trending Topics</h3>
+          <h3 className="text-sm font-regular text-neutral-900 dark:text-neutral-100 mb-4">Trending Topics</h3>
           <div className="space-y-3">
             {trendingCategories.length > 0 ? (
               trendingCategories.map(([cat, count], i) => (
                 <div key={cat} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">#{i + 1}</span>
-                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{cat}</span>
+                    <span className="text-xs font-regular text-neutral-500 dark:text-neutral-400">#{i + 1}</span>
+                    <span className="text-xs font-regular text-neutral-900 dark:text-neutral-100">{cat}</span>
                   </div>
                   <span className="text-xs text-neutral-500 dark:text-neutral-400">{count} articles</span>
                 </div>
@@ -118,8 +118,8 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
         {/* Category Filter */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Categories</h3>
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            <h3 className="text-sm font-regular text-neutral-900 dark:text-neutral-100">Categories</h3>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400">
               {Object.keys(categoryCounts || {}).length} total
             </span>
           </div>
@@ -147,9 +147,9 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
                 type="checkbox"
                 checked={showFavoritesOnly}
                 onChange={(e) => handleFavoritesToggle(e.target.checked)}
-                className="w-4 h-4 text-black bg-neutral-100 border-neutral-300 rounded focus:ring-black dark:focus:ring-gray-300 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
+                className="w-3 h-3 text-black bg-neutral-100 border-neutral-300 rounded focus:ring-black dark:focus:ring-gray-300 dark:ring-offset-neutral-800 focus:ring-2 dark:bg-neutral-700 dark:border-neutral-600"
               />
-              <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Show Favorites Only</span>
+              <span className="text-xs font-regular text-neutral-900 dark:text-neutral-100">Show Favorites Only</span>
             </label>
           </div>
 
@@ -187,7 +187,7 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
                           </svg>
                         </button>
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          <span className="text-xs font-regular text-neutral-900 dark:text-neutral-100">
                             {category}
                           </span>
                           <span className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -207,7 +207,7 @@ export function RightSidebar({ categoryCounts, loading = false }: RightSidebarPr
                       {!showAllCategories ? (
                         <button
                           onClick={() => setShowAllCategories(true)}
-                          className="w-full text-center py-3 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                          className="w-full text-center py-3 text-xs font-regular text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                         >
                           View All {filteredCategories.length} Categories
                         </button>
