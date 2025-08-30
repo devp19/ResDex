@@ -820,7 +820,7 @@ export default function DigestPage() {
 
       {/* Grid Articles */}
       {!showingFavoritesWithNone && gridArticlesToShow.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
           {gridArticlesToShow.map((article) => (
             <div key={article.id} className="group">
               <Link href={`/digest/${article.id}`} className="block">
@@ -847,10 +847,15 @@ export default function DigestPage() {
                         {article.tag}
                       </span>
                     </div>
+
+                    
                   </div>
+                  
                   
                   {/* Content Section */}
                   <div className="p-4 flex-1 flex flex-col">
+                    
+
                     {/* Meta Information */}
                     <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500 dark:text-neutral-400">
                       <div className="flex items-center gap-1">
@@ -864,12 +869,13 @@ export default function DigestPage() {
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        {article.author.split(',')[0].trim()}
+                        <span className='text-xs'>{article.author.split(',')[0].trim()}</span>
                       </div>
                     </div>
                     
+                    
                     {/* Title */}
-                    <h3 className="text-lg font-regular text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 transition-colors flex-shrink-0">
+                    <h3 className="text-medium font-regular text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2 transition-colors flex-shrink-0">
                       {article.title}
                     </h3>
                     
@@ -877,6 +883,7 @@ export default function DigestPage() {
                     <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2 flex-1">
                       {article.summary}
                     </p>
+
                     
                     {/* Footer Actions */}
                     <div className="flex items-center justify-between mt-auto flex-shrink-0">
