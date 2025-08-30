@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { AnimatedSubscribeButton } from "@/components/magicui/animated-subscribe-button";
-import { ChevronRightIcon, CheckIcon } from "lucide-react";
+import { ChevronRightIcon, CheckIcon, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { use3dTilt } from "@/hooks/use3dTilt";
 
@@ -19,44 +19,58 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  // Username availability states
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const tiltLogo = use3dTilt();
 
-
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
+  // REMOVE THIS AFTER LAUNCH
   useEffect(() => {
-  if (typeof window !== "undefined") {
-    const hasDevAccess = localStorage.getItem("devAccess") === "true";
-    if (!hasDevAccess) {
-      router.push("/waitlist");
+    if (typeof window !== "undefined") {
+      const hasDevAccess = localStorage.getItem("devAccess") === "true";
+      if (!hasDevAccess) {
+        router.push("/waitlist");
+      }
     }
-  }
-}, []);
+  }, []);
 
-  // REMOVVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-  // REMOVE THIS AFTER LAUNCH TO ALLOW FOR SIGNUP.
-
-  // Minimal username validation: lowercase, 3+, a-z0-9_
+  // Username regex validation
   const validateUsername = (name: string) => {
     const un = name.toLowerCase().trim();
     return /^[a-z0-9_]{3,}$/.test(un);
   };
 
-  // Memoized heading to avoid rerunning animation
+  // Debounce for async username availability check
+  useEffect(() => {
+    if (!validateUsername(username) || username.length < 3) {
+      setUsernameAvailable(null);
+      setCheckingUsername(false);
+      return;
+    }
+    setCheckingUsername(true);
+
+    const timer = setTimeout(async () => {
+      // Query the profiles table for existence of username
+      const { data, error } = await supabase
+        .from('dev_profiles')
+        .select('id')
+        .eq('username', username.toLowerCase().trim())
+        .maybeSingle();
+
+      if (error) {
+        // Could improve error handling
+        setUsernameAvailable(null);
+      } else {
+        setUsernameAvailable(!data); // true if not found, false if found
+      }
+      setCheckingUsername(false);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [username]);
+
+  // Memoized heading
   const memoizedHeading = useMemo(
     () => (
       <TextAnimate
@@ -72,7 +86,7 @@ export default function SignupPage() {
     []
   );
 
-  // Handler for form submission
+  // Form submission handler
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -93,7 +107,12 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
-    // Proceed with registration (Supabase Auth will handle duplicate email/username via backend)
+    if (!usernameAvailable) {
+      setError("Username is already taken.");
+      setLoading(false);
+      return;
+    }
+    // Supabase Auth signup
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -120,7 +139,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-white flex items-stretch justify-center relative" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
-      {/* SVG Curved Streaks Background */}
+      {/* SVG Curved Streaks */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <svg width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
           <path d="M0 200 Q720 400 1440 200" stroke="#ececec" strokeWidth="2" fill="none" />
@@ -128,10 +147,9 @@ export default function SignupPage() {
           <path d="M0 600 Q720 800 1440 600" stroke="#f5f5f5" strokeWidth="2" fill="none" />
         </svg>
       </div>
-      {/* Right vertical split (signup form) */}
+      {/* Signup Form */}
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 relative z-10 order-1 md:order-2 bg-[#f5f5f5]">
         <div className="w-full max-w-md mx-auto rounded-2xl p-8 flex flex-col items-center">
-          {/* Top content: logo, heading, description */}
           <div className="mb-6 w-full flex flex-col items-center">
             <div
               ref={tiltLogo.ref}
@@ -147,21 +165,40 @@ export default function SignupPage() {
             </p>
           </div>
           <form onSubmit={handleSignup} className="flex flex-col gap-6 w-full max-w-md items-center">
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              ref={usernameInputRef}
-              onChange={e => setUsername(e.target.value)}
-              className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
-              required
-            />
+            
+            <div className="w-full relative">
+            
+            
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                ref={usernameInputRef}
+                onChange={e => setUsername(e.target.value)}
+                className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
+                required
+              />
+
+              <span className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none transition-all">
+    {checkingUsername && (
+      <Loader2 className="animate-spin text-regular w-5 h-5" />
+    )}
+    {!checkingUsername && username.length >= 3 && usernameAvailable === true && (
+      <CheckCircle className="text-regular w-5 h-5" />
+    )}
+    {!checkingUsername && username.length >= 3 && usernameAvailable === false && (
+      <XCircle className="text-regular w-5 h-5" />
+    )}
+  </span>
+              
+            </div>
             <input
               type="text"
               placeholder="Full Name"
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
               className="border border-gray-300 px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-base bg-gray-100 w-full"
+              required
             />
             <input
               type="email"
@@ -204,7 +241,7 @@ export default function SignupPage() {
             </AnimatedSubscribeButton>
           </form>
           {error && (
-            <p className="mt-6 text-left w-full max-w-md text-[15px] font-medium" style={{ color: '#2a2a2a', marginTop: '0px' }}>
+            <p className="text-left w-full max-w-md text-[15px] font-medium" style={{ color: '#2a2a2a', marginTop: '0px' }}>
               {error}
             </p>
           )}
@@ -215,7 +252,7 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      {/* Left vertical split with cover image filling the side */}
+      {/* Left vertical split with cover image */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-gray-50 to-white border-l border-gray-200 relative z-10 order-2 md:order-1 p-0">
         <Image
           src="/logincover.webp"
