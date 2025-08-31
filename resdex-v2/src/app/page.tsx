@@ -283,7 +283,7 @@ export default function CanopyDemo() {
         {/* Nav Links - centered absolutely */}
         <div className="hidden md:flex gap-6 bg-gray-50 rounded-full px-4 py-2 text-sm font-medium absolute left-1/2 -translate-x-1/2" style={{ fontFamily: 'GellixMedium, sans-serif' }}>
           <a href="/" className="px-3 py-2 rounded-full hover:bg-gray-100 transition text-black bg-white shadow">Home</a>
-          <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Digest</a>
+          <a href="/digest" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Digest</a>
           <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Brainwave</a>
           <a href="/waitlist" className="px-3 py-2 rounded-full hover:bg-gray-100 transition">Discovery ↗</a>
         </div>
