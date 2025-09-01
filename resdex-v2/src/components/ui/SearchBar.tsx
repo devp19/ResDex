@@ -17,7 +17,7 @@ interface SearchBarProps {
   className?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ className = "" }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ className = "w-full max-w-md" }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -108,7 +108,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ className = "" }) => {
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 bg-[rgba(245,246,250,0.95)] dark:bg-[rgba(24,24,27,0.92)] backdrop-blur-md right-0 mt-2 rounded-xl shadow-lg border border-gray-200 z-50 max-h-80 overflow-y-auto min-w-[500px]">
           {isSearching ? (
             <div className="p-4 text-center text-gray-500">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400 mx-auto mb-2"></div>
@@ -116,9 +116,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ className = "" }) => {
             </div>
           ) : searchResults.length > 0 ? (
             <>
-              <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+              {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
                 Users ({searchResults.length})
-              </div>
+              </div> */}
               {searchResults.map((user) => (
                 <div
                   key={user.id}
