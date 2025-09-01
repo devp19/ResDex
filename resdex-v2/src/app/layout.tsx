@@ -5,6 +5,7 @@ import { SmoothCursor } from "@/components/ui/SmoothCursor";
 import { AuthProvider } from '@/components/auth-provider';
 import NotificationSidebarProvider from '@/components/ui/NotificationSidebarProvider';
 import { Footer7 } from "@/components/footer7";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=1, minimum-scale=1" />
         <link rel="icon" href="/beige-logo.png" />
       </head>
       <body
@@ -40,6 +42,8 @@ export default function RootLayout({
             <div className="flex flex-col min-h-screen">
               <main className="flex-1">
                 {children}
+                <Analytics />
+
               </main>
               <div className="flex justify-center w-full">
                 <Footer7

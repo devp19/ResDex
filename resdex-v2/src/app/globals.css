@@ -173,6 +173,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Ensure consistent zoom behavior in dev environment */
+    zoom: 1;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Prevent any automatic scaling */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
