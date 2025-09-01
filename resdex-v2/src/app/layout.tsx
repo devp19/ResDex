@@ -37,7 +37,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <SmoothCursor />
           <NotificationSidebarProvider>
             <div className="flex flex-col min-h-screen">
               <main className="flex-1">

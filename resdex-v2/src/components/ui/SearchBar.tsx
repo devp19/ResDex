@@ -95,6 +95,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ className = "w-full max-w-
           type="text"
           placeholder="Search users..."
           value={searchQuery}
+          spellCheck="false"
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={handleInputFocus}
           className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
