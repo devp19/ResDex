@@ -31,6 +31,10 @@ import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
 import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
+import { SearchBar } from "@/components/ui/SearchBar";
+
+
+
 // Navigation items
 const navItems = [
   { name: "Home", link: "/" },
@@ -448,15 +452,7 @@ export default function ProfilePage() {
             {/* Left group: Logo + Search */}
             <div className="flex items-center gap-6 min-w-0">
               <NavbarLogo />
-              <div className="relative w-full max-w-xs">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
-                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
-                />
-                <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
+              <SearchBar className="w-full max-w-xs" />
             </div>
             {/* Spacer */}
             <div className="flex-grow" />
