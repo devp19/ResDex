@@ -31,6 +31,10 @@ import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
 import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
+import { SearchBar } from "@/components/ui/SearchBar";
+
+
+
 // Navigation items
 const navItems = [
   { name: "Home", link: "/" },
@@ -442,49 +446,39 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
-      <Navbar>
-        <NavBody>
-          <div className="flex items-center w-full">
-            {/* Left group: Logo + Search */}
-            <div className="flex items-center gap-6 min-w-0">
-              <NavbarLogo />
-              <div className="relative w-full max-w-xs">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
-                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
-                />
-                <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
-            </div>
-            {/* Spacer */}
-            <div className="flex-grow" />
-            <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
-            <MessageBadge />
-            <NotificationBadge />
-            {/* Avatar/Login button */}
-            <div className="relative ml-4 flex items-center gap-2">
-              {currentUser ? (
-                <AvatarDropdown
-                  userProfile={myProfile}
-                  displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
-                  username={myProfile?.username || currentUser.email?.split("@")[0]}
-                  avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
-                  onSignOut={handleSignOut}
-                />
-              ) : (
-                <button
-                  className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
-                  onClick={() => router.push("/login")}
-                >
-                  Login
-                </button>
-              )}
-            </div>
-          </div>
-        </NavBody>
-      </Navbar>
+    <Navbar>
+  <NavBody>
+    <div className="flex items-center w-full">
+      {/* Left group: Logo + Search */}
+      <div className="flex items-center gap-6 min-w-0 flex-1">
+        <NavbarLogo />
+        <SearchBar className="w-full max-w-xl" />
+      </div>
+
+      <MessageBadge />
+      <NotificationBadge />
+      {/* Avatar/Login button */}
+      <div className="relative ml-4 flex items-center gap-2">
+        {currentUser ? (
+          <AvatarDropdown
+            userProfile={myProfile}
+            displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
+            username={myProfile?.username || currentUser.email?.split("@")[0]}
+            avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
+            onSignOut={handleSignOut}
+          />
+        ) : (
+          <button
+            className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </button>
+        )}
+      </div>
+    </div>
+  </NavBody>
+</Navbar>
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
