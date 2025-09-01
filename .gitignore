@@ -1,4 +1,5 @@
 .env
 .env.local
 /resdex-v2/misc
+resdex-v2/src/admin/hack.js
 /resdex-v2/src/admin
