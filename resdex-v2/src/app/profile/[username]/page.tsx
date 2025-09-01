@@ -556,7 +556,7 @@ export default function ProfilePage() {
                   {currentUser && !isOwnProfile && profile?.id && (
                     <button
                       className={`ml-2 px-4 py-2 rounded-full font-semibold transition flex items-center gap-2 justify-center
-                        ${isFollowing ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-blue-600 text-white hover:bg-blue-700"}
+                        ${isFollowing ? "bg-gray-900 text-white hover:bg-gray-700 hover:cursor-pointer" : "bg-gray-100 hover:bg-gray-200 text-black hover:cursor-pointer"}
                       `}
                       style={{ minWidth: 96 }}
                       onClick={isFollowing ? handleUnfollow : handleFollow}
