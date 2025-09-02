@@ -6,6 +6,8 @@ import { Navbar, NavBody, NavbarLogo, NavItems, MessageBadge, NotificationBadge 
 import Link from "next/link";
 import { FaPaperPlane } from 'react-icons/fa';
 import { FaLink } from "react-icons/fa";
+import ChatThread from "@/components/chat/ChatThread";
+import type { ChatMessage } from "@/lib/chat/runs";
 
 
 // Types
@@ -170,12 +172,29 @@ useEffect(() => {
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
-      setMessages(data || []);
+      // Transform messages to match ChatMessage type
+      const transformedMessages: ChatMessage[] = (data || []).map(msg => ({
+        id: msg.id,
+        userId: msg.sender_id,
+        text: msg.content,
+        createdAt: msg.created_at,
+        user: {
+          id: msg.sender_id,
+          name: msg.sender_id === currentUserId 
+            ? (currentUserProfile?.full_name || currentUserProfile?.username || 'You')
+            : (selectedUser?.full_name || selectedUser?.username || 'User'),
+          avatarUrl: msg.sender_id === currentUserId 
+            ? currentUserProfile?.avatar_url 
+            : selectedUser?.avatar_url
+        }
+      }));
+
+      setMessages(transformedMessages);
       setLoadingMessages(false);
     };
 
     fetchMessages();
-  }, [selectedUser, currentUserId]);
+  }, [selectedUser, currentUserId, currentUserProfile]);
 
   // Real-time subscription for new messages
   useEffect(() => {
@@ -195,11 +214,28 @@ useEffect(() => {
           filter: `conversation_id=eq.${conversationId}`,
         },
         payload => {
-          setMessages(prev =>
-            prev.some(m => m.id === payload.new.id)
-              ? prev
-              : [...prev, payload.new]
-          );
+          setMessages(prev => {
+            if (prev.some(m => m.id === payload.new.id)) return prev;
+            
+            // Transform new message to match ChatMessage type
+            const newMessage: ChatMessage = {
+              id: payload.new.id,
+              userId: payload.new.sender_id,
+              text: payload.new.content,
+              createdAt: payload.new.created_at,
+              user: {
+                id: payload.new.sender_id,
+                name: payload.new.sender_id === currentUserId 
+                  ? (currentUserProfile?.full_name || currentUserProfile?.username || 'You')
+                  : (selectedUser?.full_name || selectedUser?.username || 'User'),
+                avatarUrl: payload.new.sender_id === currentUserId 
+                  ? currentUserProfile?.avatar_url 
+                  : selectedUser?.avatar_url
+              }
+            };
+            
+            return [...prev, newMessage];
+          });
         }
       )
       .subscribe();
@@ -207,7 +243,7 @@ useEffect(() => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedUser, currentUserId]);
+  }, [selectedUser, currentUserId, currentUserProfile]);
 
   // Helper for initials fallback
   const getInitials = (name: string = "") =>
@@ -396,35 +432,10 @@ useEffect(() => {
         ) : messages.length === 0 ? (
           <div className="text-gray-400 text-center py-12">No messages yet.</div>
         ) : (
-          messages.map((msg) => {
-            const isMe = msg.sender_id === currentUserId;
-            return (
-              <div
-                key={msg.id}
-                className={`flex ${isMe ? "justify-end" : "justify-start"} mb-3 group items-end`}
-              >
-                {isMe ? (
-                  <>
-                    <span className="hidden group-hover:inline text-xs text-gray-400 mb-3 mr-2">
-                      {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-[#2a2a2a] gray-800 text-white">
-                      {msg.content}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="max-w-[70%] px-4 py-2 rounded-2xl shadow text-base bg-gray-200 text-black">
-                      {msg.content}
-                    </div>
-                    <span className="hidden group-hover:inline text-xs mb-3 text-gray-400 ml-2">
-                      {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                  </>
-                )}
-              </div>
-            );
-          })
+          <ChatThread 
+            messages={messages} 
+            currentUserId={currentUserId!} 
+          />
         )}
         {/* End-of-messages anchor */}
         <div ref={messagesEndRef} />
