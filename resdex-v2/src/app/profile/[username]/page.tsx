@@ -31,6 +31,10 @@ import { AvatarDropdown } from "@/components/ui/AvatarDropdown";
 import { ProfileStatsCard } from "@/components/ui/ProfileStatsCard";
 import { ProfileOrgInterestsCard } from "@/components/ui/ProfileOrgInterestsCard";
 
+import { SearchBar } from "@/components/ui/SearchBar";
+
+
+
 // Navigation items
 const navItems = [
   { name: "Home", link: "/" },
@@ -442,49 +446,39 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] flex flex-col items-center py-8 mx-4 sm:mx-4 lg:mx-auto">
-      <Navbar>
-        <NavBody>
-          <div className="flex items-center w-full">
-            {/* Left group: Logo + Search */}
-            <div className="flex items-center gap-6 min-w-0">
-              <NavbarLogo />
-              <div className="relative w-full max-w-xs">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  className="rounded-full bg-white/30 backdrop-blur-md border-none shadow-none focus-visible:ring-2 focus-visible:ring-blue-200 placeholder:text-gray-400 px-6 py-3 h-12 w-full text-base !outline-none pr-12"
-                  style={{ boxShadow: "0 2px 16px 0 rgba(80, 72, 72, 0.04)", background: "rgba(255,255,255,0.35)" }}
-                />
-                <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
-            </div>
-            {/* Spacer */}
-            <div className="flex-grow" />
-            <NavItems items={navItems} className="static flex justify-end flex-1 space-x-2" />
-            <MessageBadge />
-            <NotificationBadge />
-            {/* Avatar/Login button */}
-            <div className="relative ml-4 flex items-center gap-2">
-              {currentUser ? (
-                <AvatarDropdown
-                  userProfile={myProfile}
-                  displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
-                  username={myProfile?.username || currentUser.email?.split("@")[0]}
-                  avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
-                  onSignOut={handleSignOut}
-                />
-              ) : (
-                <button
-                  className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
-                  onClick={() => router.push("/login")}
-                >
-                  Login
-                </button>
-              )}
-            </div>
-          </div>
-        </NavBody>
-      </Navbar>
+    <Navbar>
+  <NavBody>
+    <div className="flex items-center w-full">
+      {/* Left group: Logo + Search */}
+      <div className="flex items-center gap-6 min-w-0 flex-1">
+        <NavbarLogo />
+        <SearchBar className="w-full max-w-xl" />
+      </div>
+
+      <MessageBadge />
+      <NotificationBadge />
+      {/* Avatar/Login button */}
+      <div className="relative ml-4 flex items-center gap-2">
+        {currentUser ? (
+          <AvatarDropdown
+            userProfile={myProfile}
+            displayName={myProfile?.display_name || myProfile?.full_name || myProfile?.username || currentUser.email}
+            username={myProfile?.username || currentUser.email?.split("@")[0]}
+            avatarUrl={myProfile?.avatar_url || "/empty-pic.webp"}
+            onSignOut={handleSignOut}
+          />
+        ) : (
+          <button
+            className="px-6 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-bold hover:bg-[#444] transition"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </button>
+        )}
+      </div>
+    </div>
+  </NavBody>
+</Navbar>
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 mt-8">
         {/* Main Column: Profile Card + Posts */}
         <div className="md:col-span-1 flex flex-col gap-6">
@@ -562,7 +556,7 @@ export default function ProfilePage() {
                   {currentUser && !isOwnProfile && profile?.id && (
                     <button
                       className={`ml-2 px-4 py-2 rounded-full font-semibold transition flex items-center gap-2 justify-center
-                        ${isFollowing ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-blue-600 text-white hover:bg-blue-700"}
+                        ${isFollowing ? "bg-gray-900 text-white hover:bg-gray-700 hover:cursor-pointer" : "bg-gray-100 hover:bg-gray-200 text-black hover:cursor-pointer"}
                       `}
                       style={{ minWidth: 96 }}
                       onClick={isFollowing ? handleUnfollow : handleFollow}
@@ -701,136 +695,166 @@ export default function ProfilePage() {
           </div>
           {/* Edit Bio Modal */}
           <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
-            <AlertDialogContent
-              style={{ maxHeight: 620, minWidth: 360, overflowY: 'auto' }}
-              className="!p-6"
+  <AlertDialogContent
+    style={{
+      maxHeight: 620,
+      minWidth: 360,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: 0, // remove padding, add where needed
+      overflow: 'hidden'
+    }}
+    className="!p-0"
+  >
+    <AlertDialogHeader className="p-6">
+      <AlertDialogTitle>Edit Profile</AlertDialogTitle>
+    </AlertDialogHeader>
+    <div
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        paddingLeft: '24px',
+        paddingRight: '24px'
+      }}
+    >
+      {/* --- FORM FIELDS BEGIN --- */}
+      <label className="block text-sm font-medium text-neutral-700 mb-1">About</label>
+      <textarea
+        className="w-full border border-gray-300 rounded-lg p-3 text-base min-h-[60px] focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
+        value={aboutDraft}
+        onChange={e => {
+          if (e.target.value.length <= 90) setAboutDraft(e.target.value);
+        }}
+        maxLength={90}
+        rows={2}
+        placeholder="e.g. Chief Technology Officer at Google"
+      />
+      <div className="text-right text-xs text-neutral-400">{aboutDraft.length}/90</div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">Location</label>
+      <input
+        className="w-full border border-gray-300 rounded-lg p-3 text-base min-h-[60px] focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
+        value={locationDraft}
+        onChange={e => setLocationDraft(e.target.value)}
+        maxLength={60}
+        placeholder="e.g. Toronto, Ontario"
+        type="text"
+      />
+      <label className="block text-sm font-medium text-neutral-700 mb-1 mt-5">Interests (3)</label>
+      <input
+        type="text"
+        className="w-full border border-gray-300 rounded-lg p-2 min-h-[60px] text-base mb-2 focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
+        placeholder={interestsDraft.length >= 3 ? "3/3 Selected! Remove to replace." : "Type to search interests..."}
+        value={interestSearch}
+        onChange={e => setInterestSearch(e.target.value)}
+        disabled={interestsDraft.length >= 3}
+      />
+      <div className="flex gap-2 mb-2 min-h-[36px]">
+        {interestsDraft.length === 0 ? (
+          <span className="italic text-neutral-400 text-sm">No interests selected...</span>
+        ) : (
+          interestsDraft.map(interest => (
+            <button
+              key={interest}
+              type="button"
+              className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-medium flex items-center gap-1 hover:bg-[#444] transition group"
+              onClick={() => setInterestsDraft(interestsDraft.filter(i => i !== interest))}
+              title="Remove"
             >
-              <AlertDialogHeader>
-                <AlertDialogTitle>Edit Profile</AlertDialogTitle>
-              </AlertDialogHeader>
-              <label className="block text-sm font-medium text-neutral-700 mb-1 mt-1">About</label>
-              <textarea
-                className="w-full border border-gray-300 rounded-lg p-3 text-base min-h-[60px] focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
-                value={aboutDraft}
-                onChange={e => {
-                  if (e.target.value.length <= 90) setAboutDraft(e.target.value);
-                }}
-                maxLength={90}
-                rows={2}
-                placeholder="e.g. Chief Technology Officer at Google"
-              />
-              <div className="text-right text-xs text-neutral-400">{aboutDraft.length}/90</div>
-              <label className="block text-sm font-medium text-neutral-700">Location</label>
-              <input
-                className="w-full border border-gray-300 rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
-                value={locationDraft}
-                onChange={e => setLocationDraft(e.target.value)}
-                maxLength={60}
-                placeholder="e.g. Toronto, Ontario"
-                type="text"
-              />
-              <label className="block text-sm font-medium text-neutral-700 mb-1 mt-2">Interests (max 3)</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg p-2 text-base mb-2 focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
-                placeholder={interestsDraft.length >= 3 ? "3/3 Selected! Remove to replace." : "Type to search interests..."}
-                value={interestSearch}
-                onChange={e => setInterestSearch(e.target.value)}
-                disabled={interestsDraft.length >= 3}
-              />
-              <div className="flex gap-2 mb-2 min-h-[36px]">
-                {interestsDraft.length === 0 ? (
-                  <span className="italic text-neutral-400 text-sm">No interests selected...</span>
-                ) : (
-                  interestsDraft.map(interest => (
-                    <button
-                      key={interest}
-                      type="button"
-                      className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white text-sm font-medium flex items-center gap-1 hover:bg-[#444] transition group"
-                      onClick={() => setInterestsDraft(interestsDraft.filter(i => i !== interest))}
-                      title="Remove"
-                    >
-                      {interest}
-                      <span className="ml-1 text-xs text-white/80 group-hover:text-red-300">×</span>
-                    </button>
-                  ))
-                )}
-              </div>
-              {(() => {
-                const search = interestSearch.trim().toLowerCase();
-                const notSelected = INTEREST_OPTIONS.filter(opt => !interestsDraft.includes(opt));
-                const matches = search
-                  ? notSelected.filter(opt => opt.toLowerCase().includes(search))
-                  : [];
-                const rest = notSelected.filter(opt => !matches.includes(opt));
-                const display = [...matches, ...rest];
-                return (
-                  <div
-                    className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-3"
-                    style={{ maxHeight: 200, overflowY: 'auto', minHeight: 40 }}
-                  >
-                    {display.map(option => {
-                      const selected = interestsDraft.includes(option);
-                      return (
-                        <button
-                          key={option}
-                          type="button"
-                          className={
-                            `px-4 py-2 rounded-full border text-sm font-medium transition ` +
-                            (selected
-                              ? 'bg-[#2a2a2a] text-white border-[#2a2a2a] shadow'
-                              : 'bg-white text-[#2a2a2a] border-gray-300 hover:bg-gray-100')
-                          }
-                          disabled={selected || interestsDraft.length >= 3}
-                          onClick={() => {
-                            if (!selected && interestsDraft.length < 3) {
-                              setInterestsDraft([...interestsDraft, option]);
-                              setInterestSearch("");
-                            }
-                          }}
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-              <div className="text-right text-xs text-neutral-400 mb-2">
-                {interestsDraft.length}/3 selected
-              </div>
-              <label className="block text-sm font-medium text-neutral-700 mt-2">Organization</label>
-              <input
-                className="w-full border border-gray-300 rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
-                value={organizationDraft}
-                onChange={e => setOrganizationDraft(e.target.value)}
-                maxLength={60}
-                placeholder="e.g. Google, University of Toronto"
-                type="text"
-              />
-              <AlertDialogFooter>
-                <AlertDialogCancel asChild>
-                  <button
-                    className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    disabled={editLoading}
-                  >
-                    Cancel
-                  </button>
-                </AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <button
-                    className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white hover:bg-[#444] disabled:opacity-60"
-                    onClick={handleEditAbout}
-                    disabled={editLoading}
-                  >
-                    {editLoading ? "Saving..." : "Save"}
-                  </button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-              {editError && <div className="text-red-500 mt-2 text-sm">{editError}</div>}
-              {editSuccess && <div className="text-green-600 mt-2 text-sm">{editSuccess}</div>}
-            </AlertDialogContent>
-          </AlertDialog>
+              {interest}
+              <span className="ml-1 text-xs text-white/80 group-hover:text-red-300">×</span>
+            </button>
+          ))
+        )}
+      </div>
+      {(() => {
+        const search = interestSearch.trim().toLowerCase();
+        const notSelected = INTEREST_OPTIONS.filter(opt => !interestsDraft.includes(opt));
+        const matches = search
+          ? notSelected.filter(opt => opt.toLowerCase().includes(search))
+          : [];
+        const rest = notSelected.filter(opt => !matches.includes(opt));
+        const display = [...matches, ...rest];
+        return (
+          <div
+            className="flex flex-wrap gap-2 mb-2 border border-gray-200 rounded-lg bg-gray-50 p-3"
+            style={{ maxHeight: 200, overflowY: 'auto', minHeight: 40 }}
+          >
+            {display.map(option => {
+              const selected = interestsDraft.includes(option);
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={
+                    `px-4 py-2 rounded-full border text-sm font-medium transition ` +
+                    (selected
+                      ? 'bg-[#2a2a2a] text-white border-[#2a2a2a] shadow'
+                      : 'bg-white text-[#2a2a2a] border-gray-300 hover:bg-gray-100')
+                  }
+                  disabled={selected || interestsDraft.length >= 3}
+                  onClick={() => {
+                    if (!selected && interestsDraft.length < 3) {
+                      setInterestsDraft([...interestsDraft, option]);
+                      setInterestSearch("");
+                    }
+                  }}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        );
+      })()}
+      <div className="text-right text-xs text-neutral-400 mb-2">
+        {interestsDraft.length}/3 selected
+      </div>
+      <label className="block text-sm font-medium text-neutral-700 mt-2 mb-1">Organization</label>
+      <input
+        className="w-full border border-gray-300 rounded-lg p-3 min-h-[60px] text-base focus:outline-none focus:ring-2 focus:ring-[#2a2a2a]"
+        value={organizationDraft}
+        onChange={e => setOrganizationDraft(e.target.value)}
+        maxLength={60}
+        placeholder="e.g. Google, University of Toronto"
+        type="text"
+      />
+      {editError && <div className="text-black mt-2 text-sm">{editError}</div>}
+      {editSuccess && <div className="text-black mt-2 text-sm">{editSuccess}</div>}
+      {/* --- FORM FIELDS END --- */}
+    </div>
+
+    <AlertDialogFooter
+      style={{
+        borderTop: '1px solid #eee',
+        padding: '16px 24px',
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 1,
+      }}
+
+      className="backdrop-blur-sm bg-white/80 dark:bg-neutral-900/20"
+    >
+      <AlertDialogCancel asChild>
+        <button
+          className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300"
+          disabled={editLoading}
+        >
+          Cancel
+        </button>
+      </AlertDialogCancel>
+      <AlertDialogAction asChild>
+        <button
+          className="px-4 py-2 rounded-full bg-[#2a2a2a] text-white hover:bg-[#444] disabled:opacity-60"
+          onClick={handleEditAbout}
+          disabled={editLoading}
+        >
+          {editLoading ? "Saving..." : "Save"}
+        </button>
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
 
           {/* Followers/Following List Modal */}
           <AlertDialog open={listModalOpen} onOpenChange={setListModalOpen}>

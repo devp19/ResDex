@@ -62,7 +62,7 @@ export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({
         <button
           type="button"
           onClick={onFollowersClick}
-          className="text-2xl font-bold focus:outline-none focus:underline hover:underline transition"
+          className="text-2xl font-semibold focus:outline-none focus:underline hover:underline transition"
           style={{ background: "none", border: 0, padding: 0, margin: 0, cursor: onFollowersClick ? "pointer" : "default" }}
           tabIndex={0}
         >
@@ -75,7 +75,7 @@ export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({
         <button
           type="button"
           onClick={onFollowingClick}
-          className="text-2xl font-bold focus:outline-none focus:underline hover:underline transition"
+          className="text-2xl font-semibold focus:outline-none focus:underline hover:underline transition"
           style={{ background: "none", border: 0, padding: 0, margin: 0, cursor: onFollowingClick ? "pointer" : "default" }}
           tabIndex={0}
         >
@@ -85,7 +85,7 @@ export const ProfileStatsCard: React.FC<ProfileStatsCardProps> = ({
       </div>
       <div className="w-px bg-zinc-200 dark:bg-zinc-700 mx-6" />
       <div className="flex-1 flex flex-col items-start justify-center">
-        <span className="text-2xl font-bold">{contributions}</span>
+        <span className="text-2xl font-semibold">{contributions}</span>
         <span className="text-sm mt-1 text-neutral-400">Contributions</span>
       </div>
     </div>

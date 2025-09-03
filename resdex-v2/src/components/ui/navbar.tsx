@@ -245,7 +245,7 @@
           damping: 50,
         }}
         style={{
-          minWidth: "800px",
+          minWidth: "50%",
         }}
         className={cn(
           "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex bg-[rgba(245,246,250,0.85)] dark:bg-[rgba(24,24,27,0.92)] backdrop-blur-md",

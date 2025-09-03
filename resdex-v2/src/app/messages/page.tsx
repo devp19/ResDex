@@ -6,8 +6,11 @@ import { Navbar, NavBody, NavbarLogo, NavItems, MessageBadge, NotificationBadge 
 import Link from "next/link";
 import { FaPaperPlane } from 'react-icons/fa';
 import { FaLink } from "react-icons/fa";
+
 import ChatThread from "@/components/chat/ChatThread";
 import type { ChatMessage } from "@/lib/chat/runs";
+import { IoArrowUpSharp } from "react-icons/io5";
+
 
 
 // Types
@@ -475,7 +478,7 @@ useEffect(() => {
             className="px-4 py-2 bg-[#2a2a2a] text-white rounded-full hover:bg-[#3a3a3a] hover:cursor-pointer transition"
             disabled={!messageContent.trim()}
           >
-            <FaPaperPlane className="inline-flex ml-2 mr-2 mb-1" />
+            <IoArrowUpSharp className="inline-flex ml-2 mr-2 mb-1" />
           </button>
         </form>
       )}
