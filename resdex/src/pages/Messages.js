@@ -207,23 +207,23 @@ const ChatWindow = ({ recipient, currentUser, chatId, onBack }) => {
                 {messages.map((msg, index) => {
                     const isCurrentUser = msg.senderId === currentUser.uid;
                     return (
-                        <div key={index} className={`mb-3 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`}>
+                        <div key={index} className={`mb-1 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`}>
                             <div 
                                 className="inline-block text-sm custom-read text-white"
                                 style={{
                                     backgroundColor: isCurrentUser ? '#5b5b5b' : '#2a2a2a',
                                     maxWidth: 'fit-content',
-                                    paddingLeft: '30px',
-                                    paddingRight: '30px',
-                                    paddingTop: '10px',
-                                    paddingBottom: '10px',
+                                    paddingLeft: '20px',
+                                    paddingRight: '20px',
+                                    paddingTop: '8px',
+                                    paddingBottom: '8px',
                                     borderRadius: '20px',
                                 }}
                             >
                                 <p className="break-words m-0">{msg.text}</p>
                                 
                             </div>
-                            <p className={`text-xs mt-1 text-muted opacity-70 pt-2 m-0 text-${isCurrentUser ? 'right' : 'left'}`} style={{ fontSize: "10px", paddingLeft: '10px' }}>
+                            <p className={`text-xs mt-1 text-muted opacity-70 pt-1 m-0 text-${isCurrentUser ? 'right' : 'left'}`} style={{ fontSize: "10px", paddingLeft: '8px' }}>
                                     {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                 </p>
                         </div>
