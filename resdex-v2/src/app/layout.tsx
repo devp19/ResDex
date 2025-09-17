@@ -68,6 +68,7 @@ export default function RootLayout({
                         { name: "About", href: "/about" },
                         { name: "Team", href: "#" },
                         { name: "Blog", href: "#" },
+                        { name: "Changelog", href: "/changelog" },
                         { name: "Careers", href: "#" },
                       ],
                     },

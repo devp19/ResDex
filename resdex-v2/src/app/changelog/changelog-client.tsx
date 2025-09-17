@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, memo } from "react";
-import { ChevronDown, ChevronUp, Search, Filter, Calendar, Tag, Zap, ExternalLink, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, Filter, Calendar, Tag, Zap, ExternalLink, X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { TextAnimate } from "@/components/magicui/text-animate";
@@ -26,7 +26,8 @@ interface FilterState {
 	search: string;
 	selectedTags: string[];
 	selectedVersions: string[];
-	dateRange: { start: string; end: string };
+	selectedYear: string;
+	selectedQuarter: string;
 }
 
 // Date formatting utility
@@ -74,6 +75,111 @@ function getQuarter(dateString: string): string {
 	return `Q4 ${year}`;
 }
 
+// Custom Dropdown Component
+const CustomDropdown = memo(function CustomDropdown({ 
+	value, 
+	onChange, 
+	options, 
+	placeholder, 
+	label 
+}: { 
+	value: string; 
+	onChange: (value: string) => void; 
+	options: string[]; 
+	placeholder: string; 
+	label: string; 
+}) {
+	const [isOpen, setIsOpen] = useState(false);
+
+	const handleSelect = useCallback((option: string) => {
+		onChange(option);
+		// Add a small delay to allow the selection animation to complete
+		setTimeout(() => setIsOpen(false), 100);
+	}, [onChange]);
+
+	const handleToggle = useCallback(() => {
+		setIsOpen(prev => !prev);
+	}, []);
+
+	return (
+		<div className="relative">
+			<label className="block text-xs text-gray-500 mb-2">{label}</label>
+			<button
+				type="button"
+				onClick={handleToggle}
+				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+			>
+				<span className={`transition-colors duration-200 ${value ? "text-gray-900" : "text-gray-500"}`}>
+					{value || placeholder}
+				</span>
+				<motion.div
+					animate={{ rotate: isOpen ? 180 : 0 }}
+					transition={{ duration: 0.3, ease: "easeInOut" }}
+				>
+					<ChevronDown className="h-4 w-4 text-gray-500" />
+				</motion.div>
+			</button>
+			
+			<AnimatePresence>
+				{isOpen && (
+					<motion.div
+						initial={{ opacity: 0, y: -8, scale: 0.95, height: 0 }}
+						animate={{ 
+							opacity: 1, 
+							y: 0, 
+							scale: 1,
+							height: "auto"
+						}}
+						exit={{ 
+							opacity: 0, 
+							y: -8, 
+							scale: 0.95,
+							height: 0
+						}}
+						transition={{ 
+							duration: 0.3, 
+							ease: "easeInOut",
+							opacity: { duration: 0.25 },
+							y: { duration: 0.3 },
+							scale: { duration: 0.3 },
+							height: { duration: 0.3 }
+						}}
+						className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden"
+						style={{ maxHeight: "12rem" }}
+					>
+						<div className="overflow-y-auto" style={{ maxHeight: "12rem" }}>
+							{options.map((option, index) => (
+								<motion.button
+									key={option}
+									type="button"
+									onClick={() => handleSelect(option)}
+									initial={{ opacity: 0, x: -10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ 
+										delay: index * 0.015,
+										duration: 0.2,
+										ease: "easeOut"
+									}}
+									className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center justify-between group transition-colors duration-150"
+								>
+									<span className="text-sm text-gray-900">{option}</span>
+									<motion.div
+										initial={{ scale: 0 }}
+										animate={{ scale: value === option ? 1 : 0 }}
+										transition={{ duration: 0.2, ease: "easeOut" }}
+									>
+										<Check className="h-4 w-4 text-blue-500" />
+									</motion.div>
+								</motion.button>
+							))}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+});
+
 // Filter Modal Component - moved outside to prevent recreation
 const FilterModal = memo(({ 
 	isOpen, 
@@ -81,18 +187,24 @@ const FilterModal = memo(({
 	filters, 
 	onSearchChange, 
 	onTagToggle, 
-	onDateRangeChange, 
+	onYearChange,
+	onQuarterChange,
 	onClearFilters, 
-	allTags 
+	allTags,
+	availableYears,
+	availableQuarters
 }: {
 	isOpen: boolean;
 	onClose: () => void;
 	filters: FilterState;
 	onSearchChange: (value: string) => void;
 	onTagToggle: (tag: string) => void;
-	onDateRangeChange: (field: 'start' | 'end', value: string) => void;
+	onYearChange: (year: string) => void;
+	onQuarterChange: (quarter: string) => void;
 	onClearFilters: () => void;
 	allTags: string[];
+	availableYears: string[];
+	availableQuarters: string[];
 }) => (
 	<AnimatePresence>
 		{isOpen && (
@@ -164,28 +276,26 @@ const FilterModal = memo(({
 							</div>
 						)}
 
-						{/* Date Range */}
+						{/* Year and Quarter Selection */}
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-3">
-								Date Range
+								Time Period
 							</label>
 							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="block text-xs text-gray-500 mb-1">From</label>
-									<Input
-										type="date"
-										value={filters.dateRange.start}
-										onChange={(e) => onDateRangeChange('start', e.target.value)}
-									/>
-								</div>
-								<div>
-									<label className="block text-xs text-gray-500 mb-1">To</label>
-									<Input
-										type="date"
-										value={filters.dateRange.end}
-										onChange={(e) => onDateRangeChange('end', e.target.value)}
-									/>
-								</div>
+								<CustomDropdown
+									value={filters.selectedYear}
+									onChange={onYearChange}
+									options={availableYears}
+									placeholder="Select Year"
+									label="Year"
+								/>
+								<CustomDropdown
+									value={filters.selectedQuarter}
+									onChange={onQuarterChange}
+									options={availableQuarters}
+									placeholder="Select Quarter"
+									label="Quarter"
+								/>
 							</div>
 						</div>
 					</div>
@@ -235,12 +345,12 @@ const HeroSection = memo(function HeroSection() {
 		<BlurFade delay={0.1} inView>
 			<div className="text-center mb-16">
 				{/* Hero Image */}
-				<div className="mb-8">
+				<div className="mb-7">
 					<Image
 						src="/beige-logo.png"
 						alt="ResDex Changelog"
-						width={80}
-						height={80}
+						width={70}
+						height={70}
 						className="mx-auto rounded-2xl"
 					/>
 				</div>
@@ -248,7 +358,7 @@ const HeroSection = memo(function HeroSection() {
 					animation="fadeIn"
 					by="line"
 					as="h1"
-					className="text-5xl md:text-6xl font-bold text-gray-900 mb-6"
+					className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
 					style={{ fontFamily: "Satoshi-Bold, sans-serif" }}
 				>
 					Changelog
@@ -315,14 +425,12 @@ const Section = memo(function Section({ title, items, icon: Icon }: { title: str
 	
 	return (
 		<motion.div 
-			className="group rounded-xl border border-gray-200 bg-white/50 p-4 hover:bg-white transition-colors"
+			className="group rounded-xl border border-gray-200 bg-white/50 p-4 hover:bg-white transition-colors cursor-pointer"
 			initial={false}
 			animate={{ height: "auto" }}
+			onClick={() => setIsExpanded(!isExpanded)}
 		>
-			<button
-				onClick={() => setIsExpanded(!isExpanded)}
-				className="flex w-full cursor-pointer items-center justify-between gap-2 text-left"
-			>
+			<div className="flex w-full items-center justify-between gap-2">
 				<div className="flex items-center gap-2">
 					{Icon && <Icon className="h-4 w-4 text-gray-600" />}
 					<span className="text-sm font-semibold text-gray-900" style={{ fontFamily: "Satoshi-Medium, sans-serif" }}>
@@ -338,7 +446,7 @@ const Section = memo(function Section({ title, items, icon: Icon }: { title: str
 				>
 					<ChevronDown className="h-4 w-4 text-gray-500" />
 				</motion.div>
-			</button>
+			</div>
 			<AnimatePresence>
 				{isExpanded && (
 					<motion.ul
@@ -377,7 +485,8 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 		search: "",
 		selectedTags: [],
 		selectedVersions: [],
-		dateRange: { start: "", end: "" }
+		selectedYear: "All Years",
+		selectedQuarter: "All Quarters"
 	});
 	const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set());
 	
@@ -403,6 +512,32 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 		return Array.from(tags).sort();
 	}, [entries]);
 
+	// Get available years and quarters
+	const availableYears = useMemo(() => {
+		const years = new Set<string>();
+		entries.forEach(entry => {
+			const year = new Date(entry.date).getFullYear().toString();
+			years.add(year);
+		});
+		const sortedYears = Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
+		return ["All Years", ...sortedYears];
+	}, [entries]);
+
+	const availableQuarters = useMemo(() => {
+		const quarters = new Set<string>();
+		entries.forEach(entry => {
+			const quarter = getQuarter(entry.date);
+			quarters.add(quarter);
+		});
+		const sortedQuarters = Array.from(quarters).sort((a, b) => {
+			const [qA, yearA] = a.split(' ');
+			const [qB, yearB] = b.split(' ');
+			if (yearA !== yearB) return parseInt(yearB) - parseInt(yearA);
+			return parseInt(qB.slice(1)) - parseInt(qA.slice(1));
+		});
+		return ["All Quarters", ...sortedQuarters];
+	}, [entries]);
+
 	// Filter entries based on search and filters
 	const filteredEntries = useMemo(() => {
 		return entries.filter(entry => {
@@ -423,17 +558,16 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 				if (!hasMatchingTag) return false;
 			}
 
-			// Date range filter
-			if (filters.dateRange.start || filters.dateRange.end) {
-				const entryDate = new Date(entry.date);
-				if (filters.dateRange.start) {
-					const startDate = new Date(filters.dateRange.start);
-					if (entryDate < startDate) return false;
-				}
-				if (filters.dateRange.end) {
-					const endDate = new Date(filters.dateRange.end);
-					if (entryDate > endDate) return false;
-				}
+			// Year filter
+			if (filters.selectedYear && filters.selectedYear !== "All Years") {
+				const entryYear = new Date(entry.date).getFullYear().toString();
+				if (entryYear !== filters.selectedYear) return false;
+			}
+
+			// Quarter filter
+			if (filters.selectedQuarter && filters.selectedQuarter !== "All Quarters") {
+				const entryQuarter = getQuarter(entry.date);
+				if (entryQuarter !== filters.selectedQuarter) return false;
 			}
 
 			return true;
@@ -506,10 +640,18 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 		}));
 	}, []);
 
-	const handleDateRangeChange = useCallback((field: 'start' | 'end', value: string) => {
+	const handleYearChange = useCallback((year: string) => {
 		setFilters(prev => ({
 			...prev,
-			dateRange: { ...prev.dateRange, [field]: value }
+			selectedYear: year,
+			selectedQuarter: "" // Reset quarter when year changes
+		}));
+	}, []);
+
+	const handleQuarterChange = useCallback((quarter: string) => {
+		setFilters(prev => ({
+			...prev,
+			selectedQuarter: quarter
 		}));
 	}, []);
 
@@ -518,7 +660,8 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 			search: "",
 			selectedTags: [],
 			selectedVersions: [],
-			dateRange: { start: "", end: "" }
+			selectedYear: "All Years",
+			selectedQuarter: "All Quarters"
 		});
 	}, []);
 
@@ -536,7 +679,8 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 		if (filters.search) count++;
 		if (filters.selectedTags.length > 0) count++;
 		if (filters.selectedVersions.length > 0) count++;
-		if (filters.dateRange.start || filters.dateRange.end) count++;
+		if (filters.selectedYear && filters.selectedYear !== "All Years") count++;
+		if (filters.selectedQuarter && filters.selectedQuarter !== "All Quarters") count++;
 		return count;
 	}, [filters]);
 
@@ -550,9 +694,12 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 				filters={filters}
 				onSearchChange={handleSearchChange}
 				onTagToggle={handleTagToggle}
-				onDateRangeChange={handleDateRangeChange}
+				onYearChange={handleYearChange}
+				onQuarterChange={handleQuarterChange}
 				onClearFilters={handleClearFilters}
 				allTags={allTags}
+				availableYears={availableYears}
+				availableQuarters={availableQuarters}
 			/>
 			
 			{/* Navigation */}
@@ -718,8 +865,11 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 													transition={{ delay: index * 0.05 }}
 													className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
 												>
-													{/* Entry Header */}
-													<div className="p-6">
+													{/* Entry Header - Clickable area */}
+													<div 
+														className="p-6 cursor-pointer"
+														onClick={() => toggleEntryExpansion(entry.fileName)}
+													>
 														<div className="flex items-start justify-between mb-4">
 															<div className="flex-1">
 																<div className="flex items-center gap-3 mb-2">
@@ -747,7 +897,10 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 															<Button
 																variant="ghost"
 																size="sm"
-																onClick={() => toggleEntryExpansion(entry.fileName)}
+																onClick={(e) => {
+																	e.stopPropagation();
+																	toggleEntryExpansion(entry.fileName);
+																}}
 																className="ml-4"
 															>
 																{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
