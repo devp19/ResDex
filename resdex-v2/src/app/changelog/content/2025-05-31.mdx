@@ -1,0 +1,37 @@
+---
+title: "Cloudflare R2 Migration"
+description: "Complete migration from AWS S3 to Cloudflare R2 storage using AWS SDK compatibility for improved performance and cost efficiency."
+date: "May 31, 2025"
+version: "2.10"
+tags: ["Storage", "Migration", "Performance"]
+features: ["Cloudflare R2 storage integration", "AWS SDK compatibility", "Environment variable configuration", "Standardized Cloudflare usage", "Improved storage performance"]
+bugFixes: ["Removed hardcoded AWS endpoints", "Fixed bucket name standardization"]
+---
+
+Major infrastructure update migrating from AWS S3 to Cloudflare R2 storage for improved performance and cost efficiency.
+
+## Storage Migration
+- **Cloudflare R2**: Complete migration from AWS S3 to Cloudflare R2
+- **AWS SDK Compatibility**: Maintained AWS SDK usage for seamless transition
+- **Easy Fallback**: Maintained compatibility for easy fallback if needed
+- **Performance**: Improved storage performance and reliability
+
+## Technical Implementation
+- **New Configuration**: Added Cloudflare config file with R2 credentials
+- **Environment Variables**: Configured R2 credentials and endpoint from environment
+- **SDK Updates**: Updated imports to use Cloudflare S3 client
+- **Standardization**: Removed hardcoded AWS endpoints and bucket names
+
+## Benefits
+- **Cost Efficiency**: Reduced storage costs with Cloudflare R2
+- **Better Performance**: Improved storage performance and speed
+- **Global CDN**: Better global content delivery
+- **Simplified Management**: Easier storage management and configuration
+
+## Migration Details
+- **Seamless Transition**: No downtime during migration
+- **Data Integrity**: All existing data preserved during migration
+- **Code Compatibility**: Minimal code changes required
+- **Future-Proof**: Easy to switch back to AWS S3 if needed
+
+This migration significantly improved ResDex's storage performance while reducing operational costs.

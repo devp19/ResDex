@@ -490,15 +490,17 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 	});
 	const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set());
 	
-	// Get the latest quarter to open by default
-	const latestQuarter = useMemo(() => {
-		if (entries.length === 0) return null;
-		const latestEntry = entries[0]; // entries are already sorted by date descending
-		return getQuarter(latestEntry.date);
+	// Get all quarters to open by default
+	const allQuarters = useMemo(() => {
+		const quarters = new Set<string>();
+		entries.forEach(entry => {
+			quarters.add(getQuarter(entry.date));
+		});
+		return Array.from(quarters);
 	}, [entries]);
 	
 	const [expandedQuarters, setExpandedQuarters] = useState<Set<string>>(
-		latestQuarter ? new Set([latestQuarter]) : new Set()
+		new Set(allQuarters)
 	);
 	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 	const router = useRouter();
