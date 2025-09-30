@@ -1259,12 +1259,12 @@ export default function CanopyDemo() {
       </section>
 
       {/* Testimonials Section */}
-      <BlurFade delay={0.1} inView style={{ marginTop: "10rem" }}>
+      {/* <BlurFade delay={0.1} inView style={{ marginTop: "10rem" }}>
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 satoshi-bold mt-20">
           Why we love<br></br> doing what we do.
         </h2>
       </BlurFade>
-      <FlatTestimonials />
+      <FlatTestimonials /> */}
 
       {/* Modern Rounded Rectangle Section */}
       <section className="w-full flex flex-col items-center justify-center py-24 bg-transparent">
