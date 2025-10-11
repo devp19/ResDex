@@ -505,11 +505,18 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 	const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 	const router = useRouter();
 
-	// Get unique tags and versions for filters
+	// Define prominent tags only
+	const prominentTags = ["Major Update", "UI", "Performance", "Bug Fixes", "Security", "Social Features", "Search", "Document Management"];
+	
+	// Get unique tags from entries that are in our prominent tags list
 	const allTags = useMemo(() => {
 		const tags = new Set<string>();
 		entries.forEach(entry => {
-			entry.tags?.forEach(tag => tags.add(tag));
+			entry.tags?.forEach(tag => {
+				if (prominentTags.includes(tag)) {
+					tags.add(tag);
+				}
+			});
 		});
 		return Array.from(tags).sort();
 	}, [entries]);
@@ -912,14 +919,16 @@ export const ChangelogClient = memo(function ChangelogClient({ entries }: Change
 														{/* Tags */}
 														{entry.tags && entry.tags.length > 0 && (
 															<div className="flex flex-wrap gap-2 mb-4">
-																{entry.tags.map(tag => (
-																	<span
-																		key={tag}
-																		className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-md"
-																	>
-																		{tag}
-																	</span>
-																))}
+																{entry.tags
+																	.filter(tag => prominentTags.includes(tag))
+																	.map(tag => (
+																		<span
+																			key={tag}
+																			className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-md"
+																		>
+																			{tag}
+																		</span>
+																	))}
 															</div>
 														)}
 													</div>
